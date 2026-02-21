@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bright Tup Up — Connexion / Inscription</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    body {
+      background: radial-gradient(circle at top left, #000 40%, #001a33 100%);
+      color: #e0f7ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    .container {
+      width: 90%; max-width: 420px;
+      background: rgba(5,10,20,0.95);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 25px #00aaff, inset 0 0 15px #003355;
+      text-align:center;
+      border:1px solid #00aaff;
+    }
+    .profile-pic {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #00ccff;
+      box-shadow: 0 0 15px #00aaff;
+      margin-bottom: 15px;
+    }
+    h1 {
+      color: #00ccff;
+      font-size: 2em;
+      margin-bottom: 20px;
+      text-shadow: 0 0 15px #00aaff;
+    }
+    input {
+      width:100%; padding:12px; margin:10px 0;
+      border:none; outline:none; border-radius:6px;
+      background:#0a0a0a; color:#00ccff; font-size:14px;
+      border:1px solid #00aaff;
+      box-shadow: inset 0 0 8px #003355;
+    }
+    button {
+      width:100%; padding:12px; border:none; border-radius:6px;
+      background: linear-gradient(90deg, #00aaff, #004466);
+      color:#000; font-weight:bold; cursor:pointer; transition:0.3s;
+      margin-top:10px; text-transform: uppercase;
+      box-shadow: 0 0 12px #00aaff;
+      display:flex; align-items:center; justify-content:center;
+      gap:10px;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #33bbff, #006699);
+      box-shadow: 0 0 20px #33bbff;
+    }
+    .switch { color:#aaa; font-size:14px; margin-top:15px; cursor:pointer; }
+    .footer { margin-top:25px; font-size:12px; color:#555; }
+    .social-btn { display:flex; flex-direction:column; gap:10px; margin-top:15px; }
+    .social-icon { width:20px; height:20px; }
+  </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <!-- PHOTO DE PROFIL EN ROND -->
+    <img src="ton_image_profil.jpg" alt="Photo de profil" class="profile-pic" />
+
+    <h1>Bright Tup Up</h1>
+
+    <!-- FORMULAIRE INSCRIPTION -->
+    <div id="signup">
+      <p>Créer ton compte</p>
+      <input type="text" id="username" placeholder="Nom d'utilisateur" required />
+      <input type="email" id="email" placeholder="Adresse email" required />
+      <input type="password" id="password" placeholder="Mot de passe" required />
+      <button onclick="signupUser()">📧 S'inscrire</button>
+      <p class="switch" onclick="toggleForms()">Déjà un compte ? Se connecter</p>
+    </div>
+
+    <!-- FORMULAIRE CONNEXION -->
+    <div id="login" style="display: none;">
+      <p>Connexion à ton compte</p>
+      <input type="email" id="loginEmail" placeholder="Adresse email" required />
+      <input type="password" id="loginPassword" placeholder="Mot de passe" required />
+      <button onclick="loginUser()">🚀 Se connecter</button>
+      <p class="switch" onclick="toggleForms()">Pas encore inscrit ? Créer un compte</p>
+
+      <!-- Connexion sociale -->
+      <div class="social-btn">
+        <button onclick="loginGoogle()">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="social-icon" alt="Google Logo" />
+          Connexion avec Google
+        </button>
+        <button onclick="loginApple()">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" class="social-icon" alt="Apple Logo" />
+          Connexion avec Apple
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p class="footer">© 2026 Bright Tup Up — Mothemax760@gmail.com</p>
+
+  <script>
+    // Configuration Firebase (remplace par tes clés du projet Bright Tup Up)
+    const firebaseConfig = {
+      apiKey: "TON_API_KEY",
+      authDomain: "brighttupup.firebaseapp.com",
+      projectId: "brighttupup",
+      storageBucket: "brighttupup.appspot.com",
+      messagingSenderId: "TON_SENDER_ID",
+      appId: "TON_APP_ID"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    function toggleForms() {
+      const s = document.getElementById("signup");
+      const l = document.getElementById("login");
+      s.style.display = s.style.display === "none" ? "block" : "none";
+      l.style.display = l.style.display === "none" ? "block" : "none";
+    }
+
+    // Inscription email
+    function signupUser() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const username = document.getElementById("username").value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          const user = userCredential.user;
+          return db.collection("brighttupup").doc(user.uid).set({
+            username: username,
+            email: email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        })
+        .then(() => alert("✅ Compte créé avec succès !"))
+        .catch(error => alert("Erreur : " + error.message));
+    }
+
+    // Connexion email
+    function loginUser() {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => alert("🚀 Connexion réussie !"))
+        .catch(error => alert("Erreur : " + error.message));
+    }
+
+    // Connexion Google
+    function loginGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then(result => {
+          alert("🔵 Connecté avec Google : " + result.user.displayName);
+        })
+        .catch(error => alert("Erreur Google : " + error.message));
+    }
+
+    // Connexion Apple
+    function loginApple() {
+      const provider = new firebase.auth.OAuthProvider('apple.com');
+      auth.signInWithPopup(provider)
+        .then(result => {
+          alert("🍏 Connecté avec Apple : " + result.user.displayName);
+        })
+        .catch(error => alert("Erreur Apple : " + error.message));
+    }
+  </script>
+</body>
+</html>
