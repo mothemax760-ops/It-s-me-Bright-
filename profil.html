@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Profil — Bright Tup Up</title>
+<style>
+  body {
+    background: radial-gradient(circle at top left, #000 40%, #001a33 100%);
+    color: #e0f7ff;
+    font-family: "Poppins", sans-serif;
+    text-align:center;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+  }
+  .profile-box {
+    width:90%; max-width:420px;
+    background:rgba(5,10,20,0.95);
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 0 25px #00aaff, inset 0 0 15px #003355;
+    border:1px solid #00aaff;
+  }
+  #profile-pic {
+    width:120px; height:120px;
+    border-radius:50%;
+    border:3px solid #00ccff;
+    object-fit:cover;
+    box-shadow:0 0 15px #00aaff;
+    margin-bottom:15px;
+  }
+  h2 { color:#00ccff; margin:10px 0; text-shadow:0 0 15px #00aaff; }
+  h3 { color:#00aaff; }
+  p { margin:5px 0; }
+  .highlight { color:#00aaff; font-weight:bold; }
+  .yellow { color:yellow; font-size:18px; }
+  button {
+    padding:12px 20px;
+    border:none; border-radius:10px;
+    cursor:pointer; font-weight:bold;
+    margin-top:10px;
+    background:linear-gradient(90deg,#00aaff,#004466);
+    color:#000;
+    box-shadow:0 0 12px #00aaff;
+    text-transform:uppercase;
+  }
+  button:hover {
+    background:linear-gradient(90deg,#33bbff,#006699);
+    box-shadow:0 0 20px #33bbff;
+  }
+  .red { background:red; color:white; }
+</style>
+</head>
+<body>
+
+<div class="profile-box">
+  <img id="profile-pic" src="https://via.placeholder.com/120" alt="Photo de profil"><br>
+  <h2 id="username">Utilisateur</h2>
+  <h3 id="dp-id"></h3>
+  <p id="email"></p>
+  <p>Rôle : <span id="role" class="highlight"></span></p>
+  <p class="yellow">💰 Solde : <span id="credits">0</span> crédits</p>
+  <p>Dernière connexion : <span id="lastLogin"></span></p>
+
+  <button onclick="logout()">❌ Déconnexion</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAHjL2jDNNbb4P6yIok_GTw8r6FMOyYTiw",
+  authDomain: "dpstore-officie.firebaseapp.com",
+  projectId: "dpstore-officie",
+  storageBucket: "dpstore-officie.appspot.com",
+  messagingSenderId: "903943973062",
+  appId: "1:903943973062:web:6501a2ec167adb31258fc7"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Charger infos depuis sessionStorage
+let sessionAccount = JSON.parse(sessionStorage.getItem("dpstore_user") || "null");
+if(!sessionAccount || !sessionAccount.email){
+  alert("Aucun compte détecté !");
+  location.href = "index.html";
+}
+
+// Récupération Firestore
+async function loadUser(){
+  try{
+    const usersSnap = await getDocs(collection(db,"users"));
+    let account = sessionAccount;
+
+    usersSnap.forEach(docSnap=>{
+      const data = docSnap.data();
+      if(data.email && data.email.toLowerCase() === sessionAccount.email.toLowerCase()){
+        account = {
+          email: data.email,
+          username: data.username ?? sessionAccount.username,
+          dp: data.dp ?? "—",
+          role: data.role ?? "user",
+          credits: Number(data.credits ?? 0),
+          photo: data.photo ?? sessionAccount.photo ?? null,
+          lastLogin: data.lastLogin ?? sessionAccount.lastLogin ?? "—"
+        };
+      }
+    });
+
+    sessionStorage.setItem("dpstore_user", JSON.stringify(account));
+
+    // Affichage
+    document.getElementById("username").textContent = account.username;
+    document.getElementById("email").textContent = account.email;
+    document.getElementById("dp-id").textContent = account.dp;
+    document.getElementById("credits").textContent = account.credits;
+    document.getElementById("lastLogin").textContent = account.lastLogin;
+    document.getElementById("role").textContent = 
+      account.role === "creator" ? "Créateur" :
+      account.role === "employee" ? "Employé" :
+      account.role === "admin" ? "Administrateur" : "Utilisateur";
+    document.getElementById("profile-pic").src = account.photo || "https://via.placeholder.com/120";
+  }catch(e){
+    console.warn("Erreur Firestore:", e);
+    alert("Erreur en récupérant les données.");
+  }
+}
+await loadUser();
+
+// Déconnexion
+function logout(){
+  sessionStorage.removeItem("dpstore_user");
+  location.href = "index.html";
+}
+window.logout = logout;
+</script>
+
+</body>
+</html>
