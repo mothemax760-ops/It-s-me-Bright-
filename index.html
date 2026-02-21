@@ -114,6 +114,7 @@
         const result = await signInWithPopup(auth, provider);
         alert("🔵 Connecté avec Google : " + result.user.displayName);
         document.getElementById("logout").style.display = "block";
+        location.href = "profil.html"; // redirection automatique
       } catch (error) {
         alert("Erreur Google : " + error.message);
       }
@@ -126,6 +127,7 @@
         const result = await signInWithPopup(auth, provider);
         alert("🍏 Connecté avec Apple : " + (result.user.displayName || "Utilisateur Apple"));
         document.getElementById("logout").style.display = "block";
+        location.href = "profil.html"; // redirection automatique
       } catch (error) {
         alert("Erreur Apple : " + error.message);
       }
