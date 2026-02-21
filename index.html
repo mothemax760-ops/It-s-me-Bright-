@@ -71,9 +71,7 @@
 
 <body>
   <div class="container">
-    <!-- PHOTO DE PROFIL EN ROND -->
     <img src="ton_image_profil.jpg" alt="Photo de profil" class="profile-pic" />
-
     <h1>Bright Tup Up</h1>
 
     <!-- FORMULAIRE INSCRIPTION -->
@@ -106,21 +104,27 @@
         </button>
       </div>
     </div>
+
+    <!-- Bouton Déconnexion -->
+    <div id="logout" style="display:none; margin-top:20px;">
+      <button onclick="logoutUser()">❌ Déconnexion</button>
+    </div>
   </div>
 
   <p class="footer">© 2026 Bright Tup Up — Mothemax760@gmail.com</p>
 
   <script>
-    // Configuration Firebase (remplace par tes clés du projet Bright Tup Up)
+    // Configuration Firebase
     const firebaseConfig = {
-      apiKey: "TON_API_KEY",
+      apiKey: "AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
       authDomain: "brighttupup.firebaseapp.com",
       projectId: "brighttupup",
       storageBucket: "brighttupup.appspot.com",
-      messagingSenderId: "TON_SENDER_ID",
-      appId: "TON_APP_ID"
+      messagingSenderId: "812394183947",
+      appId: "1:812394183947:web:d65d60d6aeee39bcc3b60e"
     };
 
+    // Initialisation
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -157,7 +161,10 @@
       const password = document.getElementById("loginPassword").value;
 
       auth.signInWithEmailAndPassword(email, password)
-        .then(() => alert("🚀 Connexion réussie !"))
+        .then(() => {
+          alert("🚀 Connexion réussie !");
+          document.getElementById("logout").style.display = "block";
+        })
         .catch(error => alert("Erreur : " + error.message));
     }
 
@@ -167,6 +174,7 @@
       auth.signInWithPopup(provider)
         .then(result => {
           alert("🔵 Connecté avec Google : " + result.user.displayName);
+          document.getElementById("logout").style.display = "block";
         })
         .catch(error => alert("Erreur Google : " + error.message));
     }
@@ -176,10 +184,23 @@
       const provider = new firebase.auth.OAuthProvider('apple.com');
       auth.signInWithPopup(provider)
         .then(result => {
-          alert("🍏 Connecté avec Apple : " + result.user.displayName);
+          alert("🍏 Connecté avec Apple : " + (result.user.displayName || "Utilisateur Apple"));
+          document.getElementById("logout").style.display = "block";
         })
         .catch(error => alert("Erreur Apple : " + error.message));
     }
+
+    // Déconnexion
+    function logoutUser() {
+      auth.signOut()
+        .then(() => {
+          alert("❌ Déconnecté !");
+          document.getElementById("logout").style.display = "none";
+          document.getElementById("signup").style.display = "block";
+          document.getElementById("login").style.display = "none";
+        })
+        .catch(error => alert("Erreur déconnexion : " + error.message));
+    }
   </script>
 </body>
-</html>
+</
