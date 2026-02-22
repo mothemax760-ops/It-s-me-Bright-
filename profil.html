@@ -68,73 +68,83 @@
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAHjL2jDNNbb4P6yIok_GTw8r6FMOyYTiw",
-  authDomain: "dpstore-officie.firebaseapp.com",
-  projectId: "dpstore-officie",
-  storageBucket: "dpstore-officie.appspot.com",
-  messagingSenderId: "903943973062",
-  appId: "1:903943973062:web:6501a2ec167adb31258fc7"
+  apiKey: "AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
+  authDomain: "brighttupup.firebaseapp.com",
+  projectId: "brighttupup",
+  storageBucket: "brighttupup.appspot.com",
+  messagingSenderId: "812394183947",
+  appId: "1:812394183947:web:d65d60d6aeee39bcc3b60e"
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Charger infos depuis sessionStorage
-let sessionAccount = JSON.parse(sessionStorage.getItem("dpstore_user") || "null");
-if(!sessionAccount || !sessionAccount.email){
-  alert("Aucun compte détecté !");
-  location.href = "index.html";
-}
+// Vérifier l'état de connexion Firebase
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    // Utilisateur connecté
+    let account = {
+      email: user.email,
+      username: user.displayName || "Utilisateur",
+      photo: user.photoURL || "https://via.placeholder.com/120",
+      role: "user",
+      credits: 0,
+      lastLogin: new Date().toLocaleString()
+    };
 
-// Récupération Firestore
-async function loadUser(){
-  try{
-    const usersSnap = await getDocs(collection(db,"users"));
-    let account = sessionAccount;
+    // Charger infos Firestore si dispo
+    try {
+      const usersSnap = await getDocs(collection(db,"users"));
+      usersSnap.forEach(docSnap=>{
+        const data = docSnap.data();
+        if(data.email && data.email.toLowerCase() === user.email.toLowerCase()){
+          account = {
+            email: data.email,
+            username: data.username ?? account.username,
+            dp: data.dp ?? "—",
+            role: data.role ?? "user",
+            credits: Number(data.credits ?? 0),
+            photo: data.photo ?? account.photo,
+            lastLogin: data.lastLogin ?? account.lastLogin
+          };
+        }
+      });
+    } catch(e){
+      console.warn("Erreur Firestore:", e);
+    }
 
-    usersSnap.forEach(docSnap=>{
-      const data = docSnap.data();
-      if(data.email && data.email.toLowerCase() === sessionAccount.email.toLowerCase()){
-        account = {
-          email: data.email,
-          username: data.username ?? sessionAccount.username,
-          dp: data.dp ?? "—",
-          role: data.role ?? "user",
-          credits: Number(data.credits ?? 0),
-          photo: data.photo ?? sessionAccount.photo ?? null,
-          lastLogin: data.lastLogin ?? sessionAccount.lastLogin ?? "—"
-        };
-      }
-    });
-
+    // Sauvegarde session
     sessionStorage.setItem("dpstore_user", JSON.stringify(account));
 
     // Affichage
     document.getElementById("username").textContent = account.username;
     document.getElementById("email").textContent = account.email;
-    document.getElementById("dp-id").textContent = account.dp;
+    document.getElementById("dp-id").textContent = account.dp || "";
     document.getElementById("credits").textContent = account.credits;
     document.getElementById("lastLogin").textContent = account.lastLogin;
     document.getElementById("role").textContent = 
       account.role === "creator" ? "Créateur" :
       account.role === "employee" ? "Employé" :
       account.role === "admin" ? "Administrateur" : "Utilisateur";
-    document.getElementById("profile-pic").src = account.photo || "https://via.placeholder.com/120";
-  }catch(e){
-    console.warn("Erreur Firestore:", e);
-    alert("Erreur en récupérant les données.");
+    document.getElementById("profile-pic").src = account.photo;
+  } else {
+    // Pas connecté → retour à index
+    location.href = "index.html";
   }
-}
-await loadUser();
+});
 
 // Déconnexion
 function logout(){
-  sessionStorage.removeItem("dpstore_user");
-  location.href = "index.html";
+  signOut(auth).then(()=>{
+    sessionStorage.removeItem("dpstore_user");
+    location.href = "index.html";
+  });
 }
 window.logout = logout;
 </script>
