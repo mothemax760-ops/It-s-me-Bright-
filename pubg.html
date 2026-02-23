@@ -1,352 +1,126 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bright Tup Up | PUBG MOBILE</title>
-
 <style>
-body {
-  font-family: 'Poppins', sans-serif;
-  background: #0b0f1c;
-  margin: 0;
-  padding: 0;
-  color: #fff;
-}
-
-/* HEADER */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(8px);
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  border-bottom: 1px solid #00ffae25;
-}
-
-.back-btn {
-  background: none;
-  border: 2px solid #00ffb3;
-  padding: 6px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  color: #00ffb3;
-  font-weight: bold;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  color: #00ffb3;
-  font-weight: 700;
-  font-size: 1.4rem;
-  letter-spacing: 2px;
-}
-
-.right-box {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.cart-btn {
-  cursor: pointer;
-  font-size: 1.4rem;
-}
-
-/* BALANCE */
-.balance-bubble {
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: rgba(0,255,179,0.08);
-  color: #00ffb3;
-  font-weight: 700;
-  border: 1px solid rgba(0,255,179,0.15);
-}
-
-/* PRODUITS */
-.product-box {
-  background: #111726;
-  margin: 15px;
-  padding: 18px;
-  border-radius: 14px;
-  box-shadow: 0 0 12px rgba(0,255,179,0.08);
-}
-.product-header {
-  display: flex;
-  align-items: center;
-}
-.product-img {
-  width: 75px;
-  height: 40px;
-  position: relative;
-  margin-right: 12px;
-}
-/* AK-47 CSS */
-.ak47 {
-  position: relative;
-  width: 75px;
-  height: 40px;
-}
-.ak47 .barrel {
-  position: absolute;
-  top: 12px;
-  left: 0;
-  width: 60px;
-  height: 4px;
-  background: #00ffb3;
-  border-radius: 2px;
-}
-.ak47 .stock {
-  position: absolute;
-  bottom: 0;
-  left: 50px;
-  width: 18px;
-  height: 12px;
-  background: #00ffb3;
-  border-radius: 2px;
-}
-.ak47 .mag {
-  position: absolute;
-  bottom: 12px;
-  left: 20px;
-  width: 6px;
-  height: 16px;
-  background: #00ffb3;
-  transform: rotate(-10deg);
-  border-radius: 1px;
-}
-.ak47 .sight {
-  position: absolute;
-  top: 8px;
-  right: 0;
-  width: 6px;
-  height: 4px;
-  background: #00ffb3;
-  border-radius: 1px;
-}
-
-.product-info {
-  flex: 1;
-}
-.product-name {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-.status-tag {
-  display: inline-block;
-  background: #00ff80;
-  color: #000;
-  padding: 3px 10px;
-  border-radius: 10px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  margin-top: 6px;
-}
-.category-tag {
-  display: inline-block;
-  background: #50545b;
-  color: #fff;
-  padding: 3px 10px;
-  border-radius: 10px;
-  font-size: 0.8rem;
-  margin-left: 6px;
-}
-.price {
-  margin-top: 6px;
-  color: #00ffb3;
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
-.add-btn {
-  width: 100%;
-  margin-top: 14px;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
-  background: #00ffb3;
-  color: #000;
-  cursor: pointer;
-}
-
-/* POPUP FORM */
-#popup {
-  position: fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(4px);
-  display:none;
-  z-index: 9999;
-}
-.popup-content {
-  width:90%;
-  max-width:380px;
-  background:#111726;
-  padding:20px;
-  border-radius:14px;
-  box-shadow:0 0 18px #00ffb344;
-}
-.form-input {
-  width:100%;
-  margin-top:12px;
-  padding:10px;
-  background:#0e1320;
-  border-radius:8px;
-  border:1px solid #00ffb320;
-  color:white;
-  font-size:1rem;
-}
-.submit-btn {
-  width:100%;
-  margin-top:16px;
-  padding:12px;
-  background:#00ffb3;
-  color:#000;
-  border:none;
-  border-radius:10px;
-  font-weight:bold;
-  cursor:pointer;
-}
-.close-btn {
-  margin-top:10px;
-  width:100%;
-  padding:10px;
-  background:#ff3b3b;
-  border:none;
-  border-radius:10px;
-  font-weight:bold;
-  cursor:pointer;
-}
+  body {margin:0;font-family:'Poppins',sans-serif;background:#001a33;color:#e0f7ff;}
+  header {background:rgba(5,10,20,0.95);padding:15px 25px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 0 15px #ff7b00aa;position:sticky;top:0;z-index:10;}
+  header h1 {font-size:1.5rem;font-weight:700;color:#ffb347;text-shadow:0 0 15px #ff7b00,0 0 30px #ff4500;}
+  .balance-box {background:rgba(255,123,0,0.2);border:1px solid #ff7b00;padding:6px 12px;border-radius:10px;font-weight:bold;color:#ffae00;margin-right:10px;}
+  .container {padding:30px;}
+  .section-title {font-size:1.8rem;margin:20px 0;text-align:center;text-shadow:0 0 10px #ff6f00;letter-spacing:2px;}
+  .grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:25px;}
+  .card {position:relative;background:linear-gradient(145deg,rgba(255,140,0,0.2),rgba(0,0,0,0.6));border:2px solid #ff6f00;border-radius:15px;padding:20px;text-align:center;box-shadow:0 0 20px #ff7b00aa;transition:0.3s;overflow:hidden;}
+  .card:hover {transform:scale(1.05);box-shadow:0 0 30px #ffae00;}
+  .card h3 {font-size:1.2rem;margin-bottom:10px;}
+  .status {background:#00ff99;color:#000;padding:3px 10px;border-radius:10px;font-size:0.8rem;font-weight:700;}
+  .tag {background:#ff7b00;color:#000;padding:3px 10px;border-radius:10px;font-size:0.8rem;font-weight:700;margin-left:5px;}
+  .price {font-size:1.1rem;font-weight:bold;color:#ffb347;text-shadow:0 0 5px #ff7b00;margin-top:10px;}
+  .btn-primary {background:#ff7b00;color:#000;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:bold;margin-top:15px;transition:0.3s;}
+  .btn-primary:hover {background:#fff;color:#ff7b00;box-shadow:0 0 20px #ffae00;}
+  .back-btn {position:fixed;top:20px;left:20px;background:rgba(255,123,0,0.2);border:1px solid #ff7b00;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;z-index:50;transition:0.3s;}
+  .back-btn:hover {background:#ff7b00;color:#000;}
+  .toast {position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#ff7b00;color:#000;padding:10px 20px;border-radius:10px;font-weight:bold;opacity:0;transition:opacity 0.4s;}
+  .toast.show {opacity:1;}
+  /* AK47 CSS */
+  .ak47 {position:relative;width:75px;height:40px;margin:auto 0 12px 0;}
+  .ak47 .barrel {position:absolute;top:12px;left:0;width:60px;height:4px;background:#ff7b00;border-radius:2px;}
+  .ak47 .stock {position:absolute;bottom:0;left:50px;width:18px;height:12px;background:#ff7b00;border-radius:2px;}
+  .ak47 .mag {position:absolute;bottom:12px;left:20px;width:6px;height:16px;background:#ff7b00;transform:rotate(-10deg);border-radius:1px;}
+  .ak47 .sight {position:absolute;top:8px;right:0;width:6px;height:4px;background:#ff7b00;border-radius:1px;}
 </style>
 </head>
-
 <body>
 
+<button class="back-btn" onclick="window.location.href='produits.html'">⬅ Retour</button>
+
 <header>
-  <button class="back-btn" onclick="window.location.href='produits.html'">← Retour</button>
-
-  <div class="logo">Bright Tup Up</div>
-
-  <div class="right-box">
-    <div class="balance-bubble" id="balanceBox">0 G</div>
-    <div class="cart-btn" onclick="gotoCart()">🛒(<span id="cartCount">0</span>)</div>
+  <h1>Bright Tup Up — PUBG MOBILE</h1>
+  <div style="display:flex; align-items:center;">
+    <div class="balance-box" id="balanceBox">0 G</div>
   </div>
 </header>
 
-<h2 style="margin-left:15px;color:#00ffb3;font-size:1.6rem;">PUBG MOBILE UC</h2>
-
-<div id="product-list"></div>
-
-<!-- POPUP -->
-<div id="popup">
-  <div class="popup-content">
-    <h3 id="popupTitle" style="margin:0 0 10px 0;color:#00ffb3;"></h3>
-
-    <input id="popupName" class="form-input" placeholder="Nom du compte">
-    <input id="popupUID" class="form-input" placeholder="UID du compte">
-
-    <button class="submit-btn" onclick="validateForm()">CONFIRMER</button>
-    <button class="close-btn" onclick="closePopup()">Annuler</button>
-  </div>
+<div class="container">
+  <h2 class="section-title">PUBG MOBILE UC</h2>
+  <div class="grid" id="productGrid"></div>
 </div>
 
+<div id="toast" class="toast">✅ Ajouté au panier</div>
+
 <script>
-function safeParse(str){ try{ return JSON.parse(str); }catch(e){ return null; } }
-
-let user = safeParse(sessionStorage.getItem("dpstore_user") || "null");
-if(!user || !user.email || !user.dp || !user.username){
-    alert("⚠ Accès refusé : vous devez être connecté.");
-    window.location.href = "index.html";
+/* ==========================
+   🔐 PROFIL SÉCURISÉ
+========================== */
+let user = JSON.parse(sessionStorage.getItem("dpstore_user")||"null");
+if(!user || !user.email || !user.username){
+  alert("⚠ Vous devez être connecté !");
+  window.location.href="index.html";
 }
 
-function normalizeId(str){ return String(str || "guest").toLowerCase().replace(/[^a-z0-9@.-]/g,"_").replace(/@/g,"_at_"); }
-function getCartKey(){ return "cart_" + normalizeId(user.email); }
+/* ==========================
+   PANIER PAR UTILISATEUR
+========================== */
+function normalizeId(str){ return (str||"guest").toLowerCase().replace(/[^a-z0-9@.-]/g,"_").replace(/@/g,"_at_"); }
+function getCartKey(){ return "cart_"+normalizeId(user.email); }
 function loadCart(){ return JSON.parse(localStorage.getItem(getCartKey())||"[]"); }
-function saveCart(cart){ localStorage.setItem(getCartKey(), JSON.stringify(cart)); }
+function saveCart(cart){ localStorage.setItem(getCartKey(),JSON.stringify(cart)); }
 
-function updateCartCount(){ document.getElementById("cartCount").textContent = loadCart().length; }
-function updateBalanceUI(){ 
-  user = safeParse(sessionStorage.getItem("dpstore_user") || "null") || user;
-  document.getElementById("balanceBox").textContent = (user.balance ?? 0) + " G";
+function updateBalanceUI(){
+  user = JSON.parse(sessionStorage.getItem("dpstore_user")||JSON.stringify(user));
+  document.getElementById("balanceBox").textContent=(user.balance??0)+" G";
 }
-function gotoCart(){ window.location.href="cart.html"; }
 
+function showToast(){
+  const toast=document.getElementById("toast");
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),1500);
+}
+
+/* ==========================
+   PRODUITS
+========================== */
 const products = [
-  { uc:"60 UC", price:180 },
-  { uc:"120 UC", price:350 },
-  { uc:"325 UC", price:850 },
-  { uc:"660 UC", price:1650 },
-  { uc:"1800 UC", price:3500 }
+  { name:"60 UC", price:180 },
+  { name:"120 UC", price:350 },
+  { name:"325 UC", price:850 },
+  { name:"660 UC", price:1650 },
+  { name:"1800 UC", price:3500 }
 ];
 products.forEach(p=>p.price=Math.round(p.price*1.20));
 
-let selectedProduct = null;
-function openForm(product){
-  selectedProduct = product;
-  document.getElementById("popupTitle").textContent = `${product.uc} - ${product.price} HTG`;
-  document.getElementById("popupName").value = user.username ?? "";
-  document.getElementById("popupUID").value = "";
-  document.getElementById("popup").style.display="flex";
-}
-function closePopup(){ document.getElementById("popup").style.display="none"; }
-
-function validateForm(){
-  const name = document.getElementById("popupName").value.trim();
-  const uid  = document.getElementById("popupUID").value.trim();
-  if(!name || !uid){ alert("⚠ Merci de remplir le nom du compte et UID."); return; }
-
-  const item = {
-    name:selectedProduct.uc,
-    price:selectedProduct.price,
-    buyer:user.email,
-    date:new Date().toLocaleString(),
-    status:"En attente",
-    meta:{uid,name}
-  };
-  const cart = loadCart();
-  cart.push(item);
-  saveCart(cart);
-  updateCartCount();
-  closePopup();
-  alert("✔ Produit ajouté au panier !");
-}
-
-/* AFFICHAGE PRODUITS */
-const list = document.getElementById("product-list");
+const grid=document.getElementById("productGrid");
 products.forEach(p=>{
-  const div = document.createElement("div");
-  div.className="product-box";
-  div.innerHTML=`
-    <div class="product-header">
-      <div class="product-img"><div class="ak47"></div></div>
-      <div class="product-info">
-        <div class="product-name">${p.uc}</div>
-        <span class="status-tag">Disponible</span>
-        <span class="category-tag">PUBG MOBILE</span>
-        <div class="price">${p.price} HTG</div>
-      </div>
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`
+    <div class="ak47">
+      <div class="barrel"></div>
+      <div class="stock"></div>
+      <div class="mag"></div>
+      <div class="sight"></div>
     </div>
-    <button class="add-btn">AJOUTER AU PANIER</button>
+    <h3>${p.name}</h3>
+    <span class="status">Disponible</span><span class="tag">PUBG</span>
+    <div class="price">${p.price} HTG</div>
+    <button class="btn-primary">Acheter</button>
   `;
-  div.querySelector("button").addEventListener("click", ()=>openForm(p));
-  list.appendChild(div);
+  card.querySelector("button").addEventListener("click",()=>{
+    const cart=loadCart();
+    cart.push({name:p.name,price:p.price,buyer:user.email,date:new Date().toLocaleString(),status:"En attente",meta:{accountName:user.username}});
+    saveCart(cart);
+    showToast();
+    updateBalanceUI();
+  });
+  grid.appendChild(card);
 });
 
+/* INIT UI */
 updateBalanceUI();
-updateCartCount();
 setInterval(updateBalanceUI,1500);
 </script>
+
 </body>
 </html>
