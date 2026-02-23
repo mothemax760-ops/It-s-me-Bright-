@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Bright Tup Up — Diamants Free Fire</title>
+
+<style>
+body{
+  background: radial-gradient(circle at top left, #000 40%, #001a33 100%);
+  color:#e0f7ff;
+  font-family:"Poppins",sans-serif;
+  margin:0;
+}
+
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:16px 22px;
+  border-bottom:1px solid #00aaff;
+  background:rgba(5,10,20,0.95);
+  box-shadow:0 0 15px #00aaff;
+}
+
+.brand{
+  font-weight:800;
+  color:#00ccff;
+  font-size:20px;
+  text-shadow:0 0 12px #00aaff;
+}
+
+.balance{
+  background:rgba(0,0,0,0.4);
+  padding:6px 14px;
+  border-radius:999px;
+  font-weight:700;
+  color:#00ccff;
+  font-size:15px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  border:1px solid #00aaff;
+  box-shadow:0 0 10px #00aaff;
+}
+
+.verified-badge{
+  width:14px;
+  height:14px;
+}
+
+main{
+  max-width:1100px;
+  margin:24px auto;
+  padding:0 18px;
+}
+
+h1{
+  font-size:22px;
+  font-weight:800;
+  color:#00ccff;
+  text-shadow:0 0 12px #00aaff;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+  margin-top:22px;
+}
+
+.card{
+  background:rgba(5,10,20,0.95);
+  border:1px solid #00aaff;
+  border-radius:12px;
+  padding:14px;
+  box-shadow:0 0 15px #003355;
+}
+
+.card:hover{
+  box-shadow:0 0 25px #00aaff;
+}
+
+.title{
+  font-weight:700;
+  color:#00ccff;
+}
+
+.price{
+  margin-top:8px;
+  color:#00ff99;
+  font-weight:800;
+  font-size:18px;
+}
+
+.btn{
+  margin-top:12px;
+  background:linear-gradient(90deg,#00aaff,#004466);
+  color:#000;
+  border:none;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.btn:hover{
+  box-shadow:0 0 15px #00aaff;
+}
+
+.toolbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.back,.cart-btn{
+  border:1px solid #00aaff;
+  background:rgba(0,0,0,0.4);
+  color:#00ccff;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.modal{
+  position:fixed;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.7);
+}
+
+.modal-card{
+  background:rgba(5,10,20,0.95);
+  padding:18px;
+  border-radius:12px;
+  border:1px solid #00aaff;
+  box-shadow:0 0 20px #00aaff;
+}
+
+.input{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  background:#000;
+  border:1px solid #00aaff;
+  border-radius:8px;
+  color:#fff;
+}
+
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Bright Tup Up</div>
+
+  <div class="balance">
+    <img id="badge" class="verified-badge hidden"
+    src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg">
+    <span id="balanceValue">Utilisateur • 0 G</span>
+  </div>
+
+</header>
+
+<main>
+
+<div class="toolbar">
+
+<h1>Achat des diamants — Free Fire</h1>
+
+<div>
+<button class="cart-btn" onclick="location.href='cart.html'">🛒 Panier</button>
+<button class="back" onclick="location.href='produits.html'">← Retour</button>
+</div>
+
+</div>
+
+<div class="grid" id="grid"></div>
+
+</main>
+
+<div id="modal" class="modal">
+
+<div class="modal-card">
+
+<h3 id="modalTitle">Acheter</h3>
+
+<input id="ffId" class="input" placeholder="ID joueur">
+
+<button id="confirm" class="btn">Ajouter</button>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// CONFIG Firebase
+const firebaseConfig={
+  apiKey:"AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
+  authDomain:"brighttupup.firebaseapp.com",
+  projectId:"brighttupup",
+  storageBucket:"brighttupup.appspot.com",
+  messagingSenderId:"812394183947",
+  appId:"1:812394183947:web:d65d60d6aeee39bcc3b60e"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+let user={};
+
+// SYSTEME CONNEXION
+onAuthStateChanged(auth,async(firebaseUser)=>{
+  if(!firebaseUser){
+    location.href="index.html";
+    return;
+  }
+
+  let account={
+    email:firebaseUser.email,
+    username:firebaseUser.displayName||"Utilisateur",
+    photo:firebaseUser.photoURL||"",
+    balance:0,
+    role:"user"
+  };
+
+  // charger Firestore
+  try{
+    const snap=await getDocs(collection(db,"users"));
+    snap.forEach(doc=>{
+      const data=doc.data();
+      if(data.email?.toLowerCase()==firebaseUser.email.toLowerCase()){
+        account.username=data.username??account.username;
+        account.balance=Number(data.credits??0);
+        account.role=data.role??"user";
+        account.photo=data.photo??account.photo;
+      }
+    });
+  }catch(e){
+    console.warn("Erreur Firestore",e);
+  }
+
+  // sauvegarde session
+  sessionStorage.setItem("dpstore_user",JSON.stringify(account));
+
+  // appliquer
+  user=account;
+  updateBalance();
+});
+
+// UPDATE UI
+function updateBalance(){
+  document.getElementById("balanceValue").textContent=
+  `${user.username} • ${user.balance} G`;
+
+  if(["admin","creator","employee"].includes(user.role))
+    document.getElementById("badge").classList.remove("hidden");
+}
+
+// PRODUITS
+const PRODUCTS=[
+  {id:"ff1",qty:"100 + 10",price:204},
+  {id:"ff2",qty:"200 + 20",price:408},
+  {id:"ff3",qty:"310 + 31",price:588}
+];
+
+const grid=document.getElementById("grid");
+
+PRODUCTS.forEach(p=>{
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`
+    <div class="title">${p.qty}</div>
+    <div class="price">${p.price} G</div>
+    <button class="btn" onclick="buy('${p.id}')">Acheter</button>
+  `;
+  grid.appendChild(card);
+});
+
+window.buy=(id)=>{
+  document.getElementById("modal").style.display="flex";
+};
+
+document.getElementById("confirm").onclick=()=>{
+  document.getElementById("modal").style.display="none";
+  alert("Ajouté au panier");
+};
+
+</script>
+
+</body>
+</html>
