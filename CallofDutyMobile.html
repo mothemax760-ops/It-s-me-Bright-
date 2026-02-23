@@ -22,30 +22,39 @@ body {
     font-weight: bold;
     letter-spacing: 2px;
     color: #00ccff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
 }
 
-.football-ball {
-    width:24px; height:24px;
-    background:#fff;
-    border-radius:50%;
-    position:relative;
-    display:inline-block;
-    box-shadow: inset -2px -2px 0 #000, inset 2px 2px 0 #000;
+/* ===================== ICONE D'ARME ===================== */
+.weapon-icon {
+    width: 30px;
+    height: 12px;
+    background: #00ccff;
+    position: relative;
+    display: inline-block;
+    border-radius: 2px;
+    margin-right: 10px;
 }
-.football-ball::before,
-.football-ball::after {
+.weapon-icon::before {
     content:"";
     position:absolute;
-    width:10px; height:10px;
-    background:#000;
-    border-radius:2px;
-    top:7px; left:7px;
+    width:6px;
+    height:20px;
+    background:#00ccff;
+    top:-4px;
+    left:2px;
+    border-radius:1px;
 }
-.football-ball::after { left:auto; right:7px; }
+.weapon-icon::after {
+    content:"";
+    position:absolute;
+    width:8px;
+    height:8px;
+    background:#00ccff;
+    top:2px;
+    right:-6px;
+    transform: rotate(45deg);
+    border-radius:1px;
+}
 
 #soldeBox {
     text-align:center;
@@ -81,15 +90,14 @@ body {
 .product-img {
     width: 75px;
     height: 75px;
-    border-radius: 50%;
-    background:#fff;
+    border-radius: 10px;
+    background:#111;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 28px;
-    color: #000;
+    color: #00ccff;
     margin-right: 20px;
-    border: 2px solid #00aaff;
 }
 
 .product-info h3 { margin: 0; font-size: 22px; }
@@ -219,7 +227,7 @@ select, input {
 
 <body>
 
-<div class="header"><span class="football-ball"></span> Bright Tup Up</div>
+<div class="header"><span class="weapon-icon"></span> Bright Tup Up</div>
 
 <div id="soldeBox">Solde : 0 G</div>
 
@@ -254,22 +262,15 @@ select, input {
 <button class="cart-btn" onclick="ouvrirPanier()">Voir panier</button>
 
 <script>
-/* ==========================
-   🔥 PROFIL SÉCURISÉ
-========================== */
 let user = JSON.parse(sessionStorage.getItem("dpstore_user") || "{}");
-
 if (!user.email || !user.username) { 
     alert("⚠ Vous devez être connecté !");
     window.location.href = "index.html";
 }
-
 if (!user.balance) user.balance = 0;
 document.getElementById("soldeBox").textContent = "Solde : " + user.balance + " G";
 
-/* ==========================
-   🔥 LISTE PAYS
-========================== */
+/* LISTE PAYS */
 const countries = [
     { name: "Haïti", code: "+509" },
     { name: "France", code: "+33" },
@@ -286,9 +287,7 @@ countries.forEach(c => {
     countrySelect.appendChild(opt);
 });
 
-/* ==========================
-   🔥 PRODUITS
-========================== */
+/* PRODUITS */
 const produits = [
     { titre: "WEEKLY SUPPLY PASS", prix: 450 },
     { titre: "MONTHLY SUPPLY PASS", prix: 1750 },
@@ -305,7 +304,7 @@ function afficherProduits() {
         const prixFinal = Math.round(p.prix * 1.20);
         html += `
         <div class="product-card">
-            <div class="product-img">⚽</div>
+            <div class="product-img"><span class="weapon-icon"></span></div>
             <div class="product-info">
                 <h3>${p.titre}</h3>
                 <span class="tag">Disponible</span>
@@ -319,9 +318,7 @@ function afficherProduits() {
 }
 afficherProduits();
 
-/* ==========================
-   🔥 FORMULAIRE
-========================== */
+/* FORMULAIRE */
 function openForm(titre, prix){
     produitSelectionne = { titre, prix };
     document.getElementById("form-title").innerText = titre;
@@ -329,9 +326,7 @@ function openForm(titre, prix){
 }
 function closeForm(){ document.getElementById("overlay").style.display = "none"; }
 
-/* ==========================
-   🔥 PANIER PAR UTILISATEUR
-========================== */
+/* PANIER */
 function normalizeId(str){ return (str||"guest").toLowerCase().replace(/[^a-z0-9@.-]/g,"_").replace(/@/g,"_at_"); }
 function getCartKey(){ return "cart_" + normalizeId(user.email); }
 function loadCart(){ return JSON.parse(localStorage.getItem(getCartKey())||"[]"); }
@@ -366,9 +361,6 @@ function ouvrirPanier(){
     window.location.href = "cart.html";
 }
 
-/* ==========================
-   🔥 SOLDE DYNAMIQUE
-========================== */
 setInterval(()=> {
     document.getElementById("soldeBox").textContent = "Solde : " + (user.balance ?? 0) + " G";
 }, 1500);
