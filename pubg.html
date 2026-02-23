@@ -24,12 +24,19 @@
   .back-btn:hover {background:#ff7b00;color:#000;}
   .toast {position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#ff7b00;color:#000;padding:10px 20px;border-radius:10px;font-weight:bold;opacity:0;transition:opacity 0.4s;}
   .toast.show {opacity:1;}
-  /* AK47 CSS */
   .ak47 {position:relative;width:75px;height:40px;margin:auto 0 12px 0;}
   .ak47 .barrel {position:absolute;top:12px;left:0;width:60px;height:4px;background:#ff7b00;border-radius:2px;}
   .ak47 .stock {position:absolute;bottom:0;left:50px;width:18px;height:12px;background:#ff7b00;border-radius:2px;}
   .ak47 .mag {position:absolute;bottom:12px;left:20px;width:6px;height:16px;background:#ff7b00;transform:rotate(-10deg);border-radius:1px;}
   .ak47 .sight {position:absolute;top:8px;right:0;width:6px;height:4px;background:#ff7b00;border-radius:1px;}
+
+  /* POPUP */
+  #popup {position:fixed;top:0;left:0;width:100%;height:100%;display:none;justify-content:center;align-items:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:9999;}
+  .popup-content {width:90%;max-width:380px;background:#001a33;padding:20px;border-radius:14px;box-shadow:0 0 20px #ff7b0044;}
+  .popup-content h2 {text-align:center;color:#ffb347;}
+  .popup-content input, .popup-content select {width:100%;padding:12px;margin:8px 0;border-radius:10px;border:none;background:#0a1a33;color:#e0f7ff;}
+  .popup-content .submit-btn {width:100%;padding:12px;margin-top:10px;border:none;border-radius:10px;background:#ff7b00;color:#000;font-weight:bold;cursor:pointer;}
+  .popup-content .close-btn {width:100%;padding:12px;margin-top:10px;border:none;border-radius:10px;background:#333;color:#fff;font-weight:bold;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -50,48 +57,64 @@
 
 <div id="toast" class="toast">✅ Ajouté au panier</div>
 
+<!-- POPUP ACHAT -->
+<div id="popup">
+  <div class="popup-content">
+    <h2 id="popupTitle">Produit</h2>
+    <select id="accountType">
+      <option value="">Type de compte</option>
+      <option>Google</option>
+      <option>PUBG</option>
+      <option>Facebook</option>
+    </select>
+    <input type="email" id="emailForm" placeholder="Email">
+    <input type="password" id="passwordForm" placeholder="Mot de passe">
+    <input type="text" id="uidForm" placeholder="UID du compte">
+    <select id="countryForm"></select>
+    <input type="text" id="whatsappForm" placeholder="Numéro WhatsApp">
+    <button class="submit-btn" onclick="addToCart()">Ajouter au panier</button>
+    <button class="close-btn" onclick="closePopup()">Fermer</button>
+  </div>
+</div>
+
 <script>
 /* ==========================
-   🔐 PROFIL SÉCURISÉ
+   UTIL + PROFIL CONNECTÉ
 ========================== */
-let user = JSON.parse(sessionStorage.getItem("dpstore_user")||"null");
-if(!user || !user.email || !user.username){
-  alert("⚠ Vous devez être connecté !");
-  window.location.href="index.html";
-}
+function safeParse(str){try{return JSON.parse(str);}catch(e){return null;}}
+let user=safeParse(sessionStorage.getItem("dpstore_user"))||null;
+if(!user||!user.email||!user.username){alert("⚠ Vous devez être connecté !");window.location.href="index.html";}
+
+function normalizeId(str){return (str||"guest").toLowerCase().replace(/[^a-z0-9@.-]/g,"_").replace(/@/g,"_at_");}
+function getCartKey(){return "cart_"+normalizeId(user.email);}
+function loadCart(){return JSON.parse(localStorage.getItem(getCartKey())||"[]");}
+function saveCart(cart){localStorage.setItem(getCartKey(),JSON.stringify(cart));}
+
+function updateBalanceUI(){user=safeParse(sessionStorage.getItem("dpstore_user"))||user;document.getElementById("balanceBox").textContent=(user.balance??0)+" G";}
+function showToast(){const t=document.getElementById("toast");t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1500);}
 
 /* ==========================
-   PANIER PAR UTILISATEUR
+   LISTE PAYS
 ========================== */
-function normalizeId(str){ return (str||"guest").toLowerCase().replace(/[^a-z0-9@.-]/g,"_").replace(/@/g,"_at_"); }
-function getCartKey(){ return "cart_"+normalizeId(user.email); }
-function loadCart(){ return JSON.parse(localStorage.getItem(getCartKey())||"[]"); }
-function saveCart(cart){ localStorage.setItem(getCartKey(),JSON.stringify(cart)); }
-
-function updateBalanceUI(){
-  user = JSON.parse(sessionStorage.getItem("dpstore_user")||JSON.stringify(user));
-  document.getElementById("balanceBox").textContent=(user.balance??0)+" G";
-}
-
-function showToast(){
-  const toast=document.getElementById("toast");
-  toast.classList.add("show");
-  setTimeout(()=>toast.classList.remove("show"),1500);
-}
+const countries=[{name:"Haïti",code:"+509"},{name:"France",code:"+33"},{name:"Canada",code:"+1"},{name:"États-Unis",code:"+1"},{name:"République Dominicaine",code:"+1-809"}];
+const countrySelect=document.getElementById("countryForm");
+countries.forEach(c=>{let opt=document.createElement("option");opt.value=c.code;opt.textContent=c.name+" ("+c.code+")";countrySelect.appendChild(opt);});
 
 /* ==========================
    PRODUITS
 ========================== */
-const products = [
-  { name:"60 UC", price:180 },
-  { name:"120 UC", price:350 },
-  { name:"325 UC", price:850 },
-  { name:"660 UC", price:1650 },
-  { name:"1800 UC", price:3500 }
+const products=[
+  {name:"60 UC",price:180},
+  {name:"120 UC",price:350},
+  {name:"325 UC",price:850},
+  {name:"660 UC",price:1650},
+  {name:"1800 UC",price:3500}
 ];
-products.forEach(p=>p.price=Math.round(p.price*1.20));
+products.forEach(p=>p.price=Math.round(p.price*1.2));
 
 const grid=document.getElementById("productGrid");
+let selectedProduct=null;
+
 products.forEach(p=>{
   const card=document.createElement("div");
   card.className="card";
@@ -108,19 +131,36 @@ products.forEach(p=>{
     <button class="btn-primary">Acheter</button>
   `;
   card.querySelector("button").addEventListener("click",()=>{
-    const cart=loadCart();
-    cart.push({name:p.name,price:p.price,buyer:user.email,date:new Date().toLocaleString(),status:"En attente",meta:{accountName:user.username}});
-    saveCart(cart);
-    showToast();
-    updateBalanceUI();
+    selectedProduct=p;
+    document.getElementById("popupTitle").textContent=p.name+" - "+p.price+" HTG";
+    document.getElementById("popup").style.display="flex";
   });
   grid.appendChild(card);
 });
 
-/* INIT UI */
+/* ==========================
+   POPUP
+========================== */
+function closePopup(){document.getElementById("popup").style.display="none";}
+function addToCart(){
+  const type=document.getElementById("accountType").value;
+  const emailF=document.getElementById("emailForm").value;
+  const mdp=document.getElementById("passwordForm").value;
+  const uid=document.getElementById("uidForm").value;
+  const wp=document.getElementById("whatsappForm").value;
+  const country=document.getElementById("countryForm").value;
+  if(!type||!emailF||!mdp||!uid||!wp){alert("⚠ Merci de remplir tout le formulaire !");return;}
+
+  const cart=loadCart();
+  cart.push({name:selectedProduct.name,price:selectedProduct.price,buyer:user.email,date:new Date().toLocaleString(),status:"En attente",meta:{accountName:user.username,type,type,email:emailF,password:mdp,uid,whatsapp:country+" "+wp}});
+  saveCart(cart);
+  showToast();
+  closePopup();
+}
+
+/* INIT */
 updateBalanceUI();
 setInterval(updateBalanceUI,1500);
 </script>
-
 </body>
 </html>
