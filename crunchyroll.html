@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bright Tup Up | Manga & Efootball</title>
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #1b0034, #000);
+  color: #e0f7ff;
+  overflow-x: hidden;
+}
+
+header {
+  background: rgba(0,0,0,0.8);
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0 15px #00aaffaa;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #00ccff;
+  text-shadow: 0 0 15px #00aaff, 0 0 30px #004466;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.balance-box {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid #00aaff;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #00ccff;
+  margin-right: 10px;
+}
+
+.container { padding: 30px; }
+
+.section-title {
+  font-size: 1.8rem;
+  margin: 20px 0;
+  text-align: center;
+  text-shadow: 0 0 10px #00aaff;
+  letter-spacing: 2px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(0,170,255,0.2), rgba(0,0,0,0.6));
+  border: 2px solid #00aaff;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 0 20px #00aaffaa;
+  transition: 0.3s;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px #00ccff;
+}
+
+.card h3 { font-size: 1.2rem; margin-bottom: 10px; }
+
+.status { background: #00ff99; color: #000; padding: 3px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; }
+.tag { background: #00aaff; color: #000; padding: 3px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; margin-left: 5px; }
+
+.price { font-size: 1.1rem; font-weight: bold; color: #00ccff; text-shadow: 0 0 5px #00aaff; margin-top: 10px; }
+.desc { font-size: 0.9rem; color: #ddd; margin-top: 8px; }
+
+.btn-primary {
+  background: #00aaff; color: #000; border: none; padding: 10px 16px;
+  border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.3s;
+}
+
+.btn-primary:hover {
+  background: #fff; color: #00aaff; box-shadow: 0 0 20px #00ccff;
+}
+
+footer { text-align: center; padding: 20px; background: rgba(0,0,0,0.7); border-top: 1px solid #00aaff; }
+
+.back-btn {
+  position: fixed; top: 20px; left: 20px; background: rgba(0,170,255,0.2);
+  border: 1px solid #00aaff; color: #fff; padding: 8px 12px; border-radius: 8px;
+  cursor: pointer; z-index: 50; transition: 0.3s;
+}
+.back-btn:hover { background: #00aaff; color: #000; }
+
+.toast {
+  position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+  background: #00aaff; color: #000; padding: 10px 20px; border-radius: 10px;
+  font-weight: bold; opacity: 0; transition: opacity 0.4s;
+}
+.toast.show { opacity: 1; }
+
+/* ===== Ballon de foot CSS ===== */
+.football-ball {
+  width:28px; height:28px;
+  background:#fff;
+  border-radius:50%;
+  position:relative;
+  display:inline-block;
+  box-shadow: inset -2px -2px 0 #000, inset 2px 2px 0 #000;
+}
+.football-ball::before,
+.football-ball::after {
+  content:"";
+  position:absolute;
+  width:12px; height:12px;
+  background:#000;
+  border-radius:2px;
+  top:8px; left:8px;
+}
+.football-ball::after {
+  left:auto; right:8px;
+}
+</style>
+</head>
+<body>
+
+<button class="back-btn" onclick="window.location.href='produits.html'">⬅ Retour</button>
+
+<header>
+  <h1><span class="football-ball"></span> Bright Tup Up — Manga & Efootball</h1>
+  <div style="display:flex; align-items:center;">
+    <div class="balance-box" id="balanceBox">0 G</div>
+    <button class="btn-primary" onclick="openCart()">🛒 Panier</button>
+  </div>
+</header>
+
+<div class="container">
+  <h2 class="section-title">Abonnements Manga ⚡</h2>
+  <div class="grid" id="productGrid"></div>
+</div>
+
+<div id="toast" class="toast">✅ Ajouté au panier</div>
+
+<footer>© 2026 Bright Tup Up — Tous droits réservés</footer>
+
+<script>
+/* ==========================
+   🔥 PROFIL SÉCURISÉ
+========================== */
+let user = JSON.parse(sessionStorage.getItem("dpstore_user") || "null");
+if(!user || !user.email || !user.username){
+  alert("⚠ Vous devez être connecté !");
+  window.location.href = "index.html";
+}
+if(!user.balance) user.balance = 0;
+
+/* ==========================
+   🔥 PANIER PAR COMPTE
+========================== */
+function normalizeId(str){ return (str||"guest").toLowerCase().replace(/[^a-z0-9@.-]/g,"_").replace(/@/g,"_at_"); }
+function getCartKey(){ return "cart_" + normalizeId(user.email); }
+function loadCart(){ return JSON.parse(localStorage.getItem(getCartKey())||"[]"); }
+function saveCart(cart){ localStorage.setItem(getCartKey(), JSON.stringify(cart)); }
+
+function updateBalanceUI() {
+  user = JSON.parse(sessionStorage.getItem("dpstore_user") || JSON.stringify(user));
+  document.getElementById("balanceBox").textContent = (user.balance ?? 0) + " G";
+}
+
+/* ==========================
+   🔥 PRODUITS
+========================== */
+const products = [
+  { name: "Bright Manga 1 Mois", price: 540 },
+  { name: "Bright Manga 2 Mois", price: 1140 },
+  { name: "Bright Manga 3 Mois", price: 1700 }
+];
+
+const grid = document.getElementById("productGrid");
+
+products.forEach(p => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <h3>${p.name}</h3>
+    <span class="status">Disponible</span><span class="tag">Manga</span>
+    <div class="price">${p.price} HTG</div>
+    <div class="desc">Livraison 0 à 3h — Accès illimité anime & manga</div>
+    <button class="btn-primary">Acheter</button>
+  `;
+  card.querySelector("button").addEventListener("click", ()=>{
+    addToCart(p.name, p.price);
+  });
+  grid.appendChild(card);
+});
+
+/* ==========================
+   🔥 AJOUT AU PANIER
+========================== */
+function addToCart(name, price){
+  const cart = loadCart();
+  cart.push({
+    name,
+    price,
+    buyer: user.email,
+    date: new Date().toLocaleString(),
+    status: "En attente",
+    meta: { accountName: user.username }
+  });
+  saveCart(cart);
+  showToast();
+  updateBalanceUI();
+}
+
+/* ==========================
+   INIT
+========================== */
+updateBalanceUI();
+setInterval(updateBalanceUI, 1500);
+
+function showToast() {
+  const toast = document.getElementById("toast");
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"), 1500);
+}
+
+function openCart() {
+  localStorage.setItem("lastPage", window.location.href);
+  window.location.href = "cart.html";
+}
+</script>
+
+</body>
+</html>
