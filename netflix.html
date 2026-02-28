@@ -3,155 +3,152 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DPSTORE | Abonnements</title>
+<title>BRIGHT STORE | Abonnements</title>
 
 <style>
-body {
-  margin:0;
+
+/* ======================
+   STYLE BRIGHT IDENTIQUE PUBG
+====================== */
+
+body{
   font-family:'Poppins',sans-serif;
-  background:linear-gradient(135deg,#000428,#004e92);
-  color:#fff;
-  overflow-x:hidden;
+  background:radial-gradient(circle at top,#001a33,#000);
+  margin:0;
+  padding:0;
+  color:#e0f7ff;
 }
 
 /* HEADER */
-header {
-  background: rgba(0,0,0,0.6);
-  padding:12px 20px;
+header{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  box-shadow:0 0 10px #00aaff;
+  padding:15px 20px;
+  background:rgba(5,10,20,0.95);
   position:sticky;
   top:0;
-  z-index:10;
-}
-
-header h1 {
-  font-size:1.3rem;
-  background:linear-gradient(90deg,#FFD700,#00ADEF);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  margin:0;
-}
-
-.balance-container {
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-#user-balance {
-  font-weight:bold;
-  background: rgba(255,255,255,0.1);
-  padding:6px 10px;
-  border-radius:8px;
-  box-shadow:0 0 5px #00aaff;
-}
-
-#role-badge {
-  padding:5px 10px;
-  border-radius:8px;
-  font-size:0.8rem;
-  font-weight:bold;
-  text-transform:uppercase;
+  z-index:20;
+  border-bottom:2px solid #00aaff;
   box-shadow:0 0 10px #00aaff;
 }
 
-.role-admin { background:#FFD700; color:#000; }
-.role-employee { background:#00ADEF; color:#000; }
-.role-user { background:#444; color:#fff; }
+.logo{
+  font-weight:bold;
+  color:#00ccff;
+  font-size:1.4rem;
+  letter-spacing:2px;
+}
 
-#back-btn {
-  background:transparent;
-  color:#fff;
-  border:1px solid #00aaff;
-  padding:6px 10px;
+.right-box{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.balance-bubble{
+  padding:6px 12px;
   border-radius:8px;
-  cursor:pointer;
-  transition:0.3s;
+  background:rgba(0,170,255,0.1);
+  color:#00ccff;
+  font-weight:bold;
+  border:1px solid #00aaff;
 }
 
-#back-btn:hover {
-  background:#00aaff;
-  color:#000;
-}
-
-/* PANIER BTN */
 .cart-btn{
+  cursor:pointer;
+  font-weight:bold;
+  color:#00ccff;
+}
+
+.back-btn{
+  background:none;
+  border:2px solid #00aaff;
+  padding:6px 12px;
+  border-radius:8px;
   cursor:pointer;
   color:#00ccff;
   font-weight:bold;
 }
 
 /* GRID */
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:20px;
-  padding:30px;
-}
-
-.card {
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.1);
-  border-radius:15px;
+.grid{
   padding:20px;
-  text-align:center;
-  box-shadow:0 0 10px #00aaff44;
-  transition:0.3s;
+  display:grid;
+  gap:15px;
 }
 
-.card:hover {
-  transform:translateY(-5px);
-  box-shadow:0 0 15px #00aaffaa;
+/* CARD */
+.card{
+  background:rgba(5,10,20,0.95);
+  padding:18px;
+  border-radius:14px;
+  border:1px solid #00aaff33;
+  box-shadow:0 0 12px #00aaff22;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
-.price {
-  color:#FFD700;
+.card:hover{
+  box-shadow:0 0 18px #00aaff;
+}
+
+.product-name{
+  font-size:1.2rem;
   font-weight:bold;
-  margin:8px 0;
 }
 
-.btn-primary {
-  background:#FFD700;
+.status-tag{
+  background:#00c853;
   color:#000;
+  padding:3px 10px;
+  border-radius:10px;
+  font-size:0.8rem;
+  font-weight:bold;
+  width:fit-content;
+}
+
+.price{
+  font-weight:bold;
+  font-size:1.1rem;
+  color:#00ccff;
+}
+
+.buy-btn{
+  padding:10px;
+  background:linear-gradient(90deg,#00aaff,#004466);
+  color:#000;
+  font-weight:bold;
   border:none;
-  padding:8px 16px;
   border-radius:8px;
   cursor:pointer;
-  margin:5px;
 }
 
-.btn-primary:hover {
-  background:#00aaff;
-  color:#fff;
+.buy-btn:hover{
+  box-shadow:0 0 12px #00aaff;
 }
 
-footer {
-  text-align:center;
-  padding:20px;
-  background: rgba(0,0,0,0.6);
-  font-size:0.9rem;
-}
-
-.toast {
+/* TOAST */
+.toast{
   position:fixed;
-  bottom:25px;
+  bottom:30px;
   left:50%;
   transform:translateX(-50%);
   background:#00aaff;
   color:#000;
-  padding:10px 20px;
+  padding:12px 25px;
   border-radius:10px;
   font-weight:bold;
+  box-shadow:0 0 15px #00aaff;
   opacity:0;
-  transition:opacity 0.4s;
+  transition:0.3s;
 }
 
-.toast.show {
+.toast.show{
   opacity:1;
 }
+
 </style>
 </head>
 
@@ -159,42 +156,47 @@ footer {
 
 <header>
 
-  <h1>DPSTORE — Abonnements</h1>
+<button class="back-btn" onclick="window.location.href='produits.html'">
+← Retour
+</button>
 
-  <div class="balance-container">
+<div class="logo">
+BRIGHT STORE
+</div>
 
-    <span id="user-balance">0 G</span>
+<div class="right-box">
 
-    <span id="role-badge" class="role-user">Utilisateur</span>
+<div class="balance-bubble" id="balanceBox">
+0 G
+</div>
 
-    <div class="cart-btn" onclick="gotoCart()">
-      🛒(<span id="cartCount">0</span>)
-    </div>
+<div class="cart-btn" onclick="gotoCart()">
+🛒(<span id="cartCount">0</span>)
+</div>
 
-    <button id="back-btn">Retour</button>
-
-  </div>
+</div>
 
 </header>
 
-<section class="grid" id="gridProducts"></section>
+<h2 style="margin-left:20px;color:#00ccff;">
+Abonnements Premium
+</h2>
 
-<div id="toast" class="toast">✅ Ajouté au panier</div>
+<div class="grid" id="productGrid"></div>
 
-<footer>© 2025 DPSTORE — Tous droits réservés</footer>
+<div id="toast" class="toast">
+Ajouté au panier
+</div>
 
 <script>
 
 /* ======================
-   UTIL & PROFIL IDENTIQUE PUBG
+   CONNEXION IDENTIQUE BRIGHT
 ====================== */
 
 function safeParse(str){
-  try{
-    return JSON.parse(str);
-  }catch(e){
-    return null;
-  }
+  try{return JSON.parse(str);}
+  catch(e){return null;}
 }
 
 let user = safeParse(sessionStorage.getItem("dpstore_user")) || {};
@@ -208,50 +210,41 @@ if(!user.email || !user.username){
 }
 
 if(!user.balance){
-  user.balance = 0;
+  user.balance=0;
 }
 
 /* ======================
-   PANIER IDENTIQUE PUBG
+   PANIER IDENTIQUE
 ====================== */
 
 function normalizeId(str){
 
-  return (str||"guest")
-  .toLowerCase()
-  .replace(/[^a-z0-9@.-]/g,"_")
-  .replace(/@/g,"_at_");
+return (str||"guest")
+.toLowerCase()
+.replace(/[^a-z0-9@.-]/g,"_")
+.replace(/@/g,"_at_");
 
 }
 
 function getCartKey(){
-
-  return "cart_"+normalizeId(user.email);
-
+return "cart_"+normalizeId(user.email);
 }
 
 function loadCart(){
-
-  return JSON.parse(localStorage.getItem(getCartKey()) || "[]");
-
+return JSON.parse(localStorage.getItem(getCartKey())||"[]");
 }
 
 function saveCart(cart){
-
-  localStorage.setItem(getCartKey(), JSON.stringify(cart));
-
+localStorage.setItem(getCartKey(),JSON.stringify(cart));
 }
 
 function updateCartCount(){
-
-  document.getElementById("cartCount").textContent = loadCart().length;
-
+document.getElementById("cartCount").textContent=
+loadCart().length;
 }
 
 function gotoCart(){
-
-  window.location.href="cart.html";
-
+window.location.href="cart.html";
 }
 
 /* ======================
@@ -260,175 +253,92 @@ function gotoCart(){
 
 function updateBalanceUI(){
 
-  document.getElementById("user-balance").textContent =
-  user.balance + " G";
+document.getElementById("balanceBox").textContent=
+user.balance+" G";
 
 }
 
 updateBalanceUI();
 
 /* ======================
-   ROLE
-====================== */
-
-const roleBadge = document.getElementById('role-badge');
-
-const CREATOR_ADMIN_EMAIL = "christopherantoine773@gmail.com";
-
-const EMPLOYEES = [
-
-  "pilotecitizen@gmail.com",
-
-  "ladouceurlorvynsky@gmail.com",
-
-  "doresmaworldens@gmail.com",
-
-  "mathieulherisson99@gmail.com"
-
-];
-
-function getRole(email){
-
-  if(email === CREATOR_ADMIN_EMAIL)
-  return "admin";
-
-  if(EMPLOYEES.includes(email))
-  return "employee";
-
-  return "user";
-
-}
-
-let role = getRole(user.email);
-
-if(role==="admin"){
-
-  roleBadge.innerText="Creator / Admin";
-  roleBadge.className="role-admin";
-
-}
-
-else if(role==="employee"){
-
-  roleBadge.innerText="Employé";
-  roleBadge.className="role-employee";
-
-}
-
-else{
-
-  roleBadge.innerText="Utilisateur";
-  roleBadge.className="role-user";
-
-}
-
-/* ======================
    PRODUITS
 ====================== */
 
-const PRODUCTS=[
+const products=[
 
-  {id:'net1', title:'Netflix — 1 mois (1 profil)', price_htg:720},
+{name:"Netflix 1 mois",price:720},
 
-  {id:'net2', title:'Netflix — 2 mois (1 profil)', price_htg:1140},
+{name:"Netflix Premium",price:1620},
 
-  {id:'net3', title:'Netflix Premium — 1 mois', price_htg:1620},
+{name:"Prime Video",price:600},
 
-  {id:'pv1', title:'Prime Video — 1 mois', price_htg:600},
+{name:"Crunchyroll",price:540},
 
-  {id:'cr1', title:'Crunchyroll — 1 mois', price_htg:540},
+{name:"NordVPN",price:840},
 
-  {id:'nv1', title:'NordVPN — 1 mois', price_htg:840},
+{name:"Free Fire Pass",price:600},
 
-  {id:'ff1', title:'Free Fire Pass — 1 mois', price_htg:600},
-
-  {id:'ff2', title:'Free Fire Pass Premium — 1 mois', price_htg:1080},
-
-  {id:'ff3', title:'Free Fire Elite Pass — 1 mois', price_htg:1440}
+{name:"Free Fire Premium",price:1080}
 
 ];
 
 /* ======================
-   AJOUT PANIER
+   RENDER
 ====================== */
 
-function addToCart(product){
+const grid=document.getElementById("productGrid");
 
-  const cart = loadCart();
+products.forEach(p=>{
 
-  cart.push({
+const div=document.createElement("div");
 
-    name: product.title,
+div.className="card";
 
-    price: product.price_htg,
+div.innerHTML=`
 
-    buyer: user.email,
+<div class="product-name">${p.name}</div>
 
-    date: new Date().toLocaleString(),
+<div class="status-tag">Disponible</div>
 
-    status: "En attente",
+<div class="price">${p.price} HTG</div>
 
-    meta:{
+<button class="buy-btn">
+Ajouter au panier
+</button>
 
-      accountName: user.username
+`;
 
-    }
+div.querySelector("button").onclick=()=>{
 
-  });
+const cart=loadCart();
 
-  saveCart(cart);
+cart.push({
 
-  updateCartCount();
+name:p.name,
 
-  showToast();
+price:p.price,
 
-}
+buyer:user.email,
 
-/* ======================
-   RENDER GRID
-====================== */
+date:new Date().toLocaleString(),
 
-const grid = document.getElementById('gridProducts');
+status:"En attente",
 
-function renderGrid(){
+meta:{accountName:user.username}
 
-  grid.innerHTML="";
+});
 
-  PRODUCTS.forEach(p=>{
+saveCart(cart);
 
-    const div=document.createElement("div");
+updateCartCount();
 
-    div.className="card";
-
-    div.innerHTML=`
-
-      <h3>${p.title}</h3>
-
-      <div class="price">${p.price_htg} G</div>
-
-      <button class="btn-primary">Ajouter</button>
-
-    `;
-
-    div.querySelector("button").onclick=()=>addToCart(p);
-
-    grid.appendChild(div);
-
-  });
-
-}
-
-renderGrid();
-
-/* ======================
-   RETOUR
-====================== */
-
-document.getElementById("back-btn").onclick=()=>{
-
-  window.location.href="produits.html";
+showToast();
 
 };
+
+grid.appendChild(div);
+
+});
 
 /* ======================
    TOAST
@@ -436,21 +346,17 @@ document.getElementById("back-btn").onclick=()=>{
 
 function showToast(){
 
-  const toast = document.getElementById("toast");
+const toast=document.getElementById("toast");
 
-  toast.classList.add("show");
+toast.classList.add("show");
 
-  setTimeout(()=>{
-
-    toast.classList.remove("show");
-
-  },1500);
+setTimeout(()=>{
+toast.classList.remove("show");
+},1500);
 
 }
 
-/* ======================
-   INIT
-====================== */
+/* INIT */
 
 updateCartCount();
 
