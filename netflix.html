@@ -6,38 +6,175 @@
 <title>DPSTORE | Abonnements</title>
 
 <style>
-body { margin:0; font-family:'Poppins',sans-serif; background:linear-gradient(135deg,#000428,#004e92); color:#fff; overflow-x:hidden; }
-header { background: rgba(0,0,0,0.6); padding:12px 20px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 0 10px #00aaff; position:sticky; top:0; z-index:10; }
-header h1 { font-size:1.3rem; background:linear-gradient(90deg,#FFD700,#00ADEF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0; }
-.balance-container { display:flex; align-items:center; gap:12px; }
-#user-balance { font-weight:bold; background: rgba(255,255,255,0.1); padding:6px 10px; border-radius:8px; box-shadow:0 0 5px #00aaff; }
-#role-badge { padding:5px 10px; border-radius:8px; font-size:0.8rem; font-weight:bold; text-transform:uppercase; box-shadow:0 0 10px #00aaff; }
+body {
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg,#000428,#004e92);
+  color:#fff;
+  overflow-x:hidden;
+}
+
+/* HEADER */
+header {
+  background: rgba(0,0,0,0.6);
+  padding:12px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 0 10px #00aaff;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+header h1 {
+  font-size:1.3rem;
+  background:linear-gradient(90deg,#FFD700,#00ADEF);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin:0;
+}
+
+.balance-container {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+#user-balance {
+  font-weight:bold;
+  background: rgba(255,255,255,0.1);
+  padding:6px 10px;
+  border-radius:8px;
+  box-shadow:0 0 5px #00aaff;
+}
+
+#role-badge {
+  padding:5px 10px;
+  border-radius:8px;
+  font-size:0.8rem;
+  font-weight:bold;
+  text-transform:uppercase;
+  box-shadow:0 0 10px #00aaff;
+}
+
 .role-admin { background:#FFD700; color:#000; }
 .role-employee { background:#00ADEF; color:#000; }
 .role-user { background:#444; color:#fff; }
-#back-btn { background:transparent; color:#fff; border:1px solid #00aaff; padding:6px 10px; border-radius:8px; cursor:pointer; transition:0.3s; }
-#back-btn:hover { background:#00aaff; color:#000; }
-.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; padding:30px; }
-.card { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:15px; padding:20px; text-align:center; box-shadow:0 0 10px #00aaff44; transition:0.3s; }
-.card:hover { transform:translateY(-5px); box-shadow:0 0 15px #00aaffaa; }
-.price { color:#FFD700; font-weight:bold; margin:8px 0; }
-.btn-primary { background:#FFD700; color:#000; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; margin:5px; }
-.btn-primary:hover { background:#00aaff; color:#fff; }
-footer { text-align:center; padding:20px; background: rgba(0,0,0,0.6); font-size:0.9rem; }
-.toast { position:fixed; bottom:25px; left:50%; transform:translateX(-50%); background:#00aaff; color:#000; padding:10px 20px; border-radius:10px; font-weight:bold; opacity:0; transition:opacity 0.4s; }
-.toast.show { opacity:1; }
+
+#back-btn {
+  background:transparent;
+  color:#fff;
+  border:1px solid #00aaff;
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+#back-btn:hover {
+  background:#00aaff;
+  color:#000;
+}
+
+/* PANIER BTN */
+.cart-btn{
+  cursor:pointer;
+  color:#00ccff;
+  font-weight:bold;
+}
+
+/* GRID */
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+  padding:30px;
+}
+
+.card {
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:15px;
+  padding:20px;
+  text-align:center;
+  box-shadow:0 0 10px #00aaff44;
+  transition:0.3s;
+}
+
+.card:hover {
+  transform:translateY(-5px);
+  box-shadow:0 0 15px #00aaffaa;
+}
+
+.price {
+  color:#FFD700;
+  font-weight:bold;
+  margin:8px 0;
+}
+
+.btn-primary {
+  background:#FFD700;
+  color:#000;
+  border:none;
+  padding:8px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  margin:5px;
+}
+
+.btn-primary:hover {
+  background:#00aaff;
+  color:#fff;
+}
+
+footer {
+  text-align:center;
+  padding:20px;
+  background: rgba(0,0,0,0.6);
+  font-size:0.9rem;
+}
+
+.toast {
+  position:fixed;
+  bottom:25px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#00aaff;
+  color:#000;
+  padding:10px 20px;
+  border-radius:10px;
+  font-weight:bold;
+  opacity:0;
+  transition:opacity 0.4s;
+}
+
+.toast.show {
+  opacity:1;
+}
 </style>
 </head>
 
 <body>
 
 <header>
+
   <h1>DPSTORE — Abonnements</h1>
+
   <div class="balance-container">
-    <span id="user-balance">Solde : 0 G</span>
+
+    <span id="user-balance">0 G</span>
+
     <span id="role-badge" class="role-user">Utilisateur</span>
+
+    <div class="cart-btn" onclick="gotoCart()">
+      🛒(<span id="cartCount">0</span>)
+    </div>
+
     <button id="back-btn">Retour</button>
+
   </div>
+
 </header>
 
 <section class="grid" id="gridProducts"></section>
@@ -47,111 +184,276 @@ footer { text-align:center; padding:20px; background: rgba(0,0,0,0.6); font-size
 <footer>© 2025 DPSTORE — Tous droits réservés</footer>
 
 <script>
+
 /* ======================
-   PROFIL SÉCURISÉ
+   UTIL & PROFIL IDENTIQUE PUBG
 ====================== */
-let user = JSON.parse(sessionStorage.getItem("dpstore_user") || "null");
-if(!user || !user.email || !user.dp || !user.username){
-  alert("⚠️ Vous devez être connecté !");
-  window.location.href="index.html";
+
+function safeParse(str){
+  try{
+    return JSON.parse(str);
+  }catch(e){
+    return null;
+  }
 }
-if(!user.balance) user.balance = 0;
+
+let user = safeParse(sessionStorage.getItem("dpstore_user")) || {};
+
+if(!user.email || !user.username){
+
+  alert("⚠ Connectez-vous !");
+
+  window.location.href="index.html";
+
+}
+
+if(!user.balance){
+  user.balance = 0;
+}
 
 /* ======================
-   PANIER PAR COMPTE
+   PANIER IDENTIQUE PUBG
 ====================== */
-function normalizeId(str){ return (str||"guest").toLowerCase().replace(/[^a-z0-9@.-]/g,"_").replace(/@/g,"_at_"); }
-function getCartKey(){ return "cart_"+normalizeId(user.email); }
-function loadCart(){ return JSON.parse(localStorage.getItem(getCartKey())||"[]"); }
-function saveCart(arr){ localStorage.setItem(getCartKey(), JSON.stringify(arr)); }
+
+function normalizeId(str){
+
+  return (str||"guest")
+  .toLowerCase()
+  .replace(/[^a-z0-9@.-]/g,"_")
+  .replace(/@/g,"_at_");
+
+}
+
+function getCartKey(){
+
+  return "cart_"+normalizeId(user.email);
+
+}
+
+function loadCart(){
+
+  return JSON.parse(localStorage.getItem(getCartKey()) || "[]");
+
+}
+
+function saveCart(cart){
+
+  localStorage.setItem(getCartKey(), JSON.stringify(cart));
+
+}
+
+function updateCartCount(){
+
+  document.getElementById("cartCount").textContent = loadCart().length;
+
+}
+
+function gotoCart(){
+
+  window.location.href="cart.html";
+
+}
 
 /* ======================
-   SOLDE & ROLE
+   SOLDE
 ====================== */
-const balanceEl = document.getElementById('user-balance');
+
+function updateBalanceUI(){
+
+  document.getElementById("user-balance").textContent =
+  user.balance + " G";
+
+}
+
+updateBalanceUI();
+
+/* ======================
+   ROLE
+====================== */
+
 const roleBadge = document.getElementById('role-badge');
-const backBtn = document.getElementById('back-btn');
 
 const CREATOR_ADMIN_EMAIL = "christopherantoine773@gmail.com";
+
 const EMPLOYEES = [
+
   "pilotecitizen@gmail.com",
+
   "ladouceurlorvynsky@gmail.com",
+
   "doresmaworldens@gmail.com",
+
   "mathieulherisson99@gmail.com"
+
 ];
 
-function updateBalance(){ balanceEl.innerText = `Solde : ${user.balance} G`; }
-updateBalance();
-setInterval(updateBalance,1500);
-
 function getRole(email){
-  if(email === CREATOR_ADMIN_EMAIL) return "admin";
-  if(EMPLOYEES.includes(email)) return "employee";
+
+  if(email === CREATOR_ADMIN_EMAIL)
+  return "admin";
+
+  if(EMPLOYEES.includes(email))
+  return "employee";
+
   return "user";
+
 }
+
 let role = getRole(user.email);
-if(role==="admin"){ roleBadge.innerText="Creator / Admin"; roleBadge.className="role-admin"; }
-else if(role==="employee"){ roleBadge.innerText="Employé"; roleBadge.className="role-employee"; }
-else { roleBadge.innerText="Utilisateur"; roleBadge.className="role-user"; }
+
+if(role==="admin"){
+
+  roleBadge.innerText="Creator / Admin";
+  roleBadge.className="role-admin";
+
+}
+
+else if(role==="employee"){
+
+  roleBadge.innerText="Employé";
+  roleBadge.className="role-employee";
+
+}
+
+else{
+
+  roleBadge.innerText="Utilisateur";
+  roleBadge.className="role-user";
+
+}
 
 /* ======================
    PRODUITS
 ====================== */
+
 const PRODUCTS=[
+
   {id:'net1', title:'Netflix — 1 mois (1 profil)', price_htg:720},
+
   {id:'net2', title:'Netflix — 2 mois (1 profil)', price_htg:1140},
+
   {id:'net3', title:'Netflix Premium — 1 mois', price_htg:1620},
+
   {id:'pv1', title:'Prime Video — 1 mois', price_htg:600},
+
   {id:'cr1', title:'Crunchyroll — 1 mois', price_htg:540},
+
   {id:'nv1', title:'NordVPN — 1 mois', price_htg:840},
+
   {id:'ff1', title:'Free Fire Pass — 1 mois', price_htg:600},
+
   {id:'ff2', title:'Free Fire Pass Premium — 1 mois', price_htg:1080},
+
   {id:'ff3', title:'Free Fire Elite Pass — 1 mois', price_htg:1440}
+
 ];
 
 /* ======================
-   AJOUT AU PANIER
+   AJOUT PANIER
 ====================== */
+
 function addToCart(product){
+
   const cart = loadCart();
+
   cart.push({
+
     name: product.title,
+
     price: product.price_htg,
+
     buyer: user.email,
+
     date: new Date().toLocaleString(),
+
     status: "En attente",
-    meta: { accountName: user.username }
+
+    meta:{
+
+      accountName: user.username
+
+    }
+
   });
+
   saveCart(cart);
+
+  updateCartCount();
+
   showToast();
+
 }
 
 /* ======================
    RENDER GRID
 ====================== */
+
 const grid = document.getElementById('gridProducts');
+
 function renderGrid(){
+
   grid.innerHTML="";
+
   PRODUCTS.forEach(p=>{
+
     const div=document.createElement("div");
+
     div.className="card";
-    div.innerHTML=`<h3>${p.title}</h3><div class="price">${p.price_htg} G</div><button class="btn-primary">Ajouter</button>`;
+
+    div.innerHTML=`
+
+      <h3>${p.title}</h3>
+
+      <div class="price">${p.price_htg} G</div>
+
+      <button class="btn-primary">Ajouter</button>
+
+    `;
+
     div.querySelector("button").onclick=()=>addToCart(p);
+
     grid.appendChild(div);
+
   });
+
 }
+
 renderGrid();
 
-backBtn.onclick=()=>window.location.href="produits.html";
+/* ======================
+   RETOUR
+====================== */
+
+document.getElementById("back-btn").onclick=()=>{
+
+  window.location.href="produits.html";
+
+};
 
 /* ======================
    TOAST
 ====================== */
+
 function showToast(){
+
   const toast = document.getElementById("toast");
+
   toast.classList.add("show");
-  setTimeout(()=>toast.classList.remove("show"),1500);
+
+  setTimeout(()=>{
+
+    toast.classList.remove("show");
+
+  },1500);
+
 }
+
+/* ======================
+   INIT
+====================== */
+
+updateCartCount();
+
 </script>
 
 </body>
