@@ -68,6 +68,13 @@ body{
     font-weight:bold;
 }
 
+.warning{
+    font-size:12px;
+    color:#ffcc00;
+    margin-top:4px;
+}
+
+/* BUY BUTTON */
 .buy-btn{
     background:linear-gradient(90deg,#00ccff,#0066ff);
     border:none;
@@ -103,6 +110,8 @@ body{
     padding:8px;
     border-radius:5px;
     border:none;
+    background:#000;
+    color:#fff;
 }
 
 .popup-box button{
@@ -113,6 +122,12 @@ body{
     background:#00ccff;
     color:white;
     cursor:pointer;
+    font-weight:bold;
+}
+
+.popup-box button.cancel{
+    background:red;
+    margin-top:5px;
 }
 
 </style>
@@ -136,6 +151,7 @@ Bright Top Up
 <div class="product-info">
 Amazon Prime<br>
 <span class="price">1 Mois + 1 Profil — 500 HTG</span>
+<div class="warning">Entrez l'ID du joueur correct. ATTENTION Le système peut prendre de 5 min à 24h 🕛</div>
 </div>
 <button class="buy-btn" onclick="openPopup('Amazon Prime 1 Mois',500)">Acheter</button>
 </div>
@@ -144,6 +160,7 @@ Amazon Prime<br>
 <div class="product-info">
 Amazon Prime<br>
 <span class="price">3 Mois + 1 Profil — 1354 HTG</span>
+<div class="warning">Entrez l'ID du joueur correct. ATTENTION Le système peut prendre de 5 min à 24h 🕛</div>
 </div>
 <button class="buy-btn" onclick="openPopup('Amazon Prime 3 Mois',1354)">Acheter</button>
 </div>
@@ -152,6 +169,7 @@ Amazon Prime<br>
 <div class="product-info">
 Amazon Prime<br>
 <span class="price">6 Mois + 1 Profil — 2707 HTG</span>
+<div class="warning">Entrez l'ID du joueur correct. ATTENTION Le système peut prendre de 5 min à 24h 🕛</div>
 </div>
 <button class="buy-btn" onclick="openPopup('Amazon Prime 6 Mois',2707)">Acheter</button>
 </div>
@@ -167,81 +185,132 @@ Amazon Prime<br>
 <h3>Achat Amazon Prime</h3>
 
 <input type="text" id="email" placeholder="Email Amazon">
-
 <input type="text" id="whatsapp" placeholder="WhatsApp">
 
 <button onclick="confirmBuy()">Confirmer</button>
-
-<button onclick="closePopup()" style="margin-top:5px;background:red;">Annuler</button>
-
-</div>
+<button class="cancel" onclick="closePopup()">Annuler</button>
 
 </div>
 
-<script>
+</div>
 
-let user = JSON.parse(sessionStorage.getItem("dpstore_user")) || {balance:0,email:"guest"};
+<script type="module">
 
-let selectedProduct=null;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-/* BALANCE */
+// CONFIG Firebase
+const firebaseConfig={
+  apiKey:"AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
+  authDomain:"brighttupup.firebaseapp.com",
+  projectId:"brighttupup",
+  storageBucket:"brighttupup.appspot.com",
+  messagingSenderId:"812394183947",
+  appId:"1:812394183947:web:d65d60d6aeee39bcc3b60e"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+let user={};
+
+// SYSTEME CONNEXION
+onAuthStateChanged(auth,async(firebaseUser)=>{
+  if(!firebaseUser){
+    location.href="index.html";
+    return;
+  }
+
+  let account={
+    email:firebaseUser.email,
+    username:firebaseUser.displayName||"Utilisateur",
+    photo:firebaseUser.photoURL||"",
+    balance:0,
+    role:"user"
+  };
+
+  // charger Firestore
+  try{
+    const snap=await getDocs(collection(db,"users"));
+    snap.forEach(doc=>{
+      const data=doc.data();
+      if(data.email?.toLowerCase()==firebaseUser.email.toLowerCase()){
+        account.username=data.username??account.username;
+        account.balance=Number(data.credits??0);
+        account.role=data.role??"user";
+        account.photo=data.photo??account.photo;
+      }
+    });
+  }catch(e){
+    console.warn("Erreur Firestore",e);
+  }
+
+  // sauvegarde session
+  sessionStorage.setItem("dpstore_user",JSON.stringify(account));
+
+  // appliquer
+  user=account;
+  updateBalance();
+});
+
+// UPDATE BALANCE
 function updateBalance(){
-document.getElementById("balanceBox").innerText=user.balance+" G";
+  document.getElementById("balanceBox").innerText=user.balance+" G";
 }
 updateBalance();
 
-/* CART COUNT */
+// CART COUNT
 function updateCartCount(){
-let cart = JSON.parse(localStorage.getItem("cart_email")) || [];
-document.getElementById("cartCount").innerText=cart.length;
+  let cart = JSON.parse(localStorage.getItem("cart_email")) || [];
+  document.getElementById("cartCount").innerText=cart.length;
 }
 updateCartCount();
 
-/* POPUP */
+// POPUP
+let selectedProduct=null;
 function openPopup(name,price){
-selectedProduct={name,price};
-document.getElementById("popup").style.display="flex";
+  selectedProduct={name,price};
+  document.getElementById("popup").style.display="flex";
 }
-
 function closePopup(){
-document.getElementById("popup").style.display="none";
+  document.getElementById("popup").style.display="none";
 }
 
-/* CONFIRM BUY */
+// CONFIRM BUY
 function confirmBuy(){
+  let email=document.getElementById("email").value;
+  let whatsapp=document.getElementById("whatsapp").value;
 
-let email=document.getElementById("email").value;
-let whatsapp=document.getElementById("whatsapp").value;
+  if(!email || !whatsapp){
+    alert("Remplis tous les champs");
+    return;
+  }
 
-if(!email || !whatsapp){
-alert("Remplis tous les champs");
-return;
+  let cart = JSON.parse(localStorage.getItem("cart_email")) || [];
+
+  cart.push({
+    name:selectedProduct.name,
+    price:selectedProduct.price,
+    email:email,
+    whatsapp:whatsapp,
+    date:new Date().toLocaleString(),
+    status:"En attente"
+  });
+
+  localStorage.setItem("cart_email",JSON.stringify(cart));
+
+  updateCartCount();
+
+  alert("Produit ajouté au panier");
+
+  closePopup();
 }
 
-let cart = JSON.parse(localStorage.getItem("cart_email")) || [];
-
-cart.push({
-name:selectedProduct.name,
-price:selectedProduct.price,
-email:email,
-whatsapp:whatsapp,
-date:new Date().toLocaleString(),
-status:"En attente"
-});
-
-localStorage.setItem("cart_email",JSON.stringify(cart));
-
-updateCartCount();
-
-alert("Produit ajouté au panier");
-
-closePopup();
-
-}
-
-/* GO CART */
+// GO CART
 function gotoCart(){
-window.location.href="cart.html";
+  window.location.href="cart.html";
 }
 
 </script>
