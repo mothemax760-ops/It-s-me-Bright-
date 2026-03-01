@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DPSTORE Bright | Apple Gift Cards</title>
+<title>Bright | Apple Gift Cards</title>
 
 <style>
 
@@ -18,10 +18,7 @@ background:linear-gradient(135deg,#000814,#001d3d,#003566);
 color:#fff;
 }
 
-/* HEADER */
-
 header{
-
 display:flex;
 justify-content:space-between;
 align-items:center;
@@ -31,24 +28,17 @@ box-shadow:0 0 20px #00cfff;
 position:sticky;
 top:0;
 z-index:999;
-
 }
 
 header h1{
-
 margin:0;
 font-size:1.2rem;
-
 background:linear-gradient(90deg,#00cfff,#ffffff);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
-
 }
 
-/* BUTTON BACK */
-
 .btn-back{
-
 background:#00cfff;
 border:none;
 padding:7px 14px;
@@ -56,20 +46,14 @@ border-radius:10px;
 font-weight:bold;
 cursor:pointer;
 transition:0.25s;
-
 }
 
 .btn-back:hover{
-
 background:#FFD700;
 transform:scale(1.05);
-
 }
 
-/* BALANCE */
-
 .balance-box{
-
 background:rgba(0,255,200,0.12);
 border:1px solid #00ffd5;
 padding:6px 12px;
@@ -77,208 +61,117 @@ border-radius:12px;
 font-weight:bold;
 color:#00ffd5;
 box-shadow:0 0 10px #00ffd5;
-
 }
 
-/* TITLE */
-
 h2{
-
 text-align:center;
 color:#00cfff;
 margin-top:20px;
-
 }
 
-/* PRODUCT CARD */
-
 .product-card{
-
 display:flex;
 justify-content:space-between;
 align-items:center;
-
 background:rgba(255,255,255,0.05);
-
 border:1px solid rgba(0,200,255,0.3);
-
 border-radius:15px;
-
 padding:15px;
-
 margin:15px;
-
 box-shadow:0 0 15px rgba(0,200,255,0.4);
-
 transition:0.3s;
-
 }
 
 .product-card:hover{
-
 transform:scale(1.03);
-
 box-shadow:0 0 25px #00cfff;
-
 }
-
-/* INFO */
 
 .info{
-
 display:flex;
 align-items:center;
-
 }
 
-/* APPLE LOGO */
-
 .product-logo{
-
 width:60px;
 height:60px;
-
 border-radius:12px;
-
 margin-right:15px;
-
 display:flex;
 align-items:center;
 justify-content:center;
-
 font-size:35px;
-
 background:linear-gradient(145deg,#003566,#00cfff);
-
 box-shadow:0 0 15px #00cfff inset,0 0 10px #00cfff;
-
 }
 
 .product-logo::after{
-
 content:"";
-
 }
-
-/* DETAILS */
 
 .details strong{
-
 color:#00cfff;
-
 }
 
-/* BADGES */
-
 .status{
-
 background:#00ff88;
 color:#000;
-
 padding:3px 8px;
-
 border-radius:6px;
-
 font-size:12px;
-
 }
 
 .tag{
-
 background:#ccc;
 color:#000;
-
 padding:3px 8px;
-
 border-radius:6px;
-
 font-size:12px;
-
 }
-
-/* PRICE */
 
 .price{
-
 font-weight:bold;
 margin-top:5px;
-
 }
-
-/* DELIVERY */
 
 .delivery{
-
 font-size:12px;
 opacity:0.8;
-
 }
 
-/* BUY BUTTON */
-
 .buy-btn{
-
 background:#00cfff;
-
 border:none;
-
 padding:9px 16px;
-
 border-radius:10px;
-
 font-weight:bold;
-
 cursor:pointer;
-
 transition:0.3s;
-
 }
 
 .buy-btn:hover{
-
 background:#FFD700;
-
 transform:scale(1.05);
-
 }
-
-/* FOOTER */
 
 footer{
-
 text-align:center;
 padding:15px;
-
 background:rgba(0,0,0,0.7);
-
 margin-top:20px;
-
 }
 
-/* TOAST */
-
 .toast{
-
 position:fixed;
-
 bottom:20px;
-
 left:50%;
-
 transform:translateX(-50%);
-
 background:#00cfff;
-
 color:#000;
-
 padding:10px 20px;
-
 border-radius:10px;
-
 font-weight:bold;
-
 box-shadow:0 0 15px #00cfff;
-
 }
 
 </style>
@@ -291,7 +184,7 @@ box-shadow:0 0 15px #00cfff;
 ← Retour
 </button>
 
-<h1>DPSTORE Bright — Apple Gift Cards</h1>
+<h1>Bright — Apple Gift Cards</h1>
 
 <div class="balance-box" id="balance-display">
 0 G
@@ -301,120 +194,62 @@ box-shadow:0 0 15px #00cfff;
 
 <h2>Cartes Cadeaux Apple</h2>
 
-
-<!-- PRODUCTS -->
-
 <div id="products"></div>
 
-
 <footer>
-© 2026 DPSTORE Bright
+© 2026 Bright
 </footer>
-
 
 <script>
 
-/* ===============================
-   USER SESSION
-================================ */
-
 function loadUser(){
-
-let u=
-JSON.parse(
-sessionStorage.getItem("dpstore_user")
-|| "{}"
-);
-
+let u=JSON.parse(sessionStorage.getItem("dpstore_user")||"{}");
 if(!u.email){
-
 alert("Connecte-toi");
-
 window.location.href="index.html";
-
 }
-
 return u;
-
 }
 
 let user=loadUser();
 
-
-/* ===============================
-   BALANCE
-================================ */
-
 function updateBalance(){
-
 user=loadUser();
-
-document.getElementById(
-"balance-display"
-).textContent=
-(user.balance||0)+" G";
-
+document.getElementById("balance-display").textContent=(user.balance||0)+" G";
 }
 
 setInterval(updateBalance,1000);
 
-
-/* ===============================
-   CART SYSTEM
-================================ */
-
 function normalizeId(str){
-
-return str
-.toLowerCase()
-.replace(/[^a-z0-9]/g,"_");
-
+return str.toLowerCase().replace(/[^a-z0-9]/g,"_");
 }
 
 function getCartKey(){
-
 return "cart_"+normalizeId(user.email);
-
 }
 
 function loadCart(){
-
-return JSON.parse(
-localStorage.getItem(getCartKey())
-||"[]"
-);
-
+return JSON.parse(localStorage.getItem(getCartKey())||"[]");
 }
 
 function saveCart(cart){
-
-localStorage.setItem(
-getCartKey(),
-JSON.stringify(cart)
-);
-
+localStorage.setItem(getCartKey(),JSON.stringify(cart));
 }
 
 
-/* ===============================
-   PRODUCTS LIST
-================================ */
-
+/* PRODUITS */
 const products=[
 
 ["APPLE 2 USD",380],
-
 ["APPLE 5 USD",980],
-
 ["APPLE 10 USD",1897],
-
-["APPLE 25 USD",4455]
+["APPLE 20 USD",3650],
+["APPLE 25 USD",4455],
+["APPLE 50 USD",8900]
 
 ];
 
-const container=
-document.getElementById("products");
-
+const container=document.getElementById("products");
 
 products.forEach(p=>{
 
@@ -425,7 +260,6 @@ card.className="product-card";
 card.innerHTML=`
 
 <div class="info">
-
 <div class="product-logo"></div>
 
 <div class="details">
@@ -433,39 +267,22 @@ card.innerHTML=`
 <strong>${p[0]}</strong>
 
 <div>
-
-<span class="status">
-Disponible
-</span>
-
-<span class="tag">
-Gift Card
-</span>
-
+<span class="status">Disponible</span>
+<span class="tag">Gift Card</span>
 </div>
 
-<div class="price">
-${p[1]} G
-</div>
+<div class="price">${p[1]} G</div>
 
-<div class="delivery">
-Livraison 0-3h
-</div>
+<div class="delivery">Livraison 0-3h</div>
 
 </div>
-
 </div>
 
-<button class="buy-btn">
-Acheter
-</button>
-
+<button class="buy-btn">Acheter</button>
 `;
 
 card.querySelector("button").onclick=()=>{
-
 addToCart(p[0],p[1]);
-
 };
 
 container.appendChild(card);
@@ -473,26 +290,16 @@ container.appendChild(card);
 });
 
 
-/* ===============================
-   ADD TO CART
-================================ */
-
 function addToCart(name,price){
 
 let cart=loadCart();
 
 cart.push({
-
 name:name,
-
 price:price,
-
 buyer:user.email,
-
 date:new Date().toLocaleString(),
-
 status:"En attente"
-
 });
 
 saveCart(cart);
@@ -500,11 +307,6 @@ saveCart(cart);
 showToast("Ajouté au panier");
 
 }
-
-
-/* ===============================
-   TOAST
-================================ */
 
 function showToast(msg){
 
@@ -516,27 +318,13 @@ t.textContent=msg;
 
 document.body.appendChild(t);
 
-setTimeout(()=>{
-
-t.remove();
-
-},2000);
+setTimeout(()=>{t.remove();},2000);
 
 }
-
-
-/* ===============================
-   BACK
-================================ */
 
 function goBack(){
-
 window.location.href="produits.html";
-
 }
-
-
-/* INIT */
 
 updateBalance();
 
