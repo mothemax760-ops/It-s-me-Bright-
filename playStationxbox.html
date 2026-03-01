@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRIGHT STORE | PlayStation & Xbox</title>
+
+<style>
+
+/* ======================
+   STYLE BRIGHT
+====================== */
+
+body{
+  font-family:'Poppins',sans-serif;
+  background:radial-gradient(circle at top,#001a33,#000);
+  margin:0;
+  color:#e0f7ff;
+}
+
+/* HEADER */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 20px;
+  background:rgba(5,10,20,0.95);
+  border-bottom:2px solid #00aaff;
+  box-shadow:0 0 10px #00aaff;
+  position:sticky;
+  top:0;
+}
+
+.logo{
+  font-weight:bold;
+  color:#00ccff;
+  font-size:1.4rem;
+}
+
+.right-box{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.balance-bubble{
+  padding:6px 12px;
+  border-radius:8px;
+  background:rgba(0,170,255,0.1);
+  border:1px solid #00aaff;
+  color:#00ccff;
+  font-weight:bold;
+}
+
+.cart-btn{
+  cursor:pointer;
+  font-weight:bold;
+  color:#00ccff;
+}
+
+.back-btn{
+  background:none;
+  border:2px solid #00aaff;
+  color:#00ccff;
+  padding:6px 12px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* TITRE */
+.section-title{
+  font-size:1.5rem;
+  margin:20px;
+  color:#00ccff;
+}
+
+/* PRODUIT */
+.product{
+  background:rgba(5,10,20,0.95);
+  margin:15px;
+  padding:15px;
+  border-radius:14px;
+  border:1px solid #00aaff33;
+  box-shadow:0 0 12px #00aaff22;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.product img{
+  width:65px;
+}
+
+.product-info{
+  flex:1;
+  margin-left:10px;
+}
+
+.product-name{
+  font-weight:bold;
+}
+
+.product-price{
+  color:#00ccff;
+  font-weight:bold;
+}
+
+.btn-add{
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+  background:linear-gradient(90deg,#00aaff,#004466);
+  color:#000;
+}
+
+.btn-add:hover{
+  box-shadow:0 0 12px #00aaff;
+}
+
+/* TOAST */
+
+.toast{
+  position:fixed;
+  bottom:30px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#00aaff;
+  color:#000;
+  padding:12px 20px;
+  border-radius:10px;
+  font-weight:bold;
+  opacity:0;
+  transition:0.3s;
+}
+
+.toast.show{
+  opacity:1;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<button class="back-btn" onclick="goBack()">← Retour</button>
+
+<div class="logo">BRIGHT STORE</div>
+
+<div class="right-box">
+
+<div class="balance-bubble" id="balanceBox">
+0 G
+</div>
+
+<div class="cart-btn" onclick="openCart()">
+🛒(<span id="cartCount">0</span>)
+</div>
+
+</div>
+
+</header>
+
+
+<h2 class="section-title">PLAYSTATION</h2>
+<div id="playstation-list"></div>
+
+<h2 class="section-title">XBOX USA</h2>
+<div id="xbox-list-us"></div>
+
+<h2 class="section-title">XBOX FRANCE</h2>
+<div id="xbox-list-fr"></div>
+
+
+<div id="toast" class="toast">
+Ajouté au panier
+</div>
+
+
+<script>
+
+/* ======================
+   CONNEXION IDENTIQUE BRIGHT PUBG
+====================== */
+
+function safeParse(str){
+
+try{return JSON.parse(str);}
+catch(e){return null;}
+
+}
+
+let user = safeParse(sessionStorage.getItem("dpstore_user")) || {};
+
+if(!user.email || !user.username){
+
+alert("⚠ Connectez-vous !");
+window.location.href="index.html";
+
+}
+
+if(!user.balance) user.balance=0;
+
+
+/* ======================
+   PANIER
+====================== */
+
+function normalizeId(str){
+
+return (str||"guest")
+.toLowerCase()
+.replace(/[^a-z0-9@.-]/g,"_")
+.replace(/@/g,"_at_");
+
+}
+
+function getCartKey(){
+
+return "cart_"+normalizeId(user.email);
+
+}
+
+function loadCart(){
+
+return JSON.parse(localStorage.getItem(getCartKey())||"[]");
+
+}
+
+function saveCart(cart){
+
+localStorage.setItem(getCartKey(),JSON.stringify(cart));
+
+}
+
+function updateCartCount(){
+
+document.getElementById("cartCount").textContent=
+loadCart().length;
+
+}
+
+function openCart(){
+
+window.location.href="cart.html";
+
+}
+
+
+/* ======================
+   SOLDE
+====================== */
+
+function updateBalanceUI(){
+
+document.getElementById("balanceBox").textContent=
+user.balance+" G";
+
+}
+
+updateBalanceUI();
+
+
+/* ======================
+   PRODUITS
+====================== */
+
+const products={
+
+playstation:[
+{name:"PLAYSTATION 5 USD",price:850,img:"https://i.imgur.com/EPp1yV2.png"},
+{name:"PLAYSTATION 10 USD",price:1650,img:"https://i.imgur.com/EPp1yV2.png"}
+],
+
+xboxUS:[
+{name:"XBOX 10 USD",price:1650,img:"https://i.imgur.com/m4n9C1P.png"}
+],
+
+xboxFR:[
+{name:"XBOX FR 10 EUR",price:1650,img:"https://i.imgur.com/m4n9C1P.png"}
+]
+
+};
+
+
+/* ======================
+   DISPLAY
+====================== */
+
+function displayProducts(id,list){
+
+const container=document.getElementById(id);
+
+list.forEach(p=>{
+
+const div=document.createElement("div");
+
+div.className="product";
+
+div.innerHTML=`
+
+<img src="${p.img}">
+
+<div class="product-info">
+
+<div class="product-name">${p.name}</div>
+
+<div class="product-price">${p.price} HTG</div>
+
+</div>
+
+<button class="btn-add">Ajouter</button>
+
+`;
+
+div.querySelector("button").onclick=()=>{
+
+const cart=loadCart();
+
+cart.push({
+
+name:p.name,
+price:p.price,
+buyer:user.email,
+date:new Date().toLocaleString(),
+status:"En attente",
+meta:{accountName:user.username}
+
+});
+
+saveCart(cart);
+
+updateCartCount();
+
+showToast();
+
+};
+
+container.appendChild(div);
+
+});
+
+}
+
+displayProducts("playstation-list",products.playstation);
+displayProducts("xbox-list-us",products.xboxUS);
+displayProducts("xbox-list-fr",products.xboxFR);
+
+
+/* ======================
+   TOAST
+====================== */
+
+function showToast(){
+
+const t=document.getElementById("toast");
+
+t.classList.add("show");
+
+setTimeout(()=>t.classList.remove("show"),1500);
+
+}
+
+function goBack(){
+
+window.location.href="produits.html";
+
+}
+
+/* INIT */
+
+updateCartCount();
+
+</script>
+
+</body>
+</html>
