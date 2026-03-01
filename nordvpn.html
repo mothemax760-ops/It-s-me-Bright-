@@ -3,168 +3,172 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DPSTORE | NordVPN</title>
+<title>Bright top up | NordVPN</title>
 
 <style>
 
-/* ===============================
-   🌌 BRIGHT GLOBAL STYLE
-================================ */
 body{
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background:linear-gradient(135deg,#000814,#001d3d,#003566);
-    color:#fff;
+margin:0;
+font-family:'Poppins',sans-serif;
+background:linear-gradient(135deg,#000814,#001d3d,#003566);
+color:#fff;
 }
 
-/* HEADER */
 header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:12px 18px;
-    background:rgba(0,0,0,0.85);
-    box-shadow:0 0 20px #00cfff;
-    position:sticky;
-    top:0;
-    z-index:999;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 18px;
+background:rgba(0,0,0,0.85);
+box-shadow:0 0 20px #00cfff;
+position:sticky;
+top:0;
+z-index:999;
 }
 
 header h1{
-    font-size:1.2rem;
-    margin:0;
-    background:linear-gradient(90deg,#00cfff,#ffffff);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
+margin:0;
+font-size:1.2rem;
+background:linear-gradient(90deg,#00cfff,#ffffff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
 }
 
-/* BUTTONS */
-.btn-retour,
-.btn-cart{
-    background:#00cfff;
-    border:none;
-    padding:7px 14px;
-    border-radius:10px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.25s;
+.btn-back{
+background:#00cfff;
+border:none;
+padding:7px 14px;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
+transition:0.25s;
 }
 
-.btn-retour:hover,
-.btn-cart:hover{
-    background:#FFD700;
-    transform:scale(1.05);
+.btn-back:hover{
+background:#FFD700;
+transform:scale(1.05);
 }
 
-/* BALANCE */
 .balance-box{
-    background:rgba(0,255,200,0.12);
-    border:1px solid #00ffd5;
-    padding:6px 12px;
-    border-radius:12px;
-    margin-right:10px;
-    font-weight:bold;
-    color:#00ffd5;
-    box-shadow:0 0 10px #00ffd5;
+background:rgba(0,255,200,0.12);
+border:1px solid #00ffd5;
+padding:6px 12px;
+border-radius:12px;
+font-weight:bold;
+color:#00ffd5;
+box-shadow:0 0 10px #00ffd5;
 }
 
-/* CONTAINER */
-.container{
-    padding:20px;
+h2{
+text-align:center;
+color:#00cfff;
+margin-top:20px;
 }
 
-/* PRODUCT CARD */
 .product-card{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(0,200,255,0.3);
-    border-radius:15px;
-    padding:15px;
-    margin-bottom:20px;
-    box-shadow:0 0 15px rgba(0,200,255,0.4);
-    transition:0.3s;
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(0,200,255,0.3);
+border-radius:15px;
+padding:15px;
+margin:15px;
+box-shadow:0 0 15px rgba(0,200,255,0.4);
+transition:0.3s;
 }
 
 .product-card:hover{
-    transform:scale(1.03);
-    box-shadow:0 0 25px #00cfff;
+transform:scale(1.03);
+box-shadow:0 0 25px #00cfff;
 }
 
-/* INFO */
-.product-info{
-    display:flex;
-    align-items:center;
-    gap:15px;
+.info{
+display:flex;
+align-items:center;
 }
 
-/* LOGO */
 .product-logo{
-    width:60px;
-    height:60px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:bold;
-    font-size:1.2rem;
-    background:linear-gradient(145deg,#003566,#00cfff);
-    box-shadow:0 0 15px #00cfff inset,0 0 10px #00cfff;
+width:60px;
+height:60px;
+border-radius:12px;
+margin-right:15px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+font-weight:bold;
+background:linear-gradient(145deg,#003566,#00cfff);
+box-shadow:0 0 15px #00cfff inset,0 0 10px #00cfff;
 }
 
-/* TEXT */
-.product-text h3{
-    margin:0;
-    color:#00cfff;
+.product-logo::after{
+content:"NV";
 }
 
-/* BADGES */
-.badge{
-    padding:3px 8px;
-    border-radius:6px;
-    font-size:0.75rem;
-    margin-right:5px;
+.details strong{
+color:#00cfff;
 }
 
-.badge.green{
-    background:#00ff88;
-    color:#000;
+.status{
+background:#00ff88;
+color:#000;
+padding:3px 8px;
+border-radius:6px;
+font-size:12px;
 }
 
-.badge.gray{
-    background:#aaa;
-    color:#000;
+.tag{
+background:#ccc;
+color:#000;
+padding:3px 8px;
+border-radius:6px;
+font-size:12px;
 }
 
-/* PRICE */
 .price{
-    font-weight:bold;
-    margin-top:5px;
+font-weight:bold;
+margin-top:5px;
 }
 
-/* BUY BUTTON */
+.delivery{
+font-size:12px;
+opacity:0.8;
+}
+
 .buy-btn{
-    background:#00cfff;
-    border:none;
-    padding:9px 16px;
-    border-radius:10px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.3s;
+background:#00cfff;
+border:none;
+padding:9px 16px;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
+transition:0.3s;
 }
 
 .buy-btn:hover{
-    background:#FFD700;
-    transform:scale(1.05);
+background:#FFD700;
+transform:scale(1.05);
 }
 
-/* FOOTER */
 footer{
-    text-align:center;
-    padding:15px;
-    background:rgba(0,0,0,0.7);
-    margin-top:30px;
+text-align:center;
+padding:15px;
+background:rgba(0,0,0,0.7);
+margin-top:20px;
+}
+
+.toast{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+background:#00cfff;
+color:#000;
+padding:10px 20px;
+border-radius:10px;
+font-weight:bold;
+box-shadow:0 0 15px #00cfff;
 }
 
 </style>
@@ -173,259 +177,148 @@ footer{
 
 <header>
 
-<button class="btn-retour"
-onclick="window.location.href='produits.html'">
-← Retour
-</button>
+<button class="btn-back" onclick="goBack()">← Retour</button>
 
-<h1>DPSTORE Bright — NordVPN</h1>
+<h1>Bright top up — NordVPN</h1>
 
-<div style="display:flex;align-items:center;">
-
-<div class="balance-box" id="balanceBox">
-0 G
-</div>
-
-<button class="btn-cart"
-onclick="window.location.href='cart.html'">
-🛒 Panier
-</button>
-
-</div>
+<div class="balance-box" id="balance-display">0 G</div>
 
 </header>
 
+<h2>NordVPN</h2>
 
-<div class="container"
-id="productContainer">
-</div>
-
+<div id="products"></div>
 
 <footer>
-© 2026 DPSTORE Bright
+© 2026 Bright top up
 </footer>
-
 
 <script>
 
-/* ===============================
-   🔐 SAFE PARSE
-================================ */
-
-function safeParse(str){
-    try{
-        return JSON.parse(str);
-    }catch{
-        return null;
-    }
-}
-
-
-/* ===============================
-   👤 SESSION USER
-================================ */
-
-let user =
-safeParse(
-sessionStorage.getItem("dpstore_user")
-);
-
-if(!user){
-alert("Connecte-toi !");
+function loadUser(){
+let u=JSON.parse(sessionStorage.getItem("dpstore_user")||"{}");
+if(!u.email){
+alert("Connecte-toi");
 window.location.href="index.html";
 }
-
-
-/* ===============================
-   🛒 CART SYSTEM PAR COMPTE
-================================ */
-
-function normalizeId(str){
-
-return str
-.toLowerCase()
-.replace(/[^a-z0-9]/g,"_");
-
+return u;
 }
 
-function getCartKey(){
-
-return "cart_"+normalizeId(user.email);
-
-}
-
-function loadCart(){
-
-return safeParse(
-localStorage.getItem(getCartKey())
-)||[];
-
-}
-
-function saveCart(cart){
-
-localStorage.setItem(
-getCartKey(),
-JSON.stringify(cart)
-);
-
-}
-
-
-/* ===============================
-   💰 UPDATE BALANCE
-================================ */
+let user=loadUser();
 
 function updateBalance(){
-
-user=
-safeParse(
-sessionStorage.getItem("dpstore_user")
-);
-
-document.getElementById(
-"balanceBox"
-).textContent=
-(user.balance||0)+" G";
-
+user=loadUser();
+document.getElementById("balance-display").textContent=(user.balance||0)+" G";
 }
 
 setInterval(updateBalance,1000);
 
+function normalizeId(str){
+return str.toLowerCase().replace(/[^a-z0-9]/g,"_");
+}
 
-/* ===============================
-   📦 PRODUITS
-================================ */
+function getCartKey(){
+return "cart_"+normalizeId(user.email);
+}
+
+function loadCart(){
+return JSON.parse(localStorage.getItem(getCartKey())||"[]");
+}
+
+function saveCart(cart){
+localStorage.setItem(getCartKey(),JSON.stringify(cart));
+}
+
+/* NORDVPN PRODUITS */
 
 const products=[
 
-{
-name:"NordVPN 1 mois",
-price:420
-},
-
-{
-name:"NordVPN 2 mois",
-price:720
-},
-
-{
-name:"NordVPN 3 mois",
-price:1200
-}
+["NORDVPN 1 MOIS",420],
+["NORDVPN 2 MOIS",720],
+["NORDVPN 3 MOIS",1200],
+["NORDVPN 6 MOIS",2200],
+["NORDVPN 12 MOIS",3900]
 
 ];
 
+const container=document.getElementById("products");
 
-/* ===============================
-   🖼 CREATE CARDS
-================================ */
+products.forEach(p=>{
 
-const container=
-document.getElementById(
-"productContainer"
-);
-
-products.forEach(product=>{
-
-const card=
-document.createElement("div");
+let card=document.createElement("div");
 
 card.className="product-card";
 
 card.innerHTML=`
 
-<div class="product-info">
+<div class="info">
+<div class="product-logo"></div>
 
-<div class="product-logo">
-NV
-</div>
+<div class="details">
 
-<div class="product-text">
-
-<h3>${product.name}</h3>
+<strong>${p[0]}</strong>
 
 <div>
-
-<span class="badge green">
-Disponible
-</span>
-
-<span class="badge gray">
-NordVPN
-</span>
-
+<span class="status">Disponible</span>
+<span class="tag">VPN</span>
 </div>
 
-<div class="price">
-${product.price} HTG
-</div>
+<div class="price">${p[1]} G</div>
 
-<div style="font-size:12px;">
-Livraison 0-3h
-</div>
+<div class="delivery">Livraison 0-3h</div>
 
 </div>
-
 </div>
 
-<button class="buy-btn">
-Acheter
-</button>
-
+<button class="buy-btn">Acheter</button>
 `;
 
-card.querySelector("button")
-.onclick=()=>{
-
-addToCart(product);
-
+card.querySelector("button").onclick=()=>{
+addToCart(p[0],p[1]);
 };
 
 container.appendChild(card);
 
 });
 
+function addToCart(name,price){
 
-/* ===============================
-   ➕ ADD TO CART
-================================ */
-
-function addToCart(product){
-
-const cart=loadCart();
+let cart=loadCart();
 
 cart.push({
-
-name:product.name,
-
-price:product.price,
-
+name:name,
+price:price,
 buyer:user.email,
-
 date:new Date().toLocaleString(),
-
-status:"En attente",
-
-account:user.username
-
+status:"En attente"
 });
 
 saveCart(cart);
 
-alert("Ajouté au panier");
+showToast("Ajouté au panier");
 
 }
 
+function showToast(msg){
 
-/* ===============================
-   INIT
-================================ */
+let t=document.createElement("div");
+
+t.className="toast";
+t.textContent=msg;
+
+document.body.appendChild(t);
+
+setTimeout(()=>{t.remove();},2000);
+
+}
+
+function goBack(){
+window.location.href="produits.html";
+}
 
 updateBalance();
 
 </script>
-
 
 </body>
 </html>
