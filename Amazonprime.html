@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bright Top Up | Amazon Prime</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#0b0f1a;
+    color:white;
+}
+
+/* HEADER */
+.header{
+    background:linear-gradient(90deg,#00ccff,#0066ff);
+    padding:15px;
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+    position:relative;
+}
+
+.balance{
+    position:absolute;
+    right:15px;
+    top:15px;
+    background:#000;
+    padding:5px 10px;
+    border-radius:6px;
+    border:1px solid #00ccff;
+}
+
+.cart-btn{
+    position:absolute;
+    left:15px;
+    top:15px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* CONTAINER */
+.container{
+    padding:20px;
+}
+
+/* PRODUCT */
+.product{
+    background:#11182a;
+    border:1px solid #00ccff;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.product-info{
+    font-size:16px;
+}
+
+.price{
+    color:#00ffcc;
+    font-weight:bold;
+}
+
+.buy-btn{
+    background:linear-gradient(90deg,#00ccff,#0066ff);
+    border:none;
+    padding:8px 15px;
+    border-radius:6px;
+    color:white;
+    cursor:pointer;
+}
+
+/* POPUP */
+.popup{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.7);
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+
+.popup-box{
+    background:#11182a;
+    padding:20px;
+    border-radius:10px;
+    width:300px;
+}
+
+.popup-box input{
+    width:100%;
+    margin-bottom:10px;
+    padding:8px;
+    border-radius:5px;
+    border:none;
+}
+
+.popup-box button{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    background:#00ccff;
+    color:white;
+    cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+<div class="cart-btn" onclick="gotoCart()">🛒(<span id="cartCount">0</span>)</div>
+
+Bright Top Up
+
+<div class="balance" id="balanceBox">0 G</div>
+
+</div>
+
+<div class="container">
+
+<div class="product">
+<div class="product-info">
+Amazon Prime<br>
+<span class="price">1 Mois + 1 Profil — 500 HTG</span>
+</div>
+<button class="buy-btn" onclick="openPopup('Amazon Prime 1 Mois',500)">Acheter</button>
+</div>
+
+<div class="product">
+<div class="product-info">
+Amazon Prime<br>
+<span class="price">3 Mois + 1 Profil — 1354 HTG</span>
+</div>
+<button class="buy-btn" onclick="openPopup('Amazon Prime 3 Mois',1354)">Acheter</button>
+</div>
+
+<div class="product">
+<div class="product-info">
+Amazon Prime<br>
+<span class="price">6 Mois + 1 Profil — 2707 HTG</span>
+</div>
+<button class="buy-btn" onclick="openPopup('Amazon Prime 6 Mois',2707)">Acheter</button>
+</div>
+
+</div>
+
+<!-- POPUP -->
+
+<div class="popup" id="popup">
+
+<div class="popup-box">
+
+<h3>Achat Amazon Prime</h3>
+
+<input type="text" id="email" placeholder="Email Amazon">
+
+<input type="text" id="whatsapp" placeholder="WhatsApp">
+
+<button onclick="confirmBuy()">Confirmer</button>
+
+<button onclick="closePopup()" style="margin-top:5px;background:red;">Annuler</button>
+
+</div>
+
+</div>
+
+<script>
+
+let user = JSON.parse(sessionStorage.getItem("dpstore_user")) || {balance:0,email:"guest"};
+
+let selectedProduct=null;
+
+/* BALANCE */
+function updateBalance(){
+document.getElementById("balanceBox").innerText=user.balance+" G";
+}
+updateBalance();
+
+/* CART COUNT */
+function updateCartCount(){
+let cart = JSON.parse(localStorage.getItem("cart_email")) || [];
+document.getElementById("cartCount").innerText=cart.length;
+}
+updateCartCount();
+
+/* POPUP */
+function openPopup(name,price){
+selectedProduct={name,price};
+document.getElementById("popup").style.display="flex";
+}
+
+function closePopup(){
+document.getElementById("popup").style.display="none";
+}
+
+/* CONFIRM BUY */
+function confirmBuy(){
+
+let email=document.getElementById("email").value;
+let whatsapp=document.getElementById("whatsapp").value;
+
+if(!email || !whatsapp){
+alert("Remplis tous les champs");
+return;
+}
+
+let cart = JSON.parse(localStorage.getItem("cart_email")) || [];
+
+cart.push({
+name:selectedProduct.name,
+price:selectedProduct.price,
+email:email,
+whatsapp:whatsapp,
+date:new Date().toLocaleString(),
+status:"En attente"
+});
+
+localStorage.setItem("cart_email",JSON.stringify(cart));
+
+updateCartCount();
+
+alert("Produit ajouté au panier");
+
+closePopup();
+
+}
+
+/* GO CART */
+function gotoCart(){
+window.location.href="cart.html";
+}
+
+</script>
+
+</body>
+</html>
