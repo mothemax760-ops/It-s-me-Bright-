@@ -93,6 +93,12 @@ h1{
   font-size:18px;
 }
 
+.warning{
+  margin-top:6px;
+  font-size:12px;
+  color:#ffcc00;
+}
+
 .btn{
   margin-top:12px;
   background:linear-gradient(90deg,#00aaff,#004466);
@@ -294,6 +300,7 @@ PRODUCTS.forEach(p=>{
   card.innerHTML=`
     <div class="title">${p.qty}</div>
     <div class="price">${p.price} G</div>
+    <div class="warning">Entrez l'ID du joueur correct. ATTENTION Le système peut prendre de 5 min à 24h 🕛</div>
     <button class="btn" onclick="buy('${p.id}')">Acheter</button>
   `;
   grid.appendChild(card);
