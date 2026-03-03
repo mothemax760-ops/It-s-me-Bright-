@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Historique</title>
+<style>
+body{background:#001a33;color:#fff;font-family:Poppins;padding:20px;}
+.box{background:#002b4d;padding:15px;margin-bottom:15px;border-radius:10px;border:1px solid #00aaff;}
+</style>
+</head>
+<body>
+
+<h2>📜 Mon Historique</h2>
+<div id="history"></div>
+
+<script>
+function safeParse(str){ try{ return JSON.parse(str);}catch(e){return null;} }
+let user=safeParse(sessionStorage.getItem("dpstore_user"))||{};
+if(!user.email){ window.location.href="index.html"; }
+
+function loadGlobalOrders(){
+  return JSON.parse(localStorage.getItem("global_orders")||"[]");
+}
+
+const historyDiv=document.getElementById("history");
+
+function render(){
+  const orders=loadGlobalOrders();
+  historyDiv.innerHTML="";
+
+  const myOrders=orders.filter(o=>o.buyer===user.email);
+
+  if(myOrders.length===0){
+    historyDiv.innerHTML="<p>Aucune commande validée.</p>";
+    return;
+  }
+
+  myOrders.forEach(o=>{
+    const box=document.createElement("div");
+    box.className="box";
+    box.innerHTML=`
+      <b>${o.name}</b><br>
+      Prix: ${o.price} HTG<br>
+      Date: ${o.validatedDate}
+    `;
+    historyDiv.appendChild(box);
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
