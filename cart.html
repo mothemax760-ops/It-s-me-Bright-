@@ -7,8 +7,17 @@
 
 <style>
 body {margin:0;font-family:'Poppins',sans-serif;background:#001a33;color:#e0f7ff;}
-header {display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:rgba(5,10,20,0.95);border-bottom:2px solid #00aaff;box-shadow:0 0 10px #00aaff;}
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 20px;
+  background:rgba(5,10,20,0.95);
+  border-bottom:2px solid #00aaff;
+  box-shadow:0 0 10px #00aaff;
+}
 .logo {font-weight:bold;color:#00ccff;font-size:1.3rem;}
+.top-btn {background:none;border:1px solid #00aaff;padding:6px 10px;border-radius:8px;color:#00ccff;cursor:pointer;}
 .container {padding:20px;}
 .cart-box {
   background:rgba(5,10,20,0.95);
@@ -21,15 +30,16 @@ header {display:flex;justify-content:space-between;align-items:center;padding:15
 .cart-box h3 {margin:0;color:#00ccff;}
 .price {font-weight:bold;color:#00ccff;margin-top:5px;}
 .meta {font-size:0.85rem;color:#ccc;margin-top:5px;}
-.remove-btn {
+.btn {
   margin-top:10px;
   padding:8px;
-  background:red;
-  color:white;
   border:none;
   border-radius:8px;
   cursor:pointer;
+  font-weight:bold;
 }
+.validate-btn {background:#00c853;color:#000;}
+.remove-btn {background:red;color:#fff;}
 .total-box {
   margin-top:25px;
   padding:20px;
@@ -38,31 +48,22 @@ header {display:flex;justify-content:space-between;align-items:center;padding:15
   text-align:center;
   box-shadow:0 0 15px #00aaff;
 }
-.checkout-btn {
-  margin-top:15px;
-  padding:12px;
-  width:100%;
-  background:linear-gradient(90deg,#00aaff,#004466);
-  border:none;
-  border-radius:10px;
-  font-weight:bold;
-  cursor:pointer;
-}
 </style>
 </head>
 <body>
 
 <header>
-  <button onclick="window.location.href='produits.html'">←</button>
+  <button class="top-btn" onclick="window.location.href='produits.html'">← Retour</button>
   <div class="logo">BRIGHT PANIER</div>
+  <button class="top-btn" onclick="window.location.href='historique.html'">📜 Historique</button>
 </header>
 
 <div class="container">
+  <h3>Solde : <span id="balanceBox">0</span> HTG</h3>
   <div id="cart-list"></div>
 
   <div class="total-box">
-    <h3>Total : <span id="totalPrice">0</span> HTG</h3>
-    <button class="checkout-btn" onclick="checkout()">Procéder au paiement</button>
+    <h3>Total Panier : <span id="totalPrice">0</span> HTG</h3>
   </div>
 </div>
 
@@ -72,10 +73,12 @@ header {display:flex;justify-content:space-between;align-items:center;padding:15
 ====================== */
 function safeParse(str){ try{ return JSON.parse(str);}catch(e){return null;} }
 let user = safeParse(sessionStorage.getItem("dpstore_user")) || {};
-if(!user.email){ alert("Connectez-vous"); window.location.href="index.html"; }
+if(!user.email){ window.location.href="index.html"; }
+
+if(user.credits === undefined) user.credits = 0;
 
 /* ======================
-   PANIER SYSTEM (IDENTIQUE PUBG)
+   PANIER
 ====================== */
 function normalizeId(str){
   return (str||"guest")
@@ -83,21 +86,23 @@ function normalizeId(str){
     .replace(/[^a-z0-9@.-]/g,"_")
     .replace(/@/g,"_at_");
 }
-function getCartKey(){
-  return "cart_"+normalizeId(user.email);
-}
-function loadCart(){
-  return JSON.parse(localStorage.getItem(getCartKey())||"[]");
-}
-function saveCart(cart){
-  localStorage.setItem(getCartKey(),JSON.stringify(cart));
-}
+function getCartKey(){ return "cart_"+normalizeId(user.email); }
+function loadCart(){ return JSON.parse(localStorage.getItem(getCartKey())||"[]"); }
+function saveCart(cart){ localStorage.setItem(getCartKey(),JSON.stringify(cart)); }
+
+function loadGlobalOrders(){ return JSON.parse(localStorage.getItem("global_orders")||"[]"); }
+function saveGlobalOrders(data){ localStorage.setItem("global_orders",JSON.stringify(data)); }
 
 /* ======================
-   RENDER
+   UI
 ====================== */
 const cartList=document.getElementById("cart-list");
 const totalPrice=document.getElementById("totalPrice");
+const balanceBox=document.getElementById("balanceBox");
+
+function updateBalanceUI(){
+  balanceBox.textContent = user.credits;
+}
 
 function renderCart(){
   const cart=loadCart();
@@ -118,12 +123,9 @@ function renderCart(){
     box.innerHTML=`
       <h3>${item.name}</h3>
       <div class="price">${item.price} HTG</div>
-      <div class="meta">
-        UID: ${item.meta?.uid ?? "-"} <br>
-        WhatsApp: ${item.meta?.whatsapp ?? "-"} <br>
-        Statut: ${item.status}
-      </div>
-      <button class="remove-btn" onclick="removeItem(${index})">Supprimer</button>
+      <div class="meta">Statut: ${item.status}</div>
+      <button class="btn validate-btn" onclick="validateOrder(${index})">Valider</button>
+      <button class="btn remove-btn" onclick="removeItem(${index})">Supprimer</button>
     `;
     cartList.appendChild(box);
   });
@@ -138,10 +140,44 @@ function removeItem(index){
   renderCart();
 }
 
-function checkout(){
-  alert("Système de paiement à connecter.");
+/* ======================
+   VALIDATION + DEDUCTION
+====================== */
+function validateOrder(index){
+  let cart=loadCart();
+  let orders=loadGlobalOrders();
+  let item=cart[index];
+
+  if(user.credits < item.price){
+    alert("Solde insuffisant !");
+    return;
+  }
+
+  // Déduction
+  user.credits -= item.price;
+
+  // Mise à jour session
+  sessionStorage.setItem("dpstore_user",JSON.stringify(user));
+
+  // Mise à jour commande
+  item.status="Payé";
+  item.validatedDate=new Date().toLocaleString();
+
+  orders.push(item);
+
+  cart.splice(index,1);
+
+  saveCart(cart);
+  saveGlobalOrders(orders);
+
+  updateBalanceUI();
+  renderCart();
+
+  alert("Commande validée et solde déduit !");
 }
 
+/* INIT */
+updateBalanceUI();
 renderCart();
 </script>
 
