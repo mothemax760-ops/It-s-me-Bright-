@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bright Tup Up | Manga & Efootball</title>
+
 <style>
 body {
   margin: 0;
@@ -111,7 +112,7 @@ footer { text-align: center; padding: 20px; background: rgba(0,0,0,0.7); border-
 }
 .toast.show { opacity: 1; }
 
-/* ===== Ballon de foot CSS ===== */
+/* Ballon */
 .football-ball {
   width:28px; height:28px;
   background:#fff;
@@ -129,9 +130,7 @@ footer { text-align: center; padding: 20px; background: rgba(0,0,0,0.7); border-
   border-radius:2px;
   top:8px; left:8px;
 }
-.football-ball::after {
-  left:auto; right:8px;
-}
+.football-ball::after { left:auto; right:8px; }
 </style>
 </head>
 <body>
@@ -156,31 +155,37 @@ footer { text-align: center; padding: 20px; background: rgba(0,0,0,0.7); border-
 <footer>© 2026 Bright Tup Up — Tous droits réservés</footer>
 
 <script>
+
 /* ==========================
-   🔥 PROFIL SÉCURISÉ
+   PROFIL
 ========================== */
 let user = JSON.parse(sessionStorage.getItem("dpstore_user") || "null");
+
 if(!user || !user.email || !user.username){
   alert("⚠ Vous devez être connecté !");
   window.location.href = "index.html";
 }
+
 if(!user.balance) user.balance = 0;
 
 /* ==========================
-   🔥 PANIER PAR COMPTE
+   PANIER GLOBAL BRIGHT
 ========================== */
-function normalizeId(str){ return (str||"guest").toLowerCase().replace(/[^a-z0-9@.-]/g,"_").replace(/@/g,"_at_"); }
-function getCartKey(){ return "cart_" + normalizeId(user.email); }
-function loadCart(){ return JSON.parse(localStorage.getItem(getCartKey())||"[]"); }
-function saveCart(cart){ localStorage.setItem(getCartKey(), JSON.stringify(cart)); }
+function loadCart(){
+  return JSON.parse(localStorage.getItem("cart") || "[]");
+}
+
+function saveCart(cart){
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
 
 function updateBalanceUI() {
-  user = JSON.parse(sessionStorage.getItem("dpstore_user") || JSON.stringify(user));
+  user = JSON.parse(sessionStorage.getItem("dpstore_user")) || user;
   document.getElementById("balanceBox").textContent = (user.balance ?? 0) + " G";
 }
 
 /* ==========================
-   🔥 PRODUITS
+   PRODUITS
 ========================== */
 const products = [
   { name: "Bright Manga 1 Mois", price: 540 },
@@ -198,7 +203,7 @@ products.forEach(p => {
     <span class="status">Disponible</span><span class="tag">Manga</span>
     <div class="price">${p.price} HTG</div>
     <div class="desc">Livraison 0 à 3h — Accès illimité anime & manga</div>
-    <button class="btn-primary">Acheter</button>
+    <button class="btn-primary">Ajouter au panier</button>
   `;
   card.querySelector("button").addEventListener("click", ()=>{
     addToCart(p.name, p.price);
@@ -207,19 +212,28 @@ products.forEach(p => {
 });
 
 /* ==========================
-   🔥 AJOUT AU PANIER
+   AJOUT PANIER GLOBAL
 ========================== */
 function addToCart(name, price){
-  const cart = loadCart();
+
+  let cart = loadCart();
+
   cart.push({
-    name,
-    price,
+    name: name,
+    price: price,
     buyer: user.email,
+    username: user.username,
+    email: user.email,
     date: new Date().toLocaleString(),
     status: "En attente",
-    meta: { accountName: user.username }
+    meta: {
+      type: "Manga",
+      accountName: user.username
+    }
   });
+
   saveCart(cart);
+
   showToast();
   updateBalanceUI();
 }
@@ -240,6 +254,7 @@ function openCart() {
   localStorage.setItem("lastPage", window.location.href);
   window.location.href = "cart.html";
 }
+
 </script>
 
 </body>
