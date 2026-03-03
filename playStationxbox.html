@@ -6,11 +6,6 @@
 <title>BRIGHT STORE | PlayStation & Xbox</title>
 
 <style>
-
-/* ======================
-   STYLE BRIGHT
-====================== */
-
 body{
   font-family:'Poppins',sans-serif;
   background:radial-gradient(circle at top,#001a33,#000);
@@ -18,7 +13,6 @@ body{
   color:#e0f7ff;
 }
 
-/* HEADER */
 header{
   display:flex;
   justify-content:space-between;
@@ -67,14 +61,12 @@ header{
   cursor:pointer;
 }
 
-/* TITRE */
 .section-title{
   font-size:1.5rem;
   margin:20px;
   color:#00ccff;
 }
 
-/* PRODUIT */
 .product{
   background:rgba(5,10,20,0.95);
   margin:15px;
@@ -87,23 +79,13 @@ header{
   justify-content:space-between;
 }
 
-.product img{
-  width:65px;
-}
+.product img{ width:65px; }
 
-.product-info{
-  flex:1;
-  margin-left:10px;
-}
+.product-info{ flex:1; margin-left:10px; }
 
-.product-name{
-  font-weight:bold;
-}
+.product-name{ font-weight:bold; }
 
-.product-price{
-  color:#00ccff;
-  font-weight:bold;
-}
+.product-price{ color:#00ccff; font-weight:bold; }
 
 .btn-add{
   padding:10px;
@@ -115,11 +97,7 @@ header{
   color:#000;
 }
 
-.btn-add:hover{
-  box-shadow:0 0 12px #00aaff;
-}
-
-/* TOAST */
+.btn-add:hover{ box-shadow:0 0 12px #00aaff; }
 
 .toast{
   position:fixed;
@@ -135,35 +113,23 @@ header{
   transition:0.3s;
 }
 
-.toast.show{
-  opacity:1;
-}
-
+.toast.show{ opacity:1; }
 </style>
 </head>
 
 <body>
 
 <header>
-
 <button class="back-btn" onclick="goBack()">← Retour</button>
-
 <div class="logo">BRIGHT STORE</div>
 
 <div class="right-box">
-
-<div class="balance-bubble" id="balanceBox">
-0 G
-</div>
-
+<div class="balance-bubble" id="balanceBox">0 G</div>
 <div class="cart-btn" onclick="openCart()">
 🛒(<span id="cartCount">0</span>)
 </div>
-
 </div>
-
 </header>
-
 
 <h2 class="section-title">PLAYSTATION</h2>
 <div id="playstation-list"></div>
@@ -174,204 +140,117 @@ header{
 <h2 class="section-title">XBOX FRANCE</h2>
 <div id="xbox-list-fr"></div>
 
-
-<div id="toast" class="toast">
-Ajouté au panier
-</div>
-
+<div id="toast" class="toast">Ajouté au panier</div>
 
 <script>
 
-/* ======================
-   CONNEXION IDENTIQUE BRIGHT PUBG
-====================== */
-
-function safeParse(str){
-
-try{return JSON.parse(str);}
-catch(e){return null;}
-
-}
-
+/* PROFIL */
+function safeParse(str){ try{return JSON.parse(str);}catch(e){return null;} }
 let user = safeParse(sessionStorage.getItem("dpstore_user")) || {};
 
 if(!user.email || !user.username){
-
 alert("⚠ Connectez-vous !");
 window.location.href="index.html";
-
 }
 
 if(!user.balance) user.balance=0;
 
-
-/* ======================
-   PANIER
-====================== */
-
-function normalizeId(str){
-
-return (str||"guest")
-.toLowerCase()
-.replace(/[^a-z0-9@.-]/g,"_")
-.replace(/@/g,"_at_");
-
-}
-
-function getCartKey(){
-
-return "cart_"+normalizeId(user.email);
-
-}
-
+/* PANIER GLOBAL */
 function loadCart(){
-
-return JSON.parse(localStorage.getItem(getCartKey())||"[]");
-
+return JSON.parse(localStorage.getItem("cart")||"[]");
 }
 
 function saveCart(cart){
-
-localStorage.setItem(getCartKey(),JSON.stringify(cart));
-
+localStorage.setItem("cart",JSON.stringify(cart));
 }
 
 function updateCartCount(){
-
 document.getElementById("cartCount").textContent=
 loadCart().length;
-
 }
 
 function openCart(){
-
 window.location.href="cart.html";
-
 }
 
-
-/* ======================
-   SOLDE
-====================== */
-
+/* SOLDE */
 function updateBalanceUI(){
-
 document.getElementById("balanceBox").textContent=
 user.balance+" G";
-
 }
-
 updateBalanceUI();
 
-
-/* ======================
-   PRODUITS
-====================== */
-
+/* PRODUITS */
 const products={
-
 playstation:[
 {name:"PLAYSTATION 5 USD",price:850,img:"https://i.imgur.com/EPp1yV2.png"},
 {name:"PLAYSTATION 10 USD",price:1650,img:"https://i.imgur.com/EPp1yV2.png"}
 ],
-
 xboxUS:[
 {name:"XBOX 10 USD",price:1650,img:"https://i.imgur.com/m4n9C1P.png"}
 ],
-
 xboxFR:[
 {name:"XBOX FR 10 EUR",price:1650,img:"https://i.imgur.com/m4n9C1P.png"}
 ]
-
 };
 
-
-/* ======================
-   DISPLAY
-====================== */
-
+/* DISPLAY */
 function displayProducts(id,list){
-
 const container=document.getElementById(id);
 
 list.forEach(p=>{
-
 const div=document.createElement("div");
-
 div.className="product";
 
 div.innerHTML=`
-
 <img src="${p.img}">
-
 <div class="product-info">
-
 <div class="product-name">${p.name}</div>
-
 <div class="product-price">${p.price} HTG</div>
-
 </div>
-
 <button class="btn-add">Ajouter</button>
-
 `;
 
 div.querySelector("button").onclick=()=>{
 
-const cart=loadCart();
+let cart=loadCart();
 
 cart.push({
-
 name:p.name,
 price:p.price,
 buyer:user.email,
+username:user.username,
+email:user.email,
 date:new Date().toLocaleString(),
 status:"En attente",
-meta:{accountName:user.username}
-
+meta:{ type:"Gift Card" }
 });
 
 saveCart(cart);
-
 updateCartCount();
-
 showToast();
-
 };
 
 container.appendChild(div);
-
 });
-
 }
 
 displayProducts("playstation-list",products.playstation);
 displayProducts("xbox-list-us",products.xboxUS);
 displayProducts("xbox-list-fr",products.xboxFR);
 
-
-/* ======================
-   TOAST
-====================== */
-
+/* TOAST */
 function showToast(){
-
 const t=document.getElementById("toast");
-
 t.classList.add("show");
-
 setTimeout(()=>t.classList.remove("show"),1500);
-
 }
 
 function goBack(){
-
 window.location.href="produits.html";
-
 }
 
 /* INIT */
-
 updateCartCount();
 
 </script>
