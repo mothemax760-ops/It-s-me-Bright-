@@ -6,86 +6,167 @@
 <title>Bright Tup Up | Panier</title>
 
 <style>
-body {margin:0;font-family:'Poppins',sans-serif;background:#001a33;color:#e0f7ff;}
-header {
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:radial-gradient(circle at top,#001a33,#000);
+  color:#e0f7ff;
+}
+
+header{
   display:flex;
   justify-content:space-between;
   align-items:center;
   padding:15px 20px;
   background:rgba(5,10,20,0.95);
   border-bottom:2px solid #00aaff;
-  box-shadow:0 0 10px #00aaff;
+  box-shadow:0 0 15px #00aaff;
+  position:sticky;
+  top:0;
 }
-.logo {font-weight:bold;color:#00ccff;font-size:1.3rem;}
-.top-btn {background:none;border:1px solid #00aaff;padding:6px 10px;border-radius:8px;color:#00ccff;cursor:pointer;}
-.container {padding:20px;}
-.cart-box {
+
+.logo{
+  font-size:1.3rem;
+  font-weight:bold;
+  color:#00ccff;
+}
+
+.top-btn{
+  background:none;
+  border:1px solid #00aaff;
+  padding:6px 12px;
+  border-radius:8px;
+  color:#00ccff;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.top-btn:hover{
+  background:#00aaff;
+  color:#000;
+}
+
+.container{
+  padding:20px;
+}
+
+.balance-box{
+  background:rgba(0,170,255,0.1);
+  border:1px solid #00aaff;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:20px;
+  box-shadow:0 0 12px #00aaff55;
+}
+
+.cart-card{
   background:rgba(5,10,20,0.95);
-  padding:15px;
-  border-radius:14px;
   border:1px solid #00aaff33;
+  border-radius:15px;
+  padding:18px;
+  margin-bottom:18px;
   box-shadow:0 0 12px #00aaff22;
-  margin-bottom:15px;
+  transition:0.3s;
 }
-.cart-box h3 {margin:0;color:#00ccff;}
-.price {font-weight:bold;color:#00ccff;margin-top:5px;}
-.meta {font-size:0.85rem;color:#ccc;margin-top:5px;}
-.btn {
+
+.cart-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 0 18px #00aaff88;
+}
+
+.product-name{
+  font-weight:bold;
+  font-size:1.1rem;
+  color:#00ccff;
+}
+
+.price{
+  font-weight:bold;
+  margin-top:8px;
+  color:#00ccff;
+}
+
+.status{
+  margin-top:6px;
+  font-size:0.85rem;
+  color:#aaa;
+}
+
+.btn{
   margin-top:10px;
-  padding:8px;
+  padding:8px 14px;
   border:none;
   border-radius:8px;
   cursor:pointer;
   font-weight:bold;
 }
-.validate-btn {background:#00c853;color:#000;}
-.remove-btn {background:red;color:#fff;}
-.total-box {
+
+.validate-btn{
+  background:#00c853;
+  color:#000;
+}
+
+.remove-btn{
+  background:red;
+  color:#fff;
+  margin-left:5px;
+}
+
+.total-box{
   margin-top:25px;
-  padding:20px;
+  padding:18px;
   border:2px solid #00aaff;
   border-radius:12px;
   text-align:center;
   box-shadow:0 0 15px #00aaff;
+}
+
+.empty{
+  text-align:center;
+  margin-top:40px;
+  color:#888;
 }
 </style>
 </head>
 <body>
 
 <header>
-  <button class="top-btn" onclick="window.location.href='produits.html'">← Retour</button>
+  <button class="top-btn" onclick="window.location.href='produits.html'">← Produits</button>
   <div class="logo">BRIGHT PANIER</div>
   <button class="top-btn" onclick="window.location.href='historique.html'">📜 Historique</button>
 </header>
 
 <div class="container">
-  <h3>Solde : <span id="balanceBox">0</span> HTG</h3>
-  <div id="cart-list"></div>
+
+  <div class="balance-box">
+    💰 Solde actuel : <strong><span id="balanceBox">0</span> HTG</strong>
+  </div>
+
+  <div id="cartList"></div>
 
   <div class="total-box">
-    <h3>Total Panier : <span id="totalPrice">0</span> HTG</h3>
+    <h3>Total panier : <span id="totalPrice">0</span> HTG</h3>
   </div>
+
 </div>
 
 <script>
-/* ======================
-   USER
-====================== */
-function safeParse(str){ try{ return JSON.parse(str);}catch(e){return null;} }
+/* ================= USER ================= */
+function safeParse(str){ try{return JSON.parse(str);}catch(e){return null;} }
+
 let user = safeParse(sessionStorage.getItem("dpstore_user")) || {};
 if(!user.email){ window.location.href="index.html"; }
 
 if(user.credits === undefined) user.credits = 0;
 
-/* ======================
-   PANIER
-====================== */
+/* ================= PANIER SYSTEM ================= */
 function normalizeId(str){
   return (str||"guest")
     .toLowerCase()
     .replace(/[^a-z0-9@.-]/g,"_")
     .replace(/@/g,"_at_");
 }
+
 function getCartKey(){ return "cart_"+normalizeId(user.email); }
 function loadCart(){ return JSON.parse(localStorage.getItem(getCartKey())||"[]"); }
 function saveCart(cart){ localStorage.setItem(getCartKey(),JSON.stringify(cart)); }
@@ -93,14 +174,12 @@ function saveCart(cart){ localStorage.setItem(getCartKey(),JSON.stringify(cart))
 function loadGlobalOrders(){ return JSON.parse(localStorage.getItem("global_orders")||"[]"); }
 function saveGlobalOrders(data){ localStorage.setItem("global_orders",JSON.stringify(data)); }
 
-/* ======================
-   UI
-====================== */
-const cartList=document.getElementById("cart-list");
+/* ================= UI ================= */
+const cartList=document.getElementById("cartList");
 const totalPrice=document.getElementById("totalPrice");
 const balanceBox=document.getElementById("balanceBox");
 
-function updateBalanceUI(){
+function updateBalance(){
   balanceBox.textContent = user.credits;
 }
 
@@ -110,7 +189,7 @@ function renderCart(){
   let total=0;
 
   if(cart.length===0){
-    cartList.innerHTML="<p>Votre panier est vide.</p>";
+    cartList.innerHTML="<div class='empty'>Votre panier est vide.</div>";
     totalPrice.textContent="0";
     return;
   }
@@ -118,31 +197,29 @@ function renderCart(){
   cart.forEach((item,index)=>{
     total+=Number(item.price);
 
-    const box=document.createElement("div");
-    box.className="cart-box";
-    box.innerHTML=`
-      <h3>${item.name}</h3>
+    const card=document.createElement("div");
+    card.className="cart-card";
+    card.innerHTML=`
+      <div class="product-name">${item.name}</div>
       <div class="price">${item.price} HTG</div>
-      <div class="meta">Statut: ${item.status}</div>
+      <div class="status">Statut: ${item.status || "En attente"}</div>
       <button class="btn validate-btn" onclick="validateOrder(${index})">Valider</button>
       <button class="btn remove-btn" onclick="removeItem(${index})">Supprimer</button>
     `;
-    cartList.appendChild(box);
+    cartList.appendChild(card);
   });
 
   totalPrice.textContent=total;
 }
 
 function removeItem(index){
-  const cart=loadCart();
+  let cart=loadCart();
   cart.splice(index,1);
   saveCart(cart);
   renderCart();
 }
 
-/* ======================
-   VALIDATION + DEDUCTION
-====================== */
+/* ================= VALIDATION ================= */
 function validateOrder(index){
   let cart=loadCart();
   let orders=loadGlobalOrders();
@@ -153,15 +230,15 @@ function validateOrder(index){
     return;
   }
 
-  // Déduction
+  // Déduction solde
   user.credits -= item.price;
-
-  // Mise à jour session
   sessionStorage.setItem("dpstore_user",JSON.stringify(user));
 
-  // Mise à jour commande
+  // Infos complètes commande
   item.status="Payé";
   item.validatedDate=new Date().toLocaleString();
+  item.email=user.email;
+  item.username=user.username;
 
   orders.push(item);
 
@@ -170,14 +247,14 @@ function validateOrder(index){
   saveCart(cart);
   saveGlobalOrders(orders);
 
-  updateBalanceUI();
+  updateBalance();
   renderCart();
 
-  alert("Commande validée et solde déduit !");
+  alert("Commande validée avec succès !");
 }
 
 /* INIT */
-updateBalanceUI();
+updateBalance();
 renderCart();
 </script>
 
