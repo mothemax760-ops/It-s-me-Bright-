@@ -173,20 +173,16 @@ h1{
     src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg">
     <span id="balanceValue">Utilisateur • 0 G</span>
   </div>
-
 </header>
 
 <main>
 
 <div class="toolbar">
-
 <h1>Achat des diamants — Free Fire</h1>
-
 <div>
 <button class="cart-btn" onclick="location.href='cart.html'">🛒 Panier</button>
 <button class="back" onclick="location.href='produits.html'">← Retour</button>
 </div>
-
 </div>
 
 <div class="grid" id="grid"></div>
@@ -194,17 +190,11 @@ h1{
 </main>
 
 <div id="modal" class="modal">
-
 <div class="modal-card">
-
 <h3 id="modalTitle">Acheter</h3>
-
 <input id="ffId" class="input" placeholder="ID joueur">
-
-<button id="confirm" class="btn">Ajouter</button>
-
+<button id="confirm" class="btn">Ajouter au panier</button>
 </div>
-
 </div>
 
 <script type="module">
@@ -213,7 +203,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// CONFIG Firebase
 const firebaseConfig={
   apiKey:"AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
   authDomain:"brighttupup.firebaseapp.com",
@@ -228,8 +217,8 @@ const auth=getAuth(app);
 const db=getFirestore(app);
 
 let user={};
+let selectedProduct=null;
 
-// SYSTEME CONNEXION
 onAuthStateChanged(auth,async(firebaseUser)=>{
   if(!firebaseUser){
     location.href="index.html";
@@ -244,7 +233,6 @@ onAuthStateChanged(auth,async(firebaseUser)=>{
     role:"user"
   };
 
-  // charger Firestore
   try{
     const snap=await getDocs(collection(db,"users"));
     snap.forEach(doc=>{
@@ -257,18 +245,14 @@ onAuthStateChanged(auth,async(firebaseUser)=>{
       }
     });
   }catch(e){
-    console.warn("Erreur Firestore",e);
+    console.warn(e);
   }
 
-  // sauvegarde session
   sessionStorage.setItem("dpstore_user",JSON.stringify(account));
-
-  // appliquer
   user=account;
   updateBalance();
 });
 
-// UPDATE UI
 function updateBalance(){
   document.getElementById("balanceValue").textContent=
   `${user.username} • ${user.balance} G`;
@@ -277,7 +261,6 @@ function updateBalance(){
     document.getElementById("badge").classList.remove("hidden");
 }
 
-// PRODUITS
 const PRODUCTS=[
   {id:"ff1",qty:"100 + 10",price:180},
   {id:"ff2",qty:"200 + 20",price:350},
@@ -300,19 +283,51 @@ PRODUCTS.forEach(p=>{
   card.innerHTML=`
     <div class="title">${p.qty}</div>
     <div class="price">${p.price} G</div>
-    <div class="warning">Entrez l'ID du joueur correct. ATTENTION Le système peut prendre de 5 min à 24h 🕛</div>
-    <button class="btn" onclick="buy('${p.id}')">Acheter</button>
+    <div class="warning">Entrez l'ID correct. Livraison 5 min à 24h 🕛</div>
+    <button class="btn" onclick="buy('${p.id}')">Ajouter au panier</button>
   `;
   grid.appendChild(card);
 });
 
 window.buy=(id)=>{
+  selectedProduct=PRODUCTS.find(p=>p.id===id);
+  document.getElementById("modalTitle").textContent=
+    `Acheter ${selectedProduct.qty}`;
   document.getElementById("modal").style.display="flex";
 };
 
+document.getElementById("modal").onclick=(e)=>{
+  if(e.target.id==="modal"){
+    document.getElementById("modal").style.display="none";
+  }
+};
+
 document.getElementById("confirm").onclick=()=>{
+  const playerId=document.getElementById("ffId").value.trim();
+  if(!playerId){
+    alert("Entrez l'ID joueur !");
+    return;
+  }
+
+  let cart=JSON.parse(localStorage.getItem("cart")||"[]");
+
+  cart.push({
+    name:`Free Fire ${selectedProduct.qty}`,
+    price:selectedProduct.price,
+    buyer:user.email,
+    username:user.username,
+    email:user.email,
+    date:new Date().toLocaleString(),
+    status:"En attente",
+    meta:{ uid:playerId }
+  });
+
+  localStorage.setItem("cart",JSON.stringify(cart));
+
   document.getElementById("modal").style.display="none";
-  alert("Ajouté au panier");
+  document.getElementById("ffId").value="";
+
+  alert("Produit ajouté au panier 🛒");
 };
 
 </script>
