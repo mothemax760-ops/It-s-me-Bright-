@@ -38,6 +38,12 @@ background:linear-gradient(90deg,#00cfff,#ffffff);
 -webkit-text-fill-color:transparent;
 }
 
+.left-box{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
 .btn-back{
 background:#00cfff;
 border:none;
@@ -53,6 +59,12 @@ background:#FFD700;
 transform:scale(1.05);
 }
 
+.right-box{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
 .balance-box{
 background:rgba(0,255,200,0.12);
 border:1px solid #00ffd5;
@@ -61,6 +73,12 @@ border-radius:12px;
 font-weight:bold;
 color:#00ffd5;
 box-shadow:0 0 10px #00ffd5;
+}
+
+.cart-btn{
+cursor:pointer;
+font-weight:bold;
+color:#00ffd5;
 }
 
 h2{
@@ -180,48 +198,55 @@ box-shadow:0 0 15px #00cfff;
 
 <header>
 
-<button class="btn-back" onclick="goBack()">
-← Retour
-</button>
-
+<div class="left-box">
+<button class="btn-back" onclick="goBack()">← Retour</button>
 <h1>Bright — Apple Gift Cards</h1>
+</div>
 
-<div class="balance-box" id="balance-display">
-0 G
+<div class="right-box">
+<div class="balance-box" id="balance-display">0 G</div>
+<div class="cart-btn" onclick="openCart()">
+🛒(<span id="cartCount">0</span>)
+</div>
 </div>
 
 </header>
 
 <h2>Cartes Cadeaux Apple</h2>
-
 <div id="products"></div>
 
-<footer>
-© 2026 Bright
-</footer>
+<footer>© 2026 Bright</footer>
 
 <script>
 
-function loadUser(){
-let u=JSON.parse(sessionStorage.getItem("dpstore_user")||"{}");
-if(!u.email){
+/* ===============================
+   USER
+================================ */
+
+function safeParse(str){
+try{return JSON.parse(str);}
+catch(e){return null;}
+}
+
+let user=safeParse(sessionStorage.getItem("dpstore_user"))||{};
+
+if(!user.email){
 alert("Connecte-toi");
 window.location.href="index.html";
 }
-return u;
-}
 
-let user=loadUser();
+if(!user.balance) user.balance=0;
 
 function updateBalance(){
-user=loadUser();
-document.getElementById("balance-display").textContent=(user.balance||0)+" G";
+document.getElementById("balance-display").textContent=user.balance+" G";
 }
 
-setInterval(updateBalance,1000);
+/* ===============================
+   PANIER
+================================ */
 
 function normalizeId(str){
-return str.toLowerCase().replace(/[^a-z0-9]/g,"_");
+return str.toLowerCase().replace(/[^a-z0-9@.-]/g,"_").replace(/@/g,"_at_");
 }
 
 function getCartKey(){
@@ -236,17 +261,25 @@ function saveCart(cart){
 localStorage.setItem(getCartKey(),JSON.stringify(cart));
 }
 
+function updateCartCount(){
+document.getElementById("cartCount").textContent=loadCart().length;
+}
 
-/* PRODUITS */
+function openCart(){
+window.location.href="cart.html";
+}
+
+/* ===============================
+   PRODUITS
+================================ */
+
 const products=[
-
 ["APPLE 2 USD",380],
 ["APPLE 5 USD",980],
 ["APPLE 10 USD",1897],
 ["APPLE 20 USD",3650],
 ["APPLE 25 USD",4455],
 ["APPLE 50 USD",8900]
-
 ];
 
 const container=document.getElementById("products");
@@ -254,31 +287,22 @@ const container=document.getElementById("products");
 products.forEach(p=>{
 
 let card=document.createElement("div");
-
 card.className="product-card";
 
 card.innerHTML=`
-
 <div class="info">
 <div class="product-logo"></div>
-
 <div class="details">
-
 <strong>${p[0]}</strong>
-
 <div>
 <span class="status">Disponible</span>
 <span class="tag">Gift Card</span>
 </div>
-
 <div class="price">${p[1]} G</div>
-
 <div class="delivery">Livraison 0-3h</div>
-
 </div>
 </div>
-
-<button class="buy-btn">Acheter</button>
+<button class="buy-btn">Ajouter</button>
 `;
 
 card.querySelector("button").onclick=()=>{
@@ -289,7 +313,6 @@ container.appendChild(card);
 
 });
 
-
 function addToCart(name,price){
 
 let cart=loadCart();
@@ -298,35 +321,36 @@ cart.push({
 name:name,
 price:price,
 buyer:user.email,
+accountName:user.username,
 date:new Date().toLocaleString(),
 status:"En attente"
 });
 
 saveCart(cart);
-
+updateCartCount();
 showToast("Ajouté au panier");
 
 }
 
+/* ===============================
+   TOAST
+================================ */
+
 function showToast(msg){
-
 let t=document.createElement("div");
-
 t.className="toast";
-
 t.textContent=msg;
-
 document.body.appendChild(t);
-
 setTimeout(()=>{t.remove();},2000);
-
 }
 
 function goBack(){
 window.location.href="produits.html";
 }
 
+/* INIT */
 updateBalance();
+updateCartCount();
 
 </script>
 
