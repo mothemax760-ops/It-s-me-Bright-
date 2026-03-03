@@ -191,7 +191,7 @@ Ajouté au panier
 <script>
 
 /* ======================
-   CONNEXION IDENTIQUE BRIGHT
+   USER
 ====================== */
 
 function safeParse(str){
@@ -202,11 +202,8 @@ function safeParse(str){
 let user = safeParse(sessionStorage.getItem("dpstore_user")) || {};
 
 if(!user.email || !user.username){
-
   alert("⚠ Connectez-vous !");
-
   window.location.href="index.html";
-
 }
 
 if(!user.balance){
@@ -214,16 +211,14 @@ if(!user.balance){
 }
 
 /* ======================
-   PANIER IDENTIQUE
+   PANIER
 ====================== */
 
 function normalizeId(str){
-
 return (str||"guest")
 .toLowerCase()
 .replace(/[^a-z0-9@.-]/g,"_")
 .replace(/@/g,"_at_");
-
 }
 
 function getCartKey(){
@@ -252,10 +247,8 @@ window.location.href="cart.html";
 ====================== */
 
 function updateBalanceUI(){
-
 document.getElementById("balanceBox").textContent=
 user.balance+" G";
-
 }
 
 updateBalanceUI();
@@ -267,17 +260,11 @@ updateBalanceUI();
 const products=[
 
 {name:"Netflix 1 mois",price:720},
-
 {name:"Netflix Premium",price:1620},
-
 {name:"Prime Video",price:600},
-
 {name:"Crunchyroll",price:540},
-
 {name:"NordVPN",price:840},
-
 {name:"Free Fire Pass",price:600},
-
 {name:"Free Fire Premium",price:1080}
 
 ];
@@ -291,20 +278,14 @@ const grid=document.getElementById("productGrid");
 products.forEach(p=>{
 
 const div=document.createElement("div");
-
 div.className="card";
 
 div.innerHTML=`
 
 <div class="product-name">${p.name}</div>
-
 <div class="status-tag">Disponible</div>
-
 <div class="price">${p.price} HTG</div>
-
-<button class="buy-btn">
-Ajouter au panier
-</button>
+<button class="buy-btn">Ajouter au panier</button>
 
 `;
 
@@ -313,25 +294,16 @@ div.querySelector("button").onclick=()=>{
 const cart=loadCart();
 
 cart.push({
-
 name:p.name,
-
 price:p.price,
-
 buyer:user.email,
-
+accountName:user.username,
 date:new Date().toLocaleString(),
-
-status:"En attente",
-
-meta:{accountName:user.username}
-
+status:"En attente"
 });
 
 saveCart(cart);
-
 updateCartCount();
-
 showToast();
 
 };
@@ -345,15 +317,9 @@ grid.appendChild(div);
 ====================== */
 
 function showToast(){
-
 const toast=document.getElementById("toast");
-
 toast.classList.add("show");
-
-setTimeout(()=>{
-toast.classList.remove("show");
-},1500);
-
+setTimeout(()=>{toast.classList.remove("show");},1500);
 }
 
 /* INIT */
