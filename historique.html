@@ -1,53 +1,223 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Historique</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bright Tup Up | Historique</title>
 <style>
-body{background:#001a33;color:#fff;font-family:Poppins;padding:20px;}
-.box{background:#002b4d;padding:15px;margin-bottom:15px;border-radius:10px;border:1px solid #00aaff;}
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:radial-gradient(circle at top,#001a33,#000);
+  color:#e0f7ff;
+}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 20px;
+  background:rgba(5,10,20,0.95);
+  border-bottom:2px solid #00aaff;
+  box-shadow:0 0 15px #00aaff;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.logo{
+  font-size:1.3rem;
+  font-weight:bold;
+  color:#00ccff;
+}
+
+.top-btn{
+  background:none;
+  border:1px solid #00aaff;
+  padding:6px 12px;
+  border-radius:8px;
+  color:#00ccff;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.top-btn:hover{
+  background:#00aaff;
+  color:#000;
+}
+
+.container{
+  padding:20px;
+}
+
+/* TOTAL BOX */
+.total-box{
+  background:rgba(0,170,255,0.08);
+  border:1px solid #00aaff;
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:20px;
+  box-shadow:0 0 15px #00aaff55;
+  text-align:center;
+}
+.total-box h3{
+  margin:0;
+  color:#00ccff;
+}
+
+/* ORDER CARD */
+.order-card{
+  background:rgba(5,10,20,0.95);
+  border:1px solid #00aaff33;
+  border-radius:15px;
+  padding:18px;
+  margin-bottom:18px;
+  box-shadow:0 0 12px #00aaff22;
+  transition:0.3s;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.order-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 18px #00aaff88;
+}
+
+.order-title{
+  font-size:1.1rem;
+  font-weight:bold;
+  color:#00ccff;
+}
+
+.order-info{
+  font-size:0.9rem;
+  color:#ccc;
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.order-info span{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.price{
+  font-weight:bold;
+  color:#00ccff;
+}
+
+.status{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:0.8rem;
+  font-weight:bold;
+}
+
+.status-paid{
+  background:#00c853;
+  color:#000;
+}
+
+.status-pending{
+  background:orange;
+  color:#000;
+}
+
+.status-cancel{
+  background:red;
+  color:#fff;
+}
+
+.empty{
+  text-align:center;
+  margin-top:50px;
+  color:#888;
+  font-size:1rem;
+}
+
+/* ICONS */
+.icon{
+  font-size:0.9rem;
+  color:#00ccff;
+}
 </style>
 </head>
 <body>
 
-<h2>📜 Mon Historique</h2>
-<div id="history"></div>
+<header>
+  <button class="top-btn" onclick="window.location.href='cart.html'">← Panier</button>
+  <div class="logo">BRIGHT HISTORIQUE</div>
+  <button class="top-btn" onclick="window.location.href='produits.html'">🏠 Produits</button>
+</header>
+
+<div class="container">
+
+  <div class="total-box">
+    <h3>Total dépensé : <span id="totalSpent">0</span> HTG</h3>
+  </div>
+
+  <div id="historyList"></div>
+
+</div>
 
 <script>
-function safeParse(str){ try{ return JSON.parse(str);}catch(e){return null;} }
-let user=safeParse(sessionStorage.getItem("dpstore_user"))||{};
+function safeParse(str){ try{return JSON.parse(str);}catch(e){return null;} }
+let user = safeParse(sessionStorage.getItem("dpstore_user")) || {};
 if(!user.email){ window.location.href="index.html"; }
 
 function loadGlobalOrders(){
   return JSON.parse(localStorage.getItem("global_orders")||"[]");
 }
 
-const historyDiv=document.getElementById("history");
+const historyList=document.getElementById("historyList");
+const totalSpent=document.getElementById("totalSpent");
 
-function render(){
+function renderHistory(){
   const orders=loadGlobalOrders();
-  historyDiv.innerHTML="";
+  // Filtrer seulement commandes de l'utilisateur et trier par date décroissante
+  const myOrders=orders.filter(o=>o.buyer===user.email)
+                       .sort((a,b)=>new Date(b.validatedDate || b.date) - new Date(a.validatedDate || a.date));
 
-  const myOrders=orders.filter(o=>o.buyer===user.email);
+  historyList.innerHTML="";
+  let total=0;
 
   if(myOrders.length===0){
-    historyDiv.innerHTML="<p>Aucune commande validée.</p>";
+    historyList.innerHTML="<div class='empty'>Aucune commande trouvée.</div>";
+    totalSpent.textContent="0";
     return;
   }
 
   myOrders.forEach(o=>{
-    const box=document.createElement("div");
-    box.className="box";
-    box.innerHTML=`
-      <b>${o.name}</b><br>
-      Prix: ${o.price} HTG<br>
-      Date: ${o.validatedDate}
+    total+=Number(o.price);
+
+    let statusClass="status-pending";
+    if(o.status==="Payé") statusClass="status-paid";
+    if(o.status==="Annulé") statusClass="status-cancel";
+
+    const card=document.createElement("div");
+    card.className="order-card";
+    card.innerHTML=`
+      <div class="order-title">${o.name}</div>
+      <div class="order-info">
+        <span class="icon">📅</span> <span>Date : ${o.validatedDate || o.date}</span>
+        <span class="icon">💰</span> <span>Prix : ${o.price} HTG</span>
+        <span class="icon">👤</span> <span>Nom : ${o.username || "-"}</span>
+        <span class="icon">📧</span> <span>Email : ${o.email || "-"}</span>
+        <span class="icon">🔢</span> <span>UID : ${o.meta?.uid ?? "-"}</span>
+        <span class="icon">📞</span> <span>WhatsApp : ${o.meta?.whatsapp ?? "-"}</span>
+      </div>
+      <div class="status ${statusClass}">${o.status}</div>
     `;
-    historyDiv.appendChild(box);
+    historyList.appendChild(card);
   });
+
+  totalSpent.textContent=total;
 }
 
-render();
+renderHistory();
 </script>
 
 </body>
