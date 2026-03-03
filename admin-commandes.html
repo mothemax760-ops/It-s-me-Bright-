@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ADMIN | Commandes Globales</title>
+<style>
+body{background:#001a33;color:#fff;font-family:Poppins;padding:20px;}
+.box{background:#002b4d;padding:15px;margin-bottom:15px;border-radius:10px;border:1px solid #00aaff;}
+.total{font-size:1.3rem;margin-bottom:20px;color:#00ccff;}
+button{padding:8px;background:red;border:none;border-radius:6px;color:#fff;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<h2>📦 Commandes Globales</h2>
+<div class="total">Total global : <span id="totalGlobal">0</span> HTG</div>
+<div id="orders"></div>
+
+<script>
+function loadGlobalOrders(){
+  return JSON.parse(localStorage.getItem("global_orders")||"[]");
+}
+function saveGlobalOrders(data){
+  localStorage.setItem("global_orders",JSON.stringify(data));
+}
+
+const ordersDiv=document.getElementById("orders");
+const totalGlobal=document.getElementById("totalGlobal");
+
+function render(){
+  const orders=loadGlobalOrders();
+  ordersDiv.innerHTML="";
+  let total=0;
+
+  if(orders.length===0){
+    ordersDiv.innerHTML="<p>Aucune commande.</p>";
+    totalGlobal.textContent="0";
+    return;
+  }
+
+  orders.forEach((o,index)=>{
+    total+=Number(o.price);
+
+    const box=document.createElement("div");
+    box.className="box";
+    box.innerHTML=`
+      <b>${o.name}</b><br>
+      Prix: ${o.price} HTG<br>
+      Client: ${o.buyer}<br>
+      Date: ${o.validatedDate}<br>
+      <button onclick="deleteOrder(${index})">Supprimer</button>
+    `;
+    ordersDiv.appendChild(box);
+  });
+
+  totalGlobal.textContent=total;
+}
+
+function deleteOrder(index){
+  let orders=loadGlobalOrders();
+  orders.splice(index,1);
+  saveGlobalOrders(orders);
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
