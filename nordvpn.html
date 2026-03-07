@@ -6,7 +6,6 @@
 <title>Bright top up | NordVPN</title>
 
 <style>
-
 body{
 margin:0;
 font-family:'Poppins',sans-serif;
@@ -169,24 +168,27 @@ padding:10px 20px;
 border-radius:10px;
 font-weight:bold;
 box-shadow:0 0 15px #00cfff;
+opacity:0;
+transition:0.3s;
 }
 
+.toast.show{opacity:1;}
 </style>
 </head>
 <body>
 
 <header>
-
 <button class="btn-back" onclick="goBack()">← Retour</button>
-
 <h1>Bright top up — NordVPN</h1>
-
+<div style="display:flex;align-items:center;gap:10px;">
 <div class="balance-box" id="balance-display">0 G</div>
-
+<div onclick="openCart()" style="cursor:pointer;font-weight:bold;">
+🛒(<span id="cartCount">0</span>)
+</div>
+</div>
 </header>
 
 <h2>NordVPN</h2>
-
 <div id="products"></div>
 
 <footer>
@@ -195,26 +197,29 @@ box-shadow:0 0 15px #00cfff;
 
 <script>
 
-function loadUser(){
-let u=JSON.parse(sessionStorage.getItem("dpstore_user")||"{}");
-if(!u.email){
-alert("Connecte-toi");
+/* ==========================
+USER
+========================== */
+function safeParse(str){
+try{return JSON.parse(str);}
+catch(e){return null;}
+}
+
+let user = safeParse(sessionStorage.getItem("dpstore_user")) || {};
+
+if(!user.email){
+alert("⚠ Connecte-toi !");
 window.location.href="index.html";
 }
-return u;
-}
 
-let user=loadUser();
-
-function updateBalance(){
-user=loadUser();
-document.getElementById("balance-display").textContent=(user.balance||0)+" G";
-}
-
-setInterval(updateBalance,1000);
-
+/* ==========================
+PANIER
+========================== */
 function normalizeId(str){
-return str.toLowerCase().replace(/[^a-z0-9]/g,"_");
+return (str||"guest")
+.toLowerCase()
+.replace(/[^a-z0-9@.-]/g,"_")
+.replace(/@/g,"_at_");
 }
 
 function getCartKey(){
@@ -229,94 +234,104 @@ function saveCart(cart){
 localStorage.setItem(getCartKey(),JSON.stringify(cart));
 }
 
-/* NORDVPN PRODUITS */
+function updateCartCount(){
+document.getElementById("cartCount").textContent = loadCart().length;
+}
 
-const products=[
+/* ==========================
+BALANCE
+========================== */
+function updateBalance(){
+user = safeParse(sessionStorage.getItem("dpstore_user")) || {};
+document.getElementById("balance-display").textContent = (user.balance || 0)+" G";
+}
 
+/* ==========================
+PRODUITS
+========================== */
+const products = [
 ["NORDVPN 1 MOIS",420],
 ["NORDVPN 2 MOIS",720],
 ["NORDVPN 3 MOIS",1200],
 ["NORDVPN 6 MOIS",2200],
 ["NORDVPN 12 MOIS",3900]
-
 ];
 
-const container=document.getElementById("products");
+const container = document.getElementById("products");
 
 products.forEach(p=>{
-
 let card=document.createElement("div");
-
 card.className="product-card";
-
 card.innerHTML=`
-
 <div class="info">
 <div class="product-logo"></div>
-
 <div class="details">
-
 <strong>${p[0]}</strong>
-
 <div>
 <span class="status">Disponible</span>
 <span class="tag">VPN</span>
 </div>
-
 <div class="price">${p[1]} G</div>
-
 <div class="delivery">Livraison 0-3h</div>
-
 </div>
 </div>
-
 <button class="buy-btn">Acheter</button>
 `;
-
-card.querySelector("button").onclick=()=>{
-addToCart(p[0],p[1]);
-};
-
+card.querySelector("button").onclick=()=>addToCart(p[0],p[1]);
 container.appendChild(card);
-
 });
 
+/* ==========================
+AJOUT AU PANIER
+========================== */
 function addToCart(name,price){
-
 let cart=loadCart();
 
 cart.push({
 name:name,
 price:price,
 buyer:user.email,
+username:user.username,
+email:user.email,
 date:new Date().toLocaleString(),
-status:"En attente"
+status:"En attente",
+meta:{type:"VPN"}
 });
 
 saveCart(cart);
-
-showToast("Ajouté au panier");
-
+updateCartCount();
+showToast("✅ Ajouté au panier");
 }
 
+/* ==========================
+TOAST
+========================== */
 function showToast(msg){
-
 let t=document.createElement("div");
-
-t.className="toast";
+t.className="toast show";
 t.textContent=msg;
-
 document.body.appendChild(t);
-
-setTimeout(()=>{t.remove();},2000);
-
+setTimeout(()=>{t.remove();},1500);
 }
 
+/* ==========================
+OPEN CART
+========================== */
+function openCart(){
+window.location.href="cart.html";
+}
+
+/* ==========================
+GO BACK
+========================== */
 function goBack(){
 window.location.href="produits.html";
 }
 
+/* INIT */
 updateBalance();
+updateCartCount();
+setInterval(updateBalance,1000);
 
 </script>
 
