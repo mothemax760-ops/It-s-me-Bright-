@@ -176,17 +176,15 @@ h1{
 </header>
 
 <main>
-
 <div class="toolbar">
 <h1>Achat des diamants — Free Fire</h1>
 <div>
-<button class="cart-btn" onclick="location.href='cart.html'">🛒 Panier</button>
+<button class="cart-btn" onclick="openCart()">🛒 Panier</button>
 <button class="back" onclick="location.href='produits.html'">← Retour</button>
 </div>
 </div>
 
 <div class="grid" id="grid"></div>
-
 </main>
 
 <div id="modal" class="modal">
@@ -219,6 +217,19 @@ const db=getFirestore(app);
 let user={};
 let selectedProduct=null;
 
+// NORMALIZE & CART KEY
+function normalizeId(str){
+  return (str||"guest").toLowerCase().replace(/[^a-z0-9@.-]/g,"_").replace(/@/g,"_at_");
+}
+
+function getCartKey(){ 
+  return "cart_" + normalizeId(user.email); 
+}
+
+function loadCart(){ return JSON.parse(localStorage.getItem(getCartKey())||"[]"); }
+function saveCart(cart){ localStorage.setItem(getCartKey(),JSON.stringify(cart)); }
+
+// SYSTEME CONNEXION
 onAuthStateChanged(auth,async(firebaseUser)=>{
   if(!firebaseUser){
     location.href="index.html";
@@ -244,23 +255,22 @@ onAuthStateChanged(auth,async(firebaseUser)=>{
         account.photo=data.photo??account.photo;
       }
     });
-  }catch(e){
-    console.warn(e);
-  }
+  }catch(e){ console.warn(e); }
 
   sessionStorage.setItem("dpstore_user",JSON.stringify(account));
   user=account;
   updateBalance();
 });
 
+// UPDATE UI
 function updateBalance(){
   document.getElementById("balanceValue").textContent=
-  `${user.username} • ${user.balance} G`;
-
+    `${user.username} • ${user.balance} G`;
   if(["admin","creator","employee"].includes(user.role))
     document.getElementById("badge").classList.remove("hidden");
 }
 
+// PRODUITS
 const PRODUCTS=[
   {id:"ff1",qty:"100 + 10",price:180},
   {id:"ff2",qty:"200 + 20",price:350},
@@ -297,9 +307,7 @@ window.buy=(id)=>{
 };
 
 document.getElementById("modal").onclick=(e)=>{
-  if(e.target.id==="modal"){
-    document.getElementById("modal").style.display="none";
-  }
+  if(e.target.id==="modal") document.getElementById("modal").style.display="none";
 };
 
 document.getElementById("confirm").onclick=()=>{
@@ -309,8 +317,8 @@ document.getElementById("confirm").onclick=()=>{
     return;
   }
 
-  let cart=JSON.parse(localStorage.getItem("cart")||"[]");
-
+  // AJOUT AU PANIER PAR UTILISATEUR
+  let cart=loadCart();
   cart.push({
     name:`Free Fire ${selectedProduct.qty}`,
     price:selectedProduct.price,
@@ -321,15 +329,17 @@ document.getElementById("confirm").onclick=()=>{
     status:"En attente",
     meta:{ uid:playerId }
   });
-
-  localStorage.setItem("cart",JSON.stringify(cart));
+  saveCart(cart);
 
   document.getElementById("modal").style.display="none";
   document.getElementById("ffId").value="";
-
   alert("Produit ajouté au panier 🛒");
 };
 
+// OUVRIR PANIER
+function openCart(){
+  window.location.href="cart.html";
+};
 </script>
 
 </body>
