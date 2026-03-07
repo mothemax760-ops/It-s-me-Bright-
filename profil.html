@@ -67,6 +67,10 @@
   <button onclick="logout()">❌ Déconnexion</button>
   <br>
   <button onclick="location.href='produits.html'">🛒 Produits</button>
+
+  <!-- Champ code admin + bouton admin 🔝 -->
+  <input type="password" id="admin-code" placeholder="Entrez code admin" style="margin-top:10px; padding:8px; border-radius:8px; border:1px solid #00aaff;">
+  <button id="admin-btn" class="yellow" style="display:none; margin-top:5px;">Admin 🔝 🧑‍💻</button>
 </div>
 
 <script type="module">
@@ -149,6 +153,22 @@ function logout(){
   });
 }
 window.logout = logout;
+
+// 🔑 Code admin
+const adminInput = document.getElementById("admin-code");
+const adminBtn = document.getElementById("admin-btn");
+
+adminInput.addEventListener("input", () => {
+  if(adminInput.value === "b18yc20byteq"){
+    adminBtn.style.display = "inline-block";
+  } else {
+    adminBtn.style.display = "none";
+  }
+});
+
+adminBtn.addEventListener("click", () => {
+  location.href = "admin.html";
+});
 </script>
 
 </body>
