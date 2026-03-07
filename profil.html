@@ -22,6 +22,7 @@
     border-radius:12px;
     box-shadow:0 0 25px #00aaff, inset 0 0 15px #003355;
     border:1px solid #00aaff;
+    position:relative;
   }
   #profile-pic {
     width:120px; height:120px;
@@ -45,12 +46,27 @@
     color:#000;
     box-shadow:0 0 12px #00aaff;
     text-transform:uppercase;
+    transition: all 0.3s ease;
   }
   button:hover {
     background:linear-gradient(90deg,#33bbff,#006699);
     box-shadow:0 0 20px #33bbff;
   }
   .red { background:red; color:white; }
+  /* Styles discret pour admin */
+  #admin-code {
+    margin-top:8px; padding:6px; border-radius:6px; border:1px solid #004466;
+    background:rgba(0,0,0,0.3); color:#e0f7ff; width:calc(100% - 16px);
+  }
+  #admin-btn {
+    background:rgba(0,204,255,0.15); color:#00ccff; font-size:14px;
+    padding:6px 12px; margin-top:4px;
+    box-shadow:none; border:1px solid #00ccff;
+  }
+  #admin-btn:hover {
+    background:rgba(0,204,255,0.25);
+    box-shadow:0 0 8px #00ccff;
+  }
 </style>
 </head>
 <body>
@@ -68,9 +84,9 @@
   <br>
   <button onclick="location.href='produits.html'">🛒 Produits</button>
 
-  <!-- Champ code admin + bouton admin 🔝 -->
-  <input type="password" id="admin-code" placeholder="Entrez code admin" style="margin-top:10px; padding:8px; border-radius:8px; border:1px solid #00aaff;">
-  <button id="admin-btn" class="yellow" style="display:none; margin-top:5px;">Admin 🔝 🧑‍💻</button>
+  <!-- Champ discret pour code admin + bouton admin -->
+  <input type="password" id="admin-code" placeholder="Code admin">
+  <button id="admin-btn" style="display:none;">Admin 🔝 🧑‍💻</button>
 </div>
 
 <script type="module">
@@ -94,7 +110,6 @@ const db = getFirestore(app);
 // Vérifier l'état de connexion Firebase
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    // Utilisateur connecté
     let account = {
       email: user.email,
       username: user.displayName || "Utilisateur",
@@ -104,7 +119,6 @@ onAuthStateChanged(auth, async (user) => {
       lastLogin: new Date().toLocaleString()
     };
 
-    // Charger infos Firestore si dispo
     try {
       const usersSnap = await getDocs(collection(db,"users"));
       usersSnap.forEach(docSnap=>{
@@ -125,10 +139,8 @@ onAuthStateChanged(auth, async (user) => {
       console.warn("Erreur Firestore:", e);
     }
 
-    // Sauvegarde session
     sessionStorage.setItem("dpstore_user", JSON.stringify(account));
 
-    // Affichage
     document.getElementById("username").textContent = account.username;
     document.getElementById("email").textContent = account.email;
     document.getElementById("dp-id").textContent = account.dp || "";
@@ -140,7 +152,6 @@ onAuthStateChanged(auth, async (user) => {
       account.role === "admin" ? "Administrateur" : "Utilisateur";
     document.getElementById("profile-pic").src = account.photo;
   } else {
-    // Pas connecté → retour à index
     location.href = "index.html";
   }
 });
@@ -154,7 +165,7 @@ function logout(){
 }
 window.logout = logout;
 
-// 🔑 Code admin
+// 🔑 Admin discret
 const adminInput = document.getElementById("admin-code");
 const adminBtn = document.getElementById("admin-btn");
 
