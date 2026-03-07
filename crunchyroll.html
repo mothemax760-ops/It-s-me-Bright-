@@ -79,180 +79,214 @@ header h1 {
   box-shadow: 0 0 30px #00ccff;
 }
 
-.card h3 { font-size: 1.2rem; margin-bottom: 10px; }
+.price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #00ccff;
+  margin-top: 10px;
+}
 
-.status { background: #00ff99; color: #000; padding: 3px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; }
-.tag { background: #00aaff; color: #000; padding: 3px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; margin-left: 5px; }
-
-.price { font-size: 1.1rem; font-weight: bold; color: #00ccff; text-shadow: 0 0 5px #00aaff; margin-top: 10px; }
-.desc { font-size: 0.9rem; color: #ddd; margin-top: 8px; }
+.desc {
+  font-size: 0.9rem;
+  color: #ddd;
+  margin-top: 8px;
+}
 
 .btn-primary {
-  background: #00aaff; color: #000; border: none; padding: 10px 16px;
-  border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.3s;
+  background: #00aaff;
+  color: #000;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 15px;
 }
 
-.btn-primary:hover {
-  background: #fff; color: #00aaff; box-shadow: 0 0 20px #00ccff;
+footer {
+  text-align: center;
+  padding: 20px;
+  background: rgba(0,0,0,0.7);
+  border-top: 1px solid #00aaff;
 }
-
-footer { text-align: center; padding: 20px; background: rgba(0,0,0,0.7); border-top: 1px solid #00aaff; }
-
-.back-btn {
-  position: fixed; top: 20px; left: 20px; background: rgba(0,170,255,0.2);
-  border: 1px solid #00aaff; color: #fff; padding: 8px 12px; border-radius: 8px;
-  cursor: pointer; z-index: 50; transition: 0.3s;
-}
-.back-btn:hover { background: #00aaff; color: #000; }
 
 .toast {
-  position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-  background: #00aaff; color: #000; padding: 10px 20px; border-radius: 10px;
-  font-weight: bold; opacity: 0; transition: opacity 0.4s;
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #00aaff;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity 0.4s;
 }
 .toast.show { opacity: 1; }
-
-/* Ballon */
-.football-ball {
-  width:28px; height:28px;
-  background:#fff;
-  border-radius:50%;
-  position:relative;
-  display:inline-block;
-  box-shadow: inset -2px -2px 0 #000, inset 2px 2px 0 #000;
-}
-.football-ball::before,
-.football-ball::after {
-  content:"";
-  position:absolute;
-  width:12px; height:12px;
-  background:#000;
-  border-radius:2px;
-  top:8px; left:8px;
-}
-.football-ball::after { left:auto; right:8px; }
 </style>
 </head>
+
 <body>
 
-<button class="back-btn" onclick="window.location.href='produits.html'">⬅ Retour</button>
-
 <header>
-  <h1><span class="football-ball"></span> Bright Tup Up — Manga & Efootball</h1>
-  <div style="display:flex; align-items:center;">
-    <div class="balance-box" id="balanceBox">0 G</div>
-    <button class="btn-primary" onclick="openCart()">🛒 Panier</button>
-  </div>
+<h1>Bright Tup Up — Manga</h1>
+
+<div style="display:flex;align-items:center">
+<div class="balance-box" id="balanceBox">0 G</div>
+<button class="btn-primary" onclick="openCart()">🛒 Panier</button>
+</div>
 </header>
 
 <div class="container">
-  <h2 class="section-title">Abonnements Manga ⚡</h2>
-  <div class="grid" id="productGrid"></div>
+
+<h2 class="section-title">Abonnements Manga ⚡</h2>
+
+<div class="grid" id="productGrid"></div>
+
 </div>
 
-<div id="toast" class="toast">✅ Ajouté au panier</div>
+<div id="toast" class="toast">Ajouté au panier</div>
 
-<footer>© 2026 Bright Tup Up — Tous droits réservés</footer>
+<footer>
+© 2026 Bright Tup Up
+</footer>
 
 <script>
 
-/* ==========================
-   PROFIL
-========================== */
-let user = JSON.parse(sessionStorage.getItem("dpstore_user") || "null");
+/* ======================
+UTILS
+====================== */
 
-if(!user || !user.email || !user.username){
-  alert("⚠ Vous devez être connecté !");
-  window.location.href = "index.html";
+function normalizeId(str){
+  return str.replace(/[^a-zA-Z0-9]/g,"_").toLowerCase();
 }
 
-if(!user.balance) user.balance = 0;
+let user = JSON.parse(sessionStorage.getItem("dpstore_user") || "null");
 
-/* ==========================
-   PANIER GLOBAL BRIGHT
-========================== */
+if(!user){
+ alert("Vous devez être connecté");
+ window.location.href="index.html";
+}
+
+function getCartKey(){
+ return "cart_"+normalizeId(user.email);
+}
+
 function loadCart(){
-  return JSON.parse(localStorage.getItem("cart") || "[]");
+ return JSON.parse(localStorage.getItem(getCartKey()) || "[]");
 }
 
 function saveCart(cart){
-  localStorage.setItem("cart", JSON.stringify(cart));
+ localStorage.setItem(getCartKey(),JSON.stringify(cart));
 }
 
-function updateBalanceUI() {
-  user = JSON.parse(sessionStorage.getItem("dpstore_user")) || user;
-  document.getElementById("balanceBox").textContent = (user.balance ?? 0) + " G";
+/* ======================
+BALANCE
+====================== */
+
+function updateBalanceUI(){
+ user = JSON.parse(sessionStorage.getItem("dpstore_user")) || user;
+ document.getElementById("balanceBox").textContent = user.balance+" G";
 }
 
-/* ==========================
-   PRODUITS
-========================== */
+updateBalanceUI();
+
+/* ======================
+PRODUITS
+====================== */
+
 const products = [
-  { name: "Bright Manga 1 Mois", price: 540 },
-  { name: "Bright Manga 2 Mois", price: 1140 },
-  { name: "Bright Manga 3 Mois", price: 1700 }
+
+{ name:"Bright Manga 1 Mois", price:540 },
+
+{ name:"Bright Manga 2 Mois", price:1140 },
+
+{ name:"Bright Manga 3 Mois", price:1700 }
+
 ];
 
 const grid = document.getElementById("productGrid");
 
-products.forEach(p => {
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `
-    <h3>${p.name}</h3>
-    <span class="status">Disponible</span><span class="tag">Manga</span>
-    <div class="price">${p.price} HTG</div>
-    <div class="desc">Livraison 0 à 3h — Accès illimité anime & manga</div>
-    <button class="btn-primary">Ajouter au panier</button>
-  `;
-  card.querySelector("button").addEventListener("click", ()=>{
-    addToCart(p.name, p.price);
-  });
-  grid.appendChild(card);
+products.forEach(p=>{
+
+const card=document.createElement("div");
+card.className="card";
+
+card.innerHTML=`
+
+<h3>${p.name}</h3>
+
+<div class="price">${p.price} HTG</div>
+
+<div class="desc">Accès illimité anime & manga</div>
+
+<button class="btn-primary">Ajouter au panier</button>
+
+`;
+
+card.querySelector("button").onclick=()=>{
+
+addToCart(p.name,p.price);
+
+};
+
+grid.appendChild(card);
+
 });
 
-/* ==========================
-   AJOUT PANIER GLOBAL
-========================== */
-function addToCart(name, price){
+/* ======================
+ADD CART
+====================== */
 
-  let cart = loadCart();
+function addToCart(name,price){
 
-  cart.push({
-    name: name,
-    price: price,
-    buyer: user.email,
-    username: user.username,
-    email: user.email,
-    date: new Date().toLocaleString(),
-    status: "En attente",
-    meta: {
-      type: "Manga",
-      accountName: user.username
-    }
-  });
+let cart=loadCart();
 
-  saveCart(cart);
+cart.push({
 
-  showToast();
-  updateBalanceUI();
+name:name,
+
+price:price,
+
+email:user.email,
+
+username:user.username,
+
+date:new Date().toLocaleString(),
+
+status:"En attente"
+
+});
+
+saveCart(cart);
+
+showToast();
+
 }
 
-/* ==========================
-   INIT
-========================== */
-updateBalanceUI();
-setInterval(updateBalanceUI, 1500);
+/* ======================
+TOAST
+====================== */
 
-function showToast() {
-  const toast = document.getElementById("toast");
-  toast.classList.add("show");
-  setTimeout(()=>toast.classList.remove("show"), 1500);
+function showToast(){
+
+const t=document.getElementById("toast");
+
+t.classList.add("show");
+
+setTimeout(()=>t.classList.remove("show"),1500);
+
 }
 
-function openCart() {
-  localStorage.setItem("lastPage", window.location.href);
-  window.location.href = "cart.html";
+/* ======================
+OPEN CART
+====================== */
+
+function openCart(){
+
+window.location.href="cart.html";
+
 }
 
 </script>
