@@ -124,10 +124,10 @@ header{
 <div class="logo">BRIGHT STORE</div>
 
 <div class="right-box">
-<div class="balance-bubble" id="balanceBox">0 G</div>
-<div class="cart-btn" onclick="openCart()">
-🛒(<span id="cartCount">0</span>)
-</div>
+  <div class="balance-bubble" id="balanceBox">0 G</div>
+  <div class="cart-btn" onclick="openCart()">
+    🛒(<span id="cartCount">0</span>)
+  </div>
 </div>
 </header>
 
@@ -143,114 +143,111 @@ header{
 <div id="toast" class="toast">Ajouté au panier</div>
 
 <script>
-
-/* PROFIL */
+/* ==========================
+UTIL
+========================== */
 function safeParse(str){ try{return JSON.parse(str);}catch(e){return null;} }
+
+/* ==========================
+USER
+========================== */
 let user = safeParse(sessionStorage.getItem("dpstore_user")) || {};
-
 if(!user.email || !user.username){
-alert("⚠ Connectez-vous !");
-window.location.href="index.html";
+  alert("⚠ Connectez-vous !");
+  window.location.href="index.html";
 }
-
 if(!user.balance) user.balance=0;
 
-/* PANIER GLOBAL */
-function loadCart(){
-return JSON.parse(localStorage.getItem("cart")||"[]");
+/* ==========================
+PANIER PAR UTILISATEUR
+========================== */
+function normalizeId(str){
+  return (str||"guest").toLowerCase().replace(/[^a-z0-9@.-]/g,"_").replace(/@/g,"_at_");
 }
 
-function saveCart(cart){
-localStorage.setItem("cart",JSON.stringify(cart));
-}
+function getCartKey(){ return "cart_"+normalizeId(user.email); }
+function loadCart(){ return JSON.parse(localStorage.getItem(getCartKey())||"[]"); }
+function saveCart(cart){ localStorage.setItem(getCartKey(),JSON.stringify(cart)); }
+function updateCartCount(){ document.getElementById("cartCount").textContent = loadCart().length; }
 
-function updateCartCount(){
-document.getElementById("cartCount").textContent=
-loadCart().length;
-}
+/* ==========================
+SOLDE
+========================== */
+function updateBalanceUI(){ document.getElementById("balanceBox").textContent = user.balance+" G"; }
 
-function openCart(){
-window.location.href="cart.html";
-}
-
-/* SOLDE */
-function updateBalanceUI(){
-document.getElementById("balanceBox").textContent=
-user.balance+" G";
-}
-updateBalanceUI();
-
-/* PRODUITS */
+/* ==========================
+PRODUITS
+========================== */
 const products={
-playstation:[
-{name:"PLAYSTATION 5 USD",price:850,img:"https://i.imgur.com/EPp1yV2.png"},
-{name:"PLAYSTATION 10 USD",price:1650,img:"https://i.imgur.com/EPp1yV2.png"}
-],
-xboxUS:[
-{name:"XBOX 10 USD",price:1650,img:"https://i.imgur.com/m4n9C1P.png"}
-],
-xboxFR:[
-{name:"XBOX FR 10 EUR",price:1650,img:"https://i.imgur.com/m4n9C1P.png"}
-]
+  playstation:[
+    {name:"PLAYSTATION 5 USD",price:850,img:"https://i.imgur.com/EPp1yV2.png"},
+    {name:"PLAYSTATION 10 USD",price:1650,img:"https://i.imgur.com/EPp1yV2.png"}
+  ],
+  xboxUS:[
+    {name:"XBOX 10 USD",price:1650,img:"https://i.imgur.com/m4n9C1P.png"}
+  ],
+  xboxFR:[
+    {name:"XBOX FR 10 EUR",price:1650,img:"https://i.imgur.com/m4n9C1P.png"}
+  ]
 };
 
-/* DISPLAY */
 function displayProducts(id,list){
-const container=document.getElementById(id);
-
-list.forEach(p=>{
-const div=document.createElement("div");
-div.className="product";
-
-div.innerHTML=`
-<img src="${p.img}">
-<div class="product-info">
-<div class="product-name">${p.name}</div>
-<div class="product-price">${p.price} HTG</div>
-</div>
-<button class="btn-add">Ajouter</button>
-`;
-
-div.querySelector("button").onclick=()=>{
-
-let cart=loadCart();
-
-cart.push({
-name:p.name,
-price:p.price,
-buyer:user.email,
-username:user.username,
-email:user.email,
-date:new Date().toLocaleString(),
-status:"En attente",
-meta:{ type:"Gift Card" }
-});
-
-saveCart(cart);
-updateCartCount();
-showToast();
-};
-
-container.appendChild(div);
-});
+  const container=document.getElementById(id);
+  list.forEach(p=>{
+    const div=document.createElement("div");
+    div.className="product";
+    div.innerHTML=`
+      <img src="${p.img}">
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-price">${p.price} HTG</div>
+      </div>
+      <button class="btn-add">Ajouter</button>
+    `;
+    div.querySelector("button").onclick=()=>{
+      let cart=loadCart();
+      cart.push({
+        name:p.name,
+        price:p.price,
+        buyer:user.email,
+        username:user.username,
+        email:user.email,
+        date:new Date().toLocaleString(),
+        status:"En attente",
+        meta:{ type:"Gift Card" }
+      });
+      saveCart(cart);
+      updateCartCount();
+      showToast("✅ Ajouté au panier");
+    };
+    container.appendChild(div);
+  });
 }
 
 displayProducts("playstation-list",products.playstation);
 displayProducts("xbox-list-us",products.xboxUS);
 displayProducts("xbox-list-fr",products.xboxFR);
 
-/* TOAST */
-function showToast(){
-const t=document.getElementById("toast");
-t.classList.add("show");
-setTimeout(()=>t.classList.remove("show"),1500);
+/* ==========================
+TOAST
+========================== */
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),1500);
 }
 
-function goBack(){
-window.location.href="produits.html";
-}
+/* ==========================
+PANIER & NAV
+========================== */
+function openCart(){ window.location.href="cart.html"; }
+function goBack(){ window.location.href="produits.html"; }
 
-/* INIT */
+/* ==========================
+INIT
+========================== */
+updateBalanceUI();
 updateCartCount();
 
 </script>
