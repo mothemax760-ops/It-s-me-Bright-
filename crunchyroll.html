@@ -30,10 +30,6 @@ header h1 {
   font-size: 1.5rem;
   font-weight: 700;
   color: #00ccff;
-  text-shadow: 0 0 15px #00aaff, 0 0 30px #004466;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .balance-box {
@@ -52,8 +48,6 @@ header h1 {
   font-size: 1.8rem;
   margin: 20px 0;
   text-align: center;
-  text-shadow: 0 0 10px #00aaff;
-  letter-spacing: 2px;
 }
 
 .grid {
@@ -63,29 +57,18 @@ header h1 {
 }
 
 .card {
-  position: relative;
   background: linear-gradient(145deg, rgba(0,170,255,0.2), rgba(0,0,0,0.6));
   border: 2px solid #00aaff;
   border-radius: 15px;
   padding: 20px;
   text-align: center;
-  box-shadow: 0 0 20px #00aaffaa;
-  transition: 0.3s;
-  overflow: hidden;
 }
 
-.card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 30px #00ccff;
+.price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #00ccff;
 }
-
-.card h3 { font-size: 1.2rem; margin-bottom: 10px; }
-
-.status { background: #00ff99; color: #000; padding: 3px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; }
-.tag { background: #00aaff; color: #000; padding: 3px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; margin-left: 5px; }
-
-.price { font-size: 1.1rem; font-weight: bold; color: #00ccff; text-shadow: 0 0 5px #00aaff; margin-top: 10px; }
-.desc { font-size: 0.9rem; color: #ddd; margin-top: 8px; }
 
 .btn-primary {
   background: #00aaff;
@@ -98,19 +81,6 @@ header h1 {
   margin-top: 15px;
 }
 
-.btn-primary:hover {
-  background: #fff;
-  color: #00aaff;
-  box-shadow: 0 0 20px #00ccff;
-}
-
-footer {
-  text-align: center;
-  padding: 20px;
-  background: rgba(0,0,0,0.7);
-  border-top: 1px solid #00aaff;
-}
-
 .back-btn {
   position: fixed;
   top: 20px;
@@ -121,7 +91,6 @@ footer {
   padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
-  z-index: 50;
 }
 
 .toast {
@@ -139,15 +108,6 @@ footer {
 }
 
 .toast.show { opacity: 1; }
-
-.football-ball {
-  width:28px;
-  height:28px;
-  background:#fff;
-  border-radius:50%;
-  position:relative;
-  display:inline-block;
-}
 </style>
 </head>
 
@@ -156,103 +116,128 @@ footer {
 <button class="back-btn" onclick="window.location.href='produits.html'">⬅ Retour</button>
 
 <header>
+
 <h1>⚡ Bright Tup Up — Manga</h1>
 
-<div style="display:flex; align-items:center;">
+<div style="display:flex;align-items:center;gap:10px">
+
 <div class="balance-box" id="balanceBox">0 G</div>
-<button class="btn-primary" onclick="openCart()">🛒 Panier</button>
+
+<div onclick="openCart()" style="cursor:pointer;font-weight:bold">
+🛒(<span id="cartCount">0</span>)
 </div>
+
+</div>
+
 </header>
 
 <div class="container">
+
 <h2 class="section-title">Abonnements Manga ⚡</h2>
+
 <div class="grid" id="productGrid"></div>
+
 </div>
 
 <div id="toast" class="toast">✅ Ajouté au panier</div>
 
-<footer>© 2026 Bright Tup Up</footer>
+<footer style="text-align:center;padding:20px;">© 2026 Bright Tup Up</footer>
 
 <script>
 
-/* ==========================
-   PROFIL
-========================== */
+/* ======================
+UTIL
+====================== */
 
-let user = JSON.parse(sessionStorage.getItem("dpstore_user") || "null");
-
-if(!user || !user.email){
-alert("Connectez-vous !");
-window.location.href = "index.html";
+function safeParse(str){
+try{return JSON.parse(str);}
+catch(e){return null;}
 }
 
-/* ==========================
-   NORMALIZE EMAIL
-========================== */
+/* ======================
+USER
+====================== */
 
-function normalizeId(id){
-return id.replace(/[^a-zA-Z0-9]/g,"").toLowerCase();
+let user = safeParse(sessionStorage.getItem("dpstore_user")) || {};
+
+if(!user.email){
+alert("⚠ Connectez-vous !");
+window.location.href="index.html";
 }
 
-/* ==========================
-   PANIER PAR EMAIL
-========================== */
+/* ======================
+PANIER (MEME SYSTEME)
+====================== */
+
+function normalizeId(str){
+return (str||"guest")
+.toLowerCase()
+.replace(/[^a-z0-9@.-]/g,"_")
+.replace(/@/g,"_at_");
+}
 
 function getCartKey(){
-return "cart_" + normalizeId(user.email);
+return "cart_"+normalizeId(user.email);
 }
 
 function loadCart(){
-return JSON.parse(localStorage.getItem(getCartKey()) || "[]");
+return JSON.parse(localStorage.getItem(getCartKey())||"[]");
 }
 
 function saveCart(cart){
-localStorage.setItem(getCartKey(), JSON.stringify(cart));
+localStorage.setItem(getCartKey(),JSON.stringify(cart));
 }
 
-/* ==========================
-   BALANCE
-========================== */
+function updateCartCount(){
+document.getElementById("cartCount").textContent=
+loadCart().length;
+}
+
+/* ======================
+BALANCE
+====================== */
 
 function updateBalanceUI(){
-let u = JSON.parse(sessionStorage.getItem("dpstore_user"));
-document.getElementById("balanceBox").textContent = (u.balance || 0) + " G";
+document.getElementById("balanceBox").textContent=
+(user.balance ?? 0)+" G";
 }
 
-/* ==========================
-   PRODUITS
-========================== */
+/* ======================
+PRODUITS
+====================== */
 
-const products = [
+const products=[
 
-{ name:"Bright Manga 1 Mois", price:540 },
-{ name:"Bright Manga 2 Mois", price:1140 },
-{ name:"Bright Manga 3 Mois", price:1700 }
+{name:"Bright Manga 1 Mois",price:540},
+{name:"Bright Manga 2 Mois",price:1140},
+{name:"Bright Manga 3 Mois",price:1700}
 
 ];
 
-const grid = document.getElementById("productGrid");
+const grid=document.getElementById("productGrid");
 
 products.forEach(p=>{
 
-const card = document.createElement("div");
+const card=document.createElement("div");
 
 card.className="card";
 
 card.innerHTML=`
+
 <h3>${p.name}</h3>
-<span class="status">Disponible</span>
-<span class="tag">Manga</span>
+
+<span style="background:#00ff99;color:#000;padding:3px 10px;border-radius:10px;font-size:0.8rem;">Disponible</span>
+
+<span style="background:#00aaff;color:#000;padding:3px 10px;border-radius:10px;font-size:0.8rem;">Manga</span>
 
 <div class="price">${p.price} HTG</div>
 
-<div class="desc">
-Livraison 0 à 3h — Accès illimité anime & manga
+<div style="font-size:0.9rem;margin-top:8px">
+Livraison 0 à 3h — Accès anime & manga
 </div>
 
-<button class="btn-primary">
-Ajouter au panier
-</button>
+<button class="btn-primary">Ajouter au panier</button>
+
 `;
 
 card.querySelector("button").onclick=()=>addToCart(p);
@@ -261,26 +246,26 @@ grid.appendChild(card);
 
 });
 
-/* ==========================
-   AJOUT PANIER
-========================== */
+/* ======================
+AJOUT PANIER
+====================== */
 
 function addToCart(product){
 
-let cart = loadCart();
+let cart=loadCart();
 
 cart.push({
 
-name: product.name,
-price: product.price,
+name:product.name,
+price:product.price,
 
-buyer: user.email,
-username: user.username,
-email: user.email,
+buyer:user.email,
+username:user.username,
+email:user.email,
 
-date: new Date().toLocaleString(),
+date:new Date().toLocaleString(),
 
-status: "En attente",
+status:"En attente",
 
 meta:{
 type:"Manga"
@@ -290,13 +275,15 @@ type:"Manga"
 
 saveCart(cart);
 
+updateCartCount();
+
 showToast();
 
 }
 
-/* ==========================
-   TOAST
-========================== */
+/* ======================
+TOAST
+====================== */
 
 function showToast(){
 
@@ -312,13 +299,11 @@ t.classList.remove("show");
 
 }
 
-/* ==========================
-   OPEN CART
-========================== */
+/* ======================
+OPEN CART
+====================== */
 
 function openCart(){
-
-localStorage.setItem("lastPage",window.location.href);
 
 window.location.href="cart.html";
 
@@ -327,7 +312,7 @@ window.location.href="cart.html";
 /* INIT */
 
 updateBalanceUI();
-setInterval(updateBalanceUI,1500);
+updateCartCount();
 
 </script>
 
