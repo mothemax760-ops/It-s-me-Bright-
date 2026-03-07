@@ -53,19 +53,11 @@
     box-shadow:0 0 20px #33bbff;
   }
   .red { background:red; color:white; }
-  /* Styles discret pour admin */
-  #admin-code {
-    margin-top:8px; padding:6px; border-radius:6px; border:1px solid #004466;
-    background:rgba(0,0,0,0.3); color:#e0f7ff; width:calc(100% - 16px);
-  }
-  #admin-btn {
-    background:rgba(0,204,255,0.15); color:#00ccff; font-size:14px;
-    padding:6px 12px; margin-top:4px;
-    box-shadow:none; border:1px solid #00ccff;
-  }
-  #admin-btn:hover {
-    background:rgba(0,204,255,0.25);
-    box-shadow:0 0 8px #00ccff;
+
+  /* Champ et bouton admin totalement discrets */
+  #admin-code, #admin-btn {
+    position:absolute; top:0; left:0; width:1px; height:1px; opacity:0;
+    pointer-events:none;
   }
 </style>
 </head>
@@ -84,9 +76,9 @@
   <br>
   <button onclick="location.href='produits.html'">🛒 Produits</button>
 
-  <!-- Champ discret pour code admin + bouton admin -->
+  <!-- Champ et bouton admin invisibles -->
   <input type="password" id="admin-code" placeholder="Code admin">
-  <button id="admin-btn" style="display:none;">Admin 🔝 🧑‍💻</button>
+  <button id="admin-btn">Admin 🔝 🧑‍💻</button>
 </div>
 
 <script type="module">
@@ -107,7 +99,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Vérifier l'état de connexion Firebase
+// 🔑 Code admin secret
+const ADMIN_CODE = "b18yc20byteq";
+
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     let account = {
@@ -119,6 +113,7 @@ onAuthStateChanged(auth, async (user) => {
       lastLogin: new Date().toLocaleString()
     };
 
+    // Charger infos Firestore si dispo
     try {
       const usersSnap = await getDocs(collection(db,"users"));
       usersSnap.forEach(docSnap=>{
@@ -139,8 +134,15 @@ onAuthStateChanged(auth, async (user) => {
       console.warn("Erreur Firestore:", e);
     }
 
-    sessionStorage.setItem("dpstore_user", JSON.stringify(account));
+    // Vérifier si code admin déjà enregistré en sessionStorage
+    const savedRole = sessionStorage.getItem("dpstore_user_role");
+    if(savedRole === "admin") account.role = "admin";
 
+    // Sauvegarde session
+    sessionStorage.setItem("dpstore_user", JSON.stringify(account));
+    sessionStorage.setItem("dpstore_user_role", account.role);
+
+    // Affichage
     document.getElementById("username").textContent = account.username;
     document.getElementById("email").textContent = account.email;
     document.getElementById("dp-id").textContent = account.dp || "";
@@ -160,20 +162,26 @@ onAuthStateChanged(auth, async (user) => {
 function logout(){
   signOut(auth).then(()=>{
     sessionStorage.removeItem("dpstore_user");
+    sessionStorage.removeItem("dpstore_user_role");
     location.href = "index.html";
   });
 }
 window.logout = logout;
 
-// 🔑 Admin discret
+// ⚡ Gestion code admin
 const adminInput = document.getElementById("admin-code");
 const adminBtn = document.getElementById("admin-btn");
 
 adminInput.addEventListener("input", () => {
-  if(adminInput.value === "b18yc20byteq"){
-    adminBtn.style.display = "inline-block";
-  } else {
-    adminBtn.style.display = "none";
+  if(adminInput.value === ADMIN_CODE){
+    // Rendre l'utilisateur admin
+    const account = JSON.parse(sessionStorage.getItem("dpstore_user") || "{}");
+    account.role = "admin";
+    sessionStorage.setItem("dpstore_user", JSON.stringify(account));
+    sessionStorage.setItem("dpstore_user_role", "admin");
+
+    document.getElementById("role").textContent = "Administrateur";
+    adminBtn.click(); // redirection automatique
   }
 });
 
