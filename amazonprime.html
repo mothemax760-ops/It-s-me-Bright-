@@ -16,7 +16,7 @@ color:#e0f7ff;
 
 /* HEADER */
 
-.header{
+header{
 display:flex;
 justify-content:space-between;
 align-items:center;
@@ -24,27 +24,46 @@ padding:15px 20px;
 background:rgba(5,10,20,0.95);
 border-bottom:2px solid #00aaff;
 box-shadow:0 0 10px #00aaff;
+position:sticky;
+top:0;
+z-index:10;
 }
 
 .logo{
-font-size:20px;
 font-weight:bold;
 color:#00ccff;
+font-size:1.3rem;
+letter-spacing:2px;
+}
+
+.right-box{
+display:flex;
+align-items:center;
+gap:12px;
 }
 
 .balance{
 padding:6px 12px;
 border-radius:8px;
 background:rgba(0,170,255,0.1);
-color:#00ccff;
-font-weight:bold;
 border:1px solid #00aaff;
+font-weight:bold;
+color:#00ccff;
 }
 
 .cart-btn{
 cursor:pointer;
 font-weight:bold;
+}
+
+.back-btn{
+background:none;
+border:2px solid #00aaff;
+padding:6px 12px;
+border-radius:8px;
+cursor:pointer;
 color:#00ccff;
+font-weight:bold;
 }
 
 /* CONTAINER */
@@ -55,12 +74,12 @@ display:grid;
 gap:15px;
 }
 
-/* PRODUCT */
+/* PRODUCT CARD */
 
 .product{
 background:rgba(5,10,20,0.95);
+border-radius:12px;
 border:1px solid #00aaff33;
-border-radius:14px;
 padding:18px;
 display:flex;
 justify-content:space-between;
@@ -73,31 +92,35 @@ box-shadow:0 0 18px #00aaff;
 }
 
 .product-info{
-font-size:16px;
+display:flex;
+flex-direction:column;
+gap:5px;
+}
+
+.title{
+font-weight:bold;
+font-size:1.1rem;
 }
 
 .price{
-color:#00ffcc;
+color:#00ccff;
 font-weight:bold;
-font-size:18px;
+font-size:1.05rem;
 }
 
 .warning{
 font-size:12px;
 color:#ffcc00;
-margin-top:6px;
 }
 
-/* BUTTON */
-
 .buy-btn{
+padding:10px 14px;
 background:linear-gradient(90deg,#00aaff,#004466);
 border:none;
-padding:10px 16px;
 border-radius:8px;
-color:#000;
 cursor:pointer;
 font-weight:bold;
+color:#000;
 }
 
 .buy-btn:hover{
@@ -120,22 +143,17 @@ align-items:center;
 
 .popup-box{
 background:rgba(5,10,20,0.95);
-padding:20px;
+border:2px solid #00aaff;
+padding:25px;
 border-radius:12px;
 width:320px;
-border:2px solid #00aaff;
 box-shadow:0 0 20px #00aaff;
-}
-
-.popup-box h3{
-margin-top:0;
-color:#00ccff;
-text-align:center;
+display:flex;
+flex-direction:column;
+gap:10px;
 }
 
 .popup-box input{
-width:100%;
-margin-bottom:10px;
 padding:10px;
 border-radius:8px;
 border:1px solid #00aaff;
@@ -144,20 +162,21 @@ color:#fff;
 }
 
 .popup-box button{
-width:100%;
 padding:10px;
 border:none;
 border-radius:8px;
-background:linear-gradient(90deg,#00aaff,#004466);
-color:#000;
 cursor:pointer;
 font-weight:bold;
 }
 
-.cancel{
-background:red !important;
-color:#fff !important;
-margin-top:6px;
+.confirm-btn{
+background:linear-gradient(90deg,#00aaff,#004466);
+color:#000;
+}
+
+.cancel-btn{
+background:red;
+color:#fff;
 }
 
 </style>
@@ -165,82 +184,66 @@ margin-top:6px;
 
 <body>
 
-<div class="header">
+<header>
 
-<div class="cart-btn" onclick="gotoCart()">
-🛒(<span id="cartCount">0</span>)
-</div>
+<button class="back-btn" onclick="location.href='produits.html'">
+← Retour
+</button>
 
 <div class="logo">
 BRIGHT PRIME
 </div>
 
+<div class="right-box">
+
 <div class="balance" id="balanceBox">
 0 G
 </div>
 
+<div class="cart-btn" onclick="gotoCart()">
+🛒(<span id="cartCount">0</span>)
 </div>
+
+</div>
+
+</header>
 
 <div class="container">
 
 <div class="product">
-
 <div class="product-info">
-Amazon Prime<br>
-<span class="price">1 Mois + 1 Profil — 500 HTG</span>
-
-<div class="warning">
-Livraison automatique entre 5 min et 24h
+<div class="title">Amazon Prime</div>
+<div class="price">1 Mois + 1 Profil — 500 HTG</div>
+<div class="warning">Livraison entre 5 min et 24h</div>
 </div>
-
-</div>
-
 <button class="buy-btn" onclick="openPopup('Amazon Prime 1 Mois',500)">
 Acheter
 </button>
-
 </div>
-
 
 <div class="product">
-
 <div class="product-info">
-Amazon Prime<br>
-<span class="price">3 Mois + 1 Profil — 1354 HTG</span>
-
-<div class="warning">
-Livraison automatique entre 5 min et 24h
+<div class="title">Amazon Prime</div>
+<div class="price">3 Mois + 1 Profil — 1354 HTG</div>
+<div class="warning">Livraison entre 5 min et 24h</div>
 </div>
-
-</div>
-
 <button class="buy-btn" onclick="openPopup('Amazon Prime 3 Mois',1354)">
 Acheter
 </button>
-
 </div>
-
 
 <div class="product">
-
 <div class="product-info">
-Amazon Prime<br>
-<span class="price">6 Mois + 1 Profil — 2707 HTG</span>
-
-<div class="warning">
-Livraison automatique entre 5 min et 24h
+<div class="title">Amazon Prime</div>
+<div class="price">6 Mois + 1 Profil — 2707 HTG</div>
+<div class="warning">Livraison entre 5 min et 24h</div>
 </div>
-
-</div>
-
 <button class="buy-btn" onclick="openPopup('Amazon Prime 6 Mois',2707)">
 Acheter
 </button>
-
 </div>
 
 </div>
-
 
 <!-- POPUP -->
 
@@ -248,17 +251,16 @@ Acheter
 
 <div class="popup-box">
 
-<h3>Achat Amazon Prime</h3>
+<h3 id="popupTitle">Amazon Prime</h3>
 
-<input type="text" id="email" placeholder="Email Amazon">
+<input id="emailAmazon" placeholder="Email Amazon">
+<input id="whatsapp" placeholder="WhatsApp">
 
-<input type="text" id="whatsapp" placeholder="WhatsApp">
-
-<button onclick="confirmBuy()">
+<button class="confirm-btn" onclick="confirmBuy()">
 Ajouter au panier
 </button>
 
-<button class="cancel" onclick="closePopup()">
+<button class="cancel-btn" onclick="closePopup()">
 Annuler
 </button>
 
@@ -266,94 +268,29 @@ Annuler
 
 </div>
 
+<script>
 
-<script type="module">
+/* USER */
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+function safeParse(str){
+try{return JSON.parse(str);}
+catch(e){return null;}
+}
 
-/* FIREBASE */
+let user=safeParse(sessionStorage.getItem("dpstore_user"))||{};
 
-const firebaseConfig={
-apiKey:"AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
-authDomain:"brighttupup.firebaseapp.com",
-projectId:"brighttupup",
-storageBucket:"brighttupup.appspot.com",
-messagingSenderId:"812394183947",
-appId:"1:812394183947:web:d65d60d6aeee39bcc3b60e"
-};
-
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
-
-let user={};
-
-/* CONNEXION */
-
-onAuthStateChanged(auth,async(firebaseUser)=>{
-
-if(!firebaseUser){
+if(!user.email || !user.username){
+alert("⚠ Connectez-vous !");
 location.href="index.html";
-return;
 }
 
-let account={
-email:firebaseUser.email,
-username:firebaseUser.displayName||"Utilisateur",
-photo:firebaseUser.photoURL||"",
-balance:0,
-role:"user"
-};
-
-try{
-
-const snap=await getDocs(collection(db,"users"));
-
-snap.forEach(doc=>{
-
-const data=doc.data();
-
-if(data.email?.toLowerCase()==firebaseUser.email.toLowerCase()){
-
-account.username=data.username??account.username;
-account.balance=Number(data.credits??0);
-account.role=data.role??"user";
-
-}
-
-});
-
-}catch(e){
-console.warn(e);
-}
-
-sessionStorage.setItem("dpstore_user",JSON.stringify(account));
-
-user=account;
-
-updateBalance();
-
-updateCartCount();
-
-});
-
-/* BALANCE */
-
-function updateBalance(){
-document.getElementById("balanceBox").innerText=user.balance+" G";
-}
-
-/* PANIER UTILISATEUR */
+/* PANIER STANDARD */
 
 function normalizeId(str){
-
 return (str||"guest")
 .toLowerCase()
 .replace(/[^a-z0-9@.-]/g,"_")
 .replace(/@/g,"_at_");
-
 }
 
 function getCartKey(){
@@ -369,40 +306,46 @@ localStorage.setItem(getCartKey(),JSON.stringify(cart));
 }
 
 function updateCartCount(){
-document.getElementById("cartCount").innerText=
-loadCart().length;
+document.getElementById("cartCount").textContent=loadCart().length;
 }
+
+function gotoCart(){
+window.location.href="cart.html";
+}
+
+/* BALANCE */
+
+function updateBalanceUI(){
+document.getElementById("balanceBox").textContent=(user.balance??0)+" G";
+}
+
+updateBalanceUI();
+updateCartCount();
 
 /* POPUP */
 
 let selectedProduct=null;
 
 function openPopup(name,price){
-
 selectedProduct={name,price};
-
+document.getElementById("popupTitle").textContent=name+" - "+price+" HTG";
 document.getElementById("popup").style.display="flex";
-
 }
 
 function closePopup(){
 document.getElementById("popup").style.display="none";
 }
 
-/* AJOUT PANIER */
+/* CONFIRM BUY */
 
 function confirmBuy(){
 
-let email=document.getElementById("email").value.trim();
-
+let emailAmazon=document.getElementById("emailAmazon").value.trim();
 let whatsapp=document.getElementById("whatsapp").value.trim();
 
-if(!email || !whatsapp){
-
+if(!emailAmazon || !whatsapp){
 alert("Remplissez tous les champs");
-
 return;
-
 }
 
 let cart=loadCart();
@@ -420,7 +363,7 @@ date:new Date().toLocaleString(),
 status:"En attente",
 
 meta:{
-amazonEmail:email,
+amazonEmail:emailAmazon,
 whatsapp:whatsapp
 }
 
@@ -434,12 +377,6 @@ closePopup();
 
 alert("Produit ajouté au panier 🛒");
 
-}
-
-/* GO CART */
-
-function gotoCart(){
-window.location.href="cart.html";
 }
 
 </script>
