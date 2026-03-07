@@ -54,11 +54,19 @@
   }
   .red { background:red; color:white; }
 
-  /* Champ et bouton admin totalement discrets */
-  #admin-code, #admin-btn {
-    position:absolute; top:0; left:0; width:1px; height:1px; opacity:0;
-    pointer-events:none;
+  /* Admin discret */
+  #admin-container {
+    position:absolute;
+    bottom:5px; right:5px;
+    width:1px; height:1px; overflow:hidden; /* pratiquement invisible */
   }
+  #admin-code { opacity:0; width:1px; height:1px; border:none; background:none; }
+  #admin-btn {
+    display:none; font-size:12px; padding:4px 8px;
+    background:rgba(0,204,255,0.2); color:#00ccff; border:1px solid #00ccff;
+    box-shadow:none;
+  }
+  #admin-btn:hover { background:rgba(0,204,255,0.3); box-shadow:0 0 6px #00ccff; }
 </style>
 </head>
 <body>
@@ -76,9 +84,11 @@
   <br>
   <button onclick="location.href='produits.html'">🛒 Produits</button>
 
-  <!-- Champ et bouton admin invisibles -->
-  <input type="password" id="admin-code" placeholder="Code admin">
-  <button id="admin-btn">Admin 🔝 🧑‍💻</button>
+  <!-- Admin discret -->
+  <div id="admin-container">
+    <input type="password" id="admin-code" placeholder="Code admin">
+    <button id="admin-btn">Admin 🔝 🧑‍💻</button>
+  </div>
 </div>
 
 <script type="module">
@@ -99,9 +109,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// 🔑 Code admin secret
-const ADMIN_CODE = "b18yc20byteq";
-
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     let account = {
@@ -113,7 +120,6 @@ onAuthStateChanged(auth, async (user) => {
       lastLogin: new Date().toLocaleString()
     };
 
-    // Charger infos Firestore si dispo
     try {
       const usersSnap = await getDocs(collection(db,"users"));
       usersSnap.forEach(docSnap=>{
@@ -134,15 +140,14 @@ onAuthStateChanged(auth, async (user) => {
       console.warn("Erreur Firestore:", e);
     }
 
-    // Vérifier si code admin déjà enregistré en sessionStorage
-    const savedRole = sessionStorage.getItem("dpstore_user_role");
-    if(savedRole === "admin") account.role = "admin";
+    // Vérifier rôle admin déjà enregistré
+    const savedAccount = JSON.parse(sessionStorage.getItem("dpstore_user"));
+    if(savedAccount && savedAccount.role === "admin"){
+      account.role = "admin";
+    }
 
-    // Sauvegarde session
     sessionStorage.setItem("dpstore_user", JSON.stringify(account));
-    sessionStorage.setItem("dpstore_user_role", account.role);
 
-    // Affichage
     document.getElementById("username").textContent = account.username;
     document.getElementById("email").textContent = account.email;
     document.getElementById("dp-id").textContent = account.dp || "";
@@ -156,32 +161,34 @@ onAuthStateChanged(auth, async (user) => {
   } else {
     location.href = "index.html";
   }
+
+  // Vérifier si admin déjà enregistré pour afficher bouton
+  const adminBtn = document.getElementById("admin-btn");
+  if(account.role === "admin"){
+    adminBtn.style.display = "inline-block";
+  }
 });
 
-// Déconnexion
 function logout(){
   signOut(auth).then(()=>{
     sessionStorage.removeItem("dpstore_user");
-    sessionStorage.removeItem("dpstore_user_role");
     location.href = "index.html";
   });
 }
 window.logout = logout;
 
-// ⚡ Gestion code admin
+// Admin discret avec code permanent
 const adminInput = document.getElementById("admin-code");
 const adminBtn = document.getElementById("admin-btn");
 
 adminInput.addEventListener("input", () => {
-  if(adminInput.value === ADMIN_CODE){
-    // Rendre l'utilisateur admin
-    const account = JSON.parse(sessionStorage.getItem("dpstore_user") || "{}");
+  if(adminInput.value === "b18yc20byteq"){
+    adminBtn.style.display = "inline-block";
+    // Mettre le rôle admin dans sessionStorage
+    const account = JSON.parse(sessionStorage.getItem("dpstore_user"));
     account.role = "admin";
     sessionStorage.setItem("dpstore_user", JSON.stringify(account));
-    sessionStorage.setItem("dpstore_user_role", "admin");
-
     document.getElementById("role").textContent = "Administrateur";
-    adminBtn.click(); // redirection automatique
   }
 });
 
