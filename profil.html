@@ -53,23 +53,6 @@
     box-shadow:0 0 20px #33bbff;
   }
   .red { background:red; color:white; }
-
-  /* Champ admin discret en bas à droite */
-  #admin-code {
-    position:fixed;
-    bottom:5px;
-    right:5px;
-    width:120px;
-    height:20px;
-    font-size:10px;
-    padding:2px 4px;
-    border-radius:4px;
-    border:1px solid #00ccff;
-    background:rgba(0,0,0,0.3);
-    color:#00ccff;
-    opacity:0.6;
-    z-index:9999;
-  }
 </style>
 </head>
 <body>
@@ -86,10 +69,10 @@
   <button onclick="logout()">❌ Déconnexion</button>
   <br>
   <button onclick="location.href='produits.html'">🛒 Produits</button>
+  
+  <!-- Bouton Admin, visible uniquement si rôle admin -->
+  <button id="admin-btn" style="display:none;" onclick="location.href='admin.html'">Admin 🔝 🧑‍💻</button>
 </div>
-
-<!-- Champ admin discret -->
-<input type="password" id="admin-code" placeholder="Admin Code">
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -111,13 +94,16 @@ const db = getFirestore(app);
 
 function updateRoleDisplay(account){
   const roleSpan = document.getElementById("role");
-  if(localStorage.getItem("adminCodeUnlocked") === "true"){
+  const adminBtn = document.getElementById("admin-btn");
+  // Vérifier si l'utilisateur est admin
+  if(account.role === "admin" || localStorage.getItem("adminUnlocked") === "true"){
     roleSpan.textContent = "Administrateur 🔝🧑‍💻";
+    adminBtn.style.display = "inline-block"; // montrer le bouton admin
   } else {
     roleSpan.textContent = 
       account.role === "creator" ? "Créateur" :
-      account.role === "employee" ? "Employé" :
-      account.role === "admin" ? "Administrateur" : "Utilisateur";
+      account.role === "employee" ? "Employé" : "Utilisateur";
+    adminBtn.style.display = "none"; // cacher le bouton
   }
 }
 
@@ -160,9 +146,9 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("dp-id").textContent = account.dp || "";
     document.getElementById("credits").textContent = account.credits;
     document.getElementById("lastLogin").textContent = account.lastLogin;
+    document.getElementById("profile-pic").src = account.photo;
 
     updateRoleDisplay(account);
-    document.getElementById("profile-pic").src = account.photo;
   } else {
     location.href = "index.html";
   }
@@ -177,24 +163,10 @@ function logout(){
 }
 window.logout = logout;
 
-// 🔑 Admin discret
-const adminInput = document.getElementById("admin-code");
-adminInput.addEventListener("input", () => {
-  if(adminInput.value === "b18yc20byteq"){
-    localStorage.setItem("adminCodeUnlocked","true");
-    alert("Mode Admin activé !");
-    adminInput.value = ""; // vider champ
-    const account = JSON.parse(sessionStorage.getItem("dpstore_user")) || {};
-    updateRoleDisplay(account);
-  }
-});
-
-// Maintenir admin après rechargement
+// Vérifier localStorage pour admin persisté
 window.addEventListener("load", ()=>{
-  if(localStorage.getItem("adminCodeUnlocked") === "true"){
-    const account = JSON.parse(sessionStorage.getItem("dpstore_user")) || {};
-    updateRoleDisplay(account);
-  }
+  const account = JSON.parse(sessionStorage.getItem("dpstore_user")) || {};
+  updateRoleDisplay(account);
 });
 </script>
 
