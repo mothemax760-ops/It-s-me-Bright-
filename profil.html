@@ -70,7 +70,7 @@
   <br>
   <button onclick="location.href='produits.html'">🛒 Produits</button>
   
-  <!-- Bouton Admin, visible uniquement si rôle admin -->
+  <!-- Bouton Admin, visible uniquement pour admin -->
   <button id="admin-btn" style="display:none;" onclick="location.href='admin.html'">Admin 🔝 🧑‍💻</button>
 </div>
 
@@ -92,66 +92,71 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Fonction pour afficher rôle et bouton admin
 function updateRoleDisplay(account){
   const roleSpan = document.getElementById("role");
   const adminBtn = document.getElementById("admin-btn");
-  // Vérifier si l'utilisateur est admin
-  if(account.role === "admin" || localStorage.getItem("adminUnlocked") === "true"){
+
+  // Vérifier si l’utilisateur est admin par Firestore ou par email
+  const adminEmails = ["christopherantoine773@gmail.com"];
+  if(adminEmails.includes(account.email.toLowerCase()) || account.role === "admin"){
     roleSpan.textContent = "Administrateur 🔝🧑‍💻";
-    adminBtn.style.display = "inline-block"; // montrer le bouton admin
+    adminBtn.style.display = "inline-block";
+  } else if(account.role === "creator"){
+    roleSpan.textContent = "Créateur";
+    adminBtn.style.display = "none";
+  } else if(account.role === "employee"){
+    roleSpan.textContent = "Employé";
+    adminBtn.style.display = "none";
   } else {
-    roleSpan.textContent = 
-      account.role === "creator" ? "Créateur" :
-      account.role === "employee" ? "Employé" : "Utilisateur";
-    adminBtn.style.display = "none"; // cacher le bouton
+    roleSpan.textContent = "Utilisateur";
+    adminBtn.style.display = "none";
   }
 }
 
-// Vérifier l'état de connexion Firebase
+// Vérifier l'état de connexion
 onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    let account = {
-      email: user.email,
-      username: user.displayName || "Utilisateur",
-      photo: user.photoURL || "https://via.placeholder.com/120",
-      role: "user",
-      credits: 0,
-      lastLogin: new Date().toLocaleString()
-    };
+  if(!user) return location.href = "index.html";
 
-    try {
-      const usersSnap = await getDocs(collection(db,"users"));
-      usersSnap.forEach(docSnap=>{
-        const data = docSnap.data();
-        if(data.email && data.email.toLowerCase() === user.email.toLowerCase()){
-          account = {
-            email: data.email,
-            username: data.username ?? account.username,
-            dp: data.dp ?? "—",
-            role: data.role ?? "user",
-            credits: Number(data.credits ?? 0),
-            photo: data.photo ?? account.photo,
-            lastLogin: data.lastLogin ?? account.lastLogin
-          };
-        }
-      });
-    } catch(e){
-      console.warn("Erreur Firestore:", e);
-    }
+  let account = {
+    email: user.email,
+    username: user.displayName || "Utilisateur",
+    photo: user.photoURL || "https://via.placeholder.com/120",
+    role: "user",
+    credits: 0,
+    lastLogin: new Date().toLocaleString()
+  };
 
-    sessionStorage.setItem("dpstore_user", JSON.stringify(account));
-
-    document.getElementById("username").textContent = account.username;
-    document.getElementById("email").textContent = account.email;
-    document.getElementById("dp-id").textContent = account.dp || "";
-    document.getElementById("credits").textContent = account.credits;
-    document.getElementById("lastLogin").textContent = account.lastLogin;
-    document.getElementById("profile-pic").src = account.photo;
-
-    updateRoleDisplay(account);
-  } else {
-    location.href = "index.html";
+  try{
+    const usersSnap = await getDocs(collection(db,"users"));
+    usersSnap.forEach(docSnap=>{
+      const data = docSnap.data();
+      if(data.email && data.email.toLowerCase() === user.email.toLowerCase()){
+        account = {
+          email: data.email,
+          username: data.username ?? account.username,
+          dp: data.dp ?? "—",
+          role: data.role ?? "user",
+          credits: Number(data.credits ?? 0),
+          photo: data.photo ?? account.photo,
+          lastLogin: data.lastLogin ?? account.lastLogin
+        };
+      }
+    });
+  } catch(e){
+    console.warn("Erreur Firestore:", e);
   }
+
+  sessionStorage.setItem("dpstore_user", JSON.stringify(account));
+
+  document.getElementById("username").textContent = account.username;
+  document.getElementById("email").textContent = account.email;
+  document.getElementById("dp-id").textContent = account.dp || "";
+  document.getElementById("credits").textContent = account.credits;
+  document.getElementById("lastLogin").textContent = account.lastLogin;
+  document.getElementById("profile-pic").src = account.photo;
+
+  updateRoleDisplay(account);
 });
 
 // Déconnexion
@@ -163,10 +168,10 @@ function logout(){
 }
 window.logout = logout;
 
-// Vérifier localStorage pour admin persisté
+// Maintenir admin après rechargement
 window.addEventListener("load", ()=>{
   const account = JSON.parse(sessionStorage.getItem("dpstore_user")) || {};
-  updateRoleDisplay(account);
+  if(account.email) updateRoleDisplay(account);
 });
 </script>
 
