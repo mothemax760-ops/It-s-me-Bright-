@@ -6,165 +6,147 @@
 <title>Bright Tup Up | Manga & Efootball</title>
 
 <style>
-body{
-margin:0;
-font-family:'Poppins',sans-serif;
-background:radial-gradient(circle at top,#1b0034,#000);
-color:#e0f7ff;
-overflow-x:hidden;
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #1b0034, #000);
+  color: #e0f7ff;
+  overflow-x: hidden;
 }
 
-header{
-background:rgba(0,0,0,0.8);
-padding:15px 25px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-box-shadow:0 0 15px #00aaffaa;
-position:sticky;
-top:0;
-z-index:10;
+header {
+  background: rgba(0,0,0,0.8);
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0 15px #00aaffaa;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-header h1{
-font-size:1.5rem;
-font-weight:700;
-color:#00ccff;
-text-shadow:0 0 15px #00aaff,0 0 30px #004466;
-display:flex;
-align-items:center;
-gap:8px;
+header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #00ccff;
+  text-shadow: 0 0 15px #00aaff, 0 0 30px #004466;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.balance-box{
-background:rgba(0,0,0,0.4);
-border:1px solid #00aaff;
-padding:6px 12px;
-border-radius:10px;
-font-weight:bold;
-color:#00ccff;
-margin-right:10px;
+.balance-box {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid #00aaff;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #00ccff;
+  margin-right: 10px;
 }
 
-.container{padding:30px;}
+.container { padding: 30px; }
 
-.section-title{
-font-size:1.8rem;
-margin:20px 0;
-text-align:center;
-text-shadow:0 0 10px #00aaff;
-letter-spacing:2px;
+.section-title {
+  font-size: 1.8rem;
+  margin: 20px 0;
+  text-align: center;
+  text-shadow: 0 0 10px #00aaff;
+  letter-spacing: 2px;
 }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-gap:25px;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
 }
 
-.card{
-background:linear-gradient(145deg,rgba(0,170,255,0.2),rgba(0,0,0,0.6));
-border:2px solid #00aaff;
-border-radius:15px;
-padding:20px;
-text-align:center;
-box-shadow:0 0 20px #00aaffaa;
-transition:0.3s;
+.card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(0,170,255,0.2), rgba(0,0,0,0.6));
+  border: 2px solid #00aaff;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 0 20px #00aaffaa;
+  transition: 0.3s;
+  overflow: hidden;
 }
 
-.card:hover{
-transform:scale(1.05);
-box-shadow:0 0 30px #00ccff;
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px #00ccff;
 }
 
-.card h3{margin-bottom:10px;}
+.card h3 { font-size: 1.2rem; margin-bottom: 10px; }
 
-.status{
-background:#00ff99;
-color:#000;
-padding:3px 10px;
-border-radius:10px;
-font-size:0.8rem;
-font-weight:700;
+.status { background: #00ff99; color: #000; padding: 3px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; }
+.tag { background: #00aaff; color: #000; padding: 3px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; margin-left: 5px; }
+
+.price { font-size: 1.1rem; font-weight: bold; color: #00ccff; text-shadow: 0 0 5px #00aaff; margin-top: 10px; }
+.desc { font-size: 0.9rem; color: #ddd; margin-top: 8px; }
+
+.btn-primary {
+  background: #00aaff;
+  color: #000;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 15px;
 }
 
-.tag{
-background:#00aaff;
-color:#000;
-padding:3px 10px;
-border-radius:10px;
-font-size:0.8rem;
-font-weight:700;
-margin-left:5px;
+.btn-primary:hover {
+  background: #fff;
+  color: #00aaff;
+  box-shadow: 0 0 20px #00ccff;
 }
 
-.price{
-font-size:1.1rem;
-font-weight:bold;
-color:#00ccff;
-margin-top:10px;
+footer {
+  text-align: center;
+  padding: 20px;
+  background: rgba(0,0,0,0.7);
+  border-top: 1px solid #00aaff;
 }
 
-.desc{
-font-size:0.9rem;
-color:#ddd;
-margin-top:8px;
+.back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(0,170,255,0.2);
+  border: 1px solid #00aaff;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 50;
 }
 
-.btn-primary{
-background:#00aaff;
-color:#000;
-border:none;
-padding:10px 16px;
-border-radius:8px;
-cursor:pointer;
-font-weight:bold;
-margin-top:15px;
+.toast {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #00aaff;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity 0.4s;
 }
 
-footer{
-text-align:center;
-padding:20px;
-background:rgba(0,0,0,0.7);
-border-top:1px solid #00aaff;
-}
+.toast.show { opacity: 1; }
 
-.back-btn{
-position:fixed;
-top:20px;
-left:20px;
-background:rgba(0,170,255,0.2);
-border:1px solid #00aaff;
-color:#fff;
-padding:8px 12px;
-border-radius:8px;
-cursor:pointer;
-}
-
-.toast{
-position:fixed;
-bottom:25px;
-left:50%;
-transform:translateX(-50%);
-background:#00aaff;
-color:#000;
-padding:10px 20px;
-border-radius:10px;
-font-weight:bold;
-opacity:0;
-transition:opacity 0.4s;
-}
-
-.toast.show{opacity:1;}
-
-.football-ball{
-width:28px;
-height:28px;
-background:#fff;
-border-radius:50%;
-position:relative;
-display:inline-block;
-box-shadow:inset -2px -2px 0 #000,inset 2px 2px 0 #000;
+.football-ball {
+  width:28px;
+  height:28px;
+  background:#fff;
+  border-radius:50%;
+  position:relative;
+  display:inline-block;
 }
 </style>
 </head>
@@ -174,9 +156,9 @@ box-shadow:inset -2px -2px 0 #000,inset 2px 2px 0 #000;
 <button class="back-btn" onclick="window.location.href='produits.html'">⬅ Retour</button>
 
 <header>
-<h1><span class="football-ball"></span> Bright Tup Up — Manga & Efootball</h1>
+<h1>⚡ Bright Tup Up — Manga</h1>
 
-<div style="display:flex;align-items:center;">
+<div style="display:flex; align-items:center;">
 <div class="balance-box" id="balanceBox">0 G</div>
 <button class="btn-primary" onclick="openCart()">🛒 Panier</button>
 </div>
@@ -193,67 +175,72 @@ box-shadow:inset -2px -2px 0 #000,inset 2px 2px 0 #000;
 
 <script>
 
-/* =======================
-UTILS
-======================= */
-
-function normalizeId(str){
-return str.replace(/[^a-z0-9]/gi,"").toLowerCase();
-}
+/* ==========================
+   PROFIL
+========================== */
 
 let user = JSON.parse(sessionStorage.getItem("dpstore_user") || "null");
 
 if(!user || !user.email){
-alert("Connectez vous");
-location.href="index.html";
+alert("Connectez-vous !");
+window.location.href = "index.html";
 }
+
+/* ==========================
+   NORMALIZE EMAIL
+========================== */
+
+function normalizeId(id){
+return id.replace(/[^a-zA-Z0-9]/g,"").toLowerCase();
+}
+
+/* ==========================
+   PANIER PAR EMAIL
+========================== */
 
 function getCartKey(){
-return "cart_"+normalizeId(user.email);
+return "cart_" + normalizeId(user.email);
 }
-
-/* =======================
-PANIER PAR UTILISATEUR
-======================= */
 
 function loadCart(){
 return JSON.parse(localStorage.getItem(getCartKey()) || "[]");
 }
 
 function saveCart(cart){
-localStorage.setItem(getCartKey(),JSON.stringify(cart));
+localStorage.setItem(getCartKey(), JSON.stringify(cart));
 }
 
-/* =======================
-BALANCE
-======================= */
+/* ==========================
+   BALANCE
+========================== */
 
 function updateBalanceUI(){
-user = JSON.parse(sessionStorage.getItem("dpstore_user")) || user;
-document.getElementById("balanceBox").textContent=(user.balance||0)+" G";
+let u = JSON.parse(sessionStorage.getItem("dpstore_user"));
+document.getElementById("balanceBox").textContent = (u.balance || 0) + " G";
 }
 
-/* =======================
-PRODUITS
-======================= */
+/* ==========================
+   PRODUITS
+========================== */
 
-const products=[
-{name:"Bright Manga 1 Mois",price:540},
-{name:"Bright Manga 2 Mois",price:1140},
-{name:"Bright Manga 3 Mois",price:1700}
+const products = [
+
+{ name:"Bright Manga 1 Mois", price:540 },
+{ name:"Bright Manga 2 Mois", price:1140 },
+{ name:"Bright Manga 3 Mois", price:1700 }
+
 ];
 
-const grid=document.getElementById("productGrid");
+const grid = document.getElementById("productGrid");
 
 products.forEach(p=>{
 
-const card=document.createElement("div");
+const card = document.createElement("div");
+
 card.className="card";
 
 card.innerHTML=`
-
 <h3>${p.name}</h3>
-
 <span class="status">Disponible</span>
 <span class="tag">Manga</span>
 
@@ -268,38 +255,35 @@ Ajouter au panier
 </button>
 `;
 
-card.querySelector("button").onclick=()=>{
-addToCart(p.name,p.price);
-};
+card.querySelector("button").onclick=()=>addToCart(p);
 
 grid.appendChild(card);
 
 });
 
-/* =======================
-AJOUT PANIER
-======================= */
+/* ==========================
+   AJOUT PANIER
+========================== */
 
-function addToCart(name,price){
+function addToCart(product){
 
-let cart=loadCart();
+let cart = loadCart();
 
 cart.push({
 
-name:name,
-price:price,
+name: product.name,
+price: product.price,
 
-buyer:user.email,
-email:user.email,
-username:user.username,
+buyer: user.email,
+username: user.username,
+email: user.email,
 
-date:new Date().toLocaleString(),
+date: new Date().toLocaleString(),
 
-status:"En attente",
+status: "En attente",
 
 meta:{
-type:"Manga",
-account:user.username
+type:"Manga"
 }
 
 });
@@ -310,40 +294,39 @@ showToast();
 
 }
 
-/* =======================
-TOAST
-======================= */
+/* ==========================
+   TOAST
+========================== */
 
 function showToast(){
 
-const toast=document.getElementById("toast");
+const t=document.getElementById("toast");
 
-toast.classList.add("show");
+t.classList.add("show");
 
 setTimeout(()=>{
-toast.classList.remove("show");
+
+t.classList.remove("show");
+
 },1500);
 
 }
 
-/* =======================
-PANIER
-======================= */
+/* ==========================
+   OPEN CART
+========================== */
 
 function openCart(){
 
-localStorage.setItem("lastPage",location.href);
+localStorage.setItem("lastPage",window.location.href);
 
-location.href="cart.html";
+window.location.href="cart.html";
 
 }
 
-/* =======================
-INIT
-======================= */
+/* INIT */
 
 updateBalanceUI();
-
 setInterval(updateBalanceUI,1500);
 
 </script>
