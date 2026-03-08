@@ -1,186 +1,214 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Admin — Bright Tup Up</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bright Admin</title>
+
 <style>
-  body {
-    background: radial-gradient(circle at top left, #000 40%, #001a33 100%);
-    color: #e0f7ff;
-    font-family: "Poppins", sans-serif;
-    text-align:center;
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    padding-top:50px;
-  }
-  .admin-box {
-    width:90%; max-width:500px;
-    background:rgba(5,10,20,0.95);
-    padding:25px;
-    border-radius:12px;
-    box-shadow:0 0 25px #00aaff, inset 0 0 15px #003355;
-    border:1px solid #00aaff;
-  }
-  h2 { color:#00ccff; margin:10px 0; text-shadow:0 0 15px #00aaff; }
-  input, select {
-    padding:10px; margin:8px 0;
-    width:90%; max-width:400px;
-    border-radius:8px; border:1px solid #00ccff;
-    background:rgba(0,0,0,0.3); color:#e0f7ff;
-  }
-  button {
-    padding:12px 20px;
-    border:none; border-radius:10px;
-    cursor:pointer; font-weight:bold;
-    margin-top:10px;
-    background:linear-gradient(90deg,#00aaff,#004466);
-    color:#000;
-    box-shadow:0 0 12px #00aaff;
-    text-transform:uppercase;
-    transition: all 0.3s ease;
-    margin-right:10px;
-  }
-  button:hover {
-    background:linear-gradient(90deg,#33bbff,#006699);
-    box-shadow:0 0 20px #33bbff;
-  }
-  hr { border-color:#00aaff; margin:20px 0; }
+body{
+font-family:Poppins,sans-serif;
+background:radial-gradient(circle,#001a33,#000);
+color:#e0f7ff;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.panel{
+background:#020b18;
+padding:30px;
+border-radius:15px;
+box-shadow:0 0 25px #00ccff;
+text-align:center;
+width:350px;
+}
+
+h2{
+color:#00ccff;
+}
+
+input{
+width:90%;
+padding:10px;
+margin:8px;
+border-radius:8px;
+border:none;
+outline:none;
+}
+
+button{
+padding:10px 18px;
+margin:6px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#00ccff;
+color:#000;
+font-weight:bold;
+}
+
+button:hover{
+background:#00e1ff;
+}
+
 </style>
 </head>
+
 <body>
 
-<div class="admin-box">
-  <h2>Admin Panel 🔝🧑‍💻</h2>
+<div class="panel">
 
-  <!-- Ajouter / Retirer argent -->
-  <h3>💰 Gestion des crédits</h3>
-  <input type="email" id="user-email" placeholder="Email de l'utilisateur"><br>
-  <input type="number" id="amount" placeholder="Montant"><br>
-  <button id="send-money-btn">Ajouter 💸</button>
-  <button id="remove-money-btn">Retirer 💸</button>
+<h2>Admin Panel 🔝🧑‍💻</h2>
 
-  <hr>
+<input id="email" placeholder="email utilisateur">
 
-  <!-- Ajouter un admin -->
-  <h3>🧑‍💻 Ajouter Admin</h3>
-  <input type="email" id="new-admin-email" placeholder="Email du nouvel admin"><br>
-  <button id="add-admin-btn">Ajouter Admin</button>
+<input id="amount" type="number" placeholder="montant">
 
-  <hr>
+<br>
 
-  <!-- Autres actions -->
-  <h3>🔢 Infos utilisateurs</h3>
-  <button id="count-users-btn">Voir nombre de comptes</button><br><br>
-  <button onclick="location.href='cmd.html'">CMD.html 🔗</button>
+<button id="addMoney">Ajouter argent</button>
+
+<button id="removeMoney">Retirer argent</button>
+
+<br><br>
+
+<button id="countUsers">Nombre de comptes</button>
+
+<br><br>
+
+<button onclick="window.location='cmd.html'">Voir Commandes</button>
+
 </div>
 
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import { getFirestore, doc, updateDoc, getDocs, collection, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
-  authDomain: "brighttupup.firebaseapp.com",
-  projectId: "brighttupup",
-  storageBucket: "brighttupup.appspot.com",
-  messagingSenderId: "812394183947",
-  appId: "1:812394183947:web:d65d60d6aeee39bcc3b60e"
+apiKey: "AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
+authDomain: "brighttupup.firebaseapp.com",
+projectId: "brighttupup",
+storageBucket: "brighttupup.appspot.com",
+messagingSenderId: "812394183947",
+appId: "1:812394183947:web:d65d60d6aeee39bcc3b60e"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Vérification admin
-onAuthStateChanged(auth, async (user) => {
-  if(!user) return alert("Non connecté !");
 
-  const email = user.email.toLowerCase();
-  if(email !== "christopherantoine773@gmail.com"){
-    alert("Accès admin refusé !");
-    location.href = "profil.html";
-  }
+
+/* verification admin */
+
+onAuthStateChanged(auth, async(user)=>{
+
+if(!user){
+
+alert("connecte toi");
+
+location="login.html";
+
+return;
+
+}
+
+const ref = doc(db,"users",user.uid);
+
+const snap = await getDoc(ref);
+
+if(!snap.exists() || snap.data().admin !== true){
+
+alert("Accès refusé");
+
+location="profil.html";
+
+}
+
 });
 
-// Ajouter argent
-document.getElementById("send-money-btn").addEventListener("click", async ()=>{
-  const email = document.getElementById("user-email").value.toLowerCase();
-  const amount = Number(document.getElementById("amount").value);
-  if(!email || isNaN(amount) || amount <= 0) return alert("Remplissez correctement les champs.");
 
-  try{
-    const usersSnap = await getDocs(collection(db,"users"));
-    let found = false;
-    for(const docSnap of usersSnap.docs){
-      const data = docSnap.data();
-      if(data.email.toLowerCase() === email){
-        const userRef = doc(db,"users",docSnap.id);
-        await updateDoc(userRef,{ credits: (Number(data.credits)||0) + amount });
-        alert(`💰 ${amount} crédits ajoutés à ${email}`);
-        found = true;
-        break;
-      }
-    }
-    if(!found) alert("Utilisateur non trouvé !");
-  }catch(e){ console.error(e); alert("Erreur lors de l'ajout."); }
+/* ajouter argent */
+
+addMoney.onclick = async()=>{
+
+const email = document.getElementById("email").value;
+const amount = Number(document.getElementById("amount").value);
+
+const users = await getDocs(collection(db,"users"));
+
+users.forEach(async(u)=>{
+
+if(u.data().email === email){
+
+const current = u.data().money || 0;
+
+await updateDoc(doc(db,"users",u.id),{
+
+money: current + amount
+
 });
 
-// Retirer argent
-document.getElementById("remove-money-btn").addEventListener("click", async ()=>{
-  const email = document.getElementById("user-email").value.toLowerCase();
-  const amount = Number(document.getElementById("amount").value);
-  if(!email || isNaN(amount) || amount <= 0) return alert("Remplissez correctement les champs.");
+alert("argent ajouté");
 
-  try{
-    const usersSnap = await getDocs(collection(db,"users"));
-    let found = false;
-    for(const docSnap of usersSnap.docs){
-      const data = docSnap.data();
-      if(data.email.toLowerCase() === email){
-        const userRef = doc(db,"users",docSnap.id);
-        const newCredits = Math.max(0, (Number(data.credits)||0) - amount);
-        await updateDoc(userRef,{ credits: newCredits });
-        alert(`💸 ${amount} crédits retirés de ${email}`);
-        found = true;
-        break;
-      }
-    }
-    if(!found) alert("Utilisateur non trouvé !");
-  }catch(e){ console.error(e); alert("Erreur lors du retrait."); }
+}
+
 });
 
-// Ajouter admin
-document.getElementById("add-admin-btn").addEventListener("click", async ()=>{
-  const email = document.getElementById("new-admin-email").value.toLowerCase();
-  if(!email) return alert("Entrez un email valide.");
+};
 
-  try{
-    const usersSnap = await getDocs(collection(db,"users"));
-    let found = false;
-    for(const docSnap of usersSnap.docs){
-      const data = docSnap.data();
-      if(data.email.toLowerCase() === email){
-        const userRef = doc(db,"users",docSnap.id);
-        await updateDoc(userRef,{ role: "admin" });
-        alert(`🧑‍💻 ${email} est maintenant Administrateur`);
-        found = true;
-        break;
-      }
-    }
-    if(!found) alert("Utilisateur non trouvé !");
-  }catch(e){ console.error(e); alert("Erreur lors de l'ajout de l'admin."); }
+
+
+/* retirer argent */
+
+removeMoney.onclick = async()=>{
+
+const email = document.getElementById("email").value;
+const amount = Number(document.getElementById("amount").value);
+
+const users = await getDocs(collection(db,"users"));
+
+users.forEach(async(u)=>{
+
+if(u.data().email === email){
+
+const current = u.data().money || 0;
+
+await updateDoc(doc(db,"users",u.id),{
+
+money: current - amount
+
 });
 
-// Voir nombre de comptes
-document.getElementById("count-users-btn").addEventListener("click", async ()=>{
-  try{
-    const usersSnap = await getDocs(collection(db,"users"));
-    alert(`🔢 Nombre total de comptes : ${usersSnap.size}`);
-  }catch(e){ console.error(e); alert("Erreur lors du comptage."); }
+alert("argent retiré");
+
+}
+
 });
+
+};
+
+
+
+/* nombre comptes */
+
+countUsers.onclick = async()=>{
+
+const users = await getDocs(collection(db,"users"));
+
+alert("Nombre comptes : " + users.size);
+
+};
+
 </script>
 
 </body>
