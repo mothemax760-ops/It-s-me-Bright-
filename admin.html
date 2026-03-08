@@ -40,33 +40,45 @@
     box-shadow:0 0 12px #00aaff;
     text-transform:uppercase;
     transition: all 0.3s ease;
+    margin-right:10px;
   }
   button:hover {
     background:linear-gradient(90deg,#33bbff,#006699);
     box-shadow:0 0 20px #33bbff;
   }
+  hr { border-color:#00aaff; margin:20px 0; }
 </style>
 </head>
 <body>
 
 <div class="admin-box">
   <h2>Admin Panel 🔝🧑‍💻</h2>
-  
-  <h3>💰 Envoyer de l'argent</h3>
+
+  <!-- Ajouter / Retirer argent -->
+  <h3>💰 Gestion des crédits</h3>
   <input type="email" id="user-email" placeholder="Email de l'utilisateur"><br>
-  <input type="number" id="amount" placeholder="Montant à ajouter"><br>
-  <button id="send-money-btn">Envoyer 💸</button>
+  <input type="number" id="amount" placeholder="Montant"><br>
+  <button id="send-money-btn">Ajouter 💸</button>
+  <button id="remove-money-btn">Retirer 💸</button>
 
-  <hr style="margin:20px 0; border-color:#00aaff;">
+  <hr>
 
-  <h3>🧑‍💻 Ajouter un Admin</h3>
+  <!-- Ajouter un admin -->
+  <h3>🧑‍💻 Ajouter Admin</h3>
   <input type="email" id="new-admin-email" placeholder="Email du nouvel admin"><br>
   <button id="add-admin-btn">Ajouter Admin</button>
+
+  <hr>
+
+  <!-- Autres actions -->
+  <h3>🔢 Infos utilisateurs</h3>
+  <button id="count-users-btn">Voir nombre de comptes</button><br><br>
+  <button onclick="location.href='cmd.html'">CMD.html 🔗</button>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -82,7 +94,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Vérifier que l’utilisateur connecté est admin
+// Vérification admin
 onAuthStateChanged(auth, async (user) => {
   if(!user) return alert("Non connecté !");
 
@@ -93,34 +105,54 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// Fonction pour envoyer de l'argent
+// Ajouter argent
 document.getElementById("send-money-btn").addEventListener("click", async ()=>{
   const email = document.getElementById("user-email").value.toLowerCase();
   const amount = Number(document.getElementById("amount").value);
-  if(!email || isNaN(amount) || amount <= 0){
-    return alert("Veuillez remplir tous les champs correctement.");
-  }
+  if(!email || isNaN(amount) || amount <= 0) return alert("Remplissez correctement les champs.");
 
   try{
     const usersSnap = await getDocs(collection(db,"users"));
     let found = false;
-    usersSnap.forEach(async docSnap=>{
+    for(const docSnap of usersSnap.docs){
       const data = docSnap.data();
       if(data.email.toLowerCase() === email){
         const userRef = doc(db,"users",docSnap.id);
         await updateDoc(userRef,{ credits: (Number(data.credits)||0) + amount });
         alert(`💰 ${amount} crédits ajoutés à ${email}`);
         found = true;
+        break;
       }
-    });
+    }
     if(!found) alert("Utilisateur non trouvé !");
-  }catch(e){
-    console.error(e);
-    alert("Erreur lors de l'envoi d'argent.");
-  }
+  }catch(e){ console.error(e); alert("Erreur lors de l'ajout."); }
 });
 
-// Fonction pour ajouter un admin
+// Retirer argent
+document.getElementById("remove-money-btn").addEventListener("click", async ()=>{
+  const email = document.getElementById("user-email").value.toLowerCase();
+  const amount = Number(document.getElementById("amount").value);
+  if(!email || isNaN(amount) || amount <= 0) return alert("Remplissez correctement les champs.");
+
+  try{
+    const usersSnap = await getDocs(collection(db,"users"));
+    let found = false;
+    for(const docSnap of usersSnap.docs){
+      const data = docSnap.data();
+      if(data.email.toLowerCase() === email){
+        const userRef = doc(db,"users",docSnap.id);
+        const newCredits = Math.max(0, (Number(data.credits)||0) - amount);
+        await updateDoc(userRef,{ credits: newCredits });
+        alert(`💸 ${amount} crédits retirés de ${email}`);
+        found = true;
+        break;
+      }
+    }
+    if(!found) alert("Utilisateur non trouvé !");
+  }catch(e){ console.error(e); alert("Erreur lors du retrait."); }
+});
+
+// Ajouter admin
 document.getElementById("add-admin-btn").addEventListener("click", async ()=>{
   const email = document.getElementById("new-admin-email").value.toLowerCase();
   if(!email) return alert("Entrez un email valide.");
@@ -128,20 +160,26 @@ document.getElementById("add-admin-btn").addEventListener("click", async ()=>{
   try{
     const usersSnap = await getDocs(collection(db,"users"));
     let found = false;
-    usersSnap.forEach(async docSnap=>{
+    for(const docSnap of usersSnap.docs){
       const data = docSnap.data();
       if(data.email.toLowerCase() === email){
         const userRef = doc(db,"users",docSnap.id);
         await updateDoc(userRef,{ role: "admin" });
         alert(`🧑‍💻 ${email} est maintenant Administrateur`);
         found = true;
+        break;
       }
-    });
+    }
     if(!found) alert("Utilisateur non trouvé !");
-  }catch(e){
-    console.error(e);
-    alert("Erreur lors de l'ajout de l'admin.");
-  }
+  }catch(e){ console.error(e); alert("Erreur lors de l'ajout de l'admin."); }
+});
+
+// Voir nombre de comptes
+document.getElementById("count-users-btn").addEventListener("click", async ()=>{
+  try{
+    const usersSnap = await getDocs(collection(db,"users"));
+    alert(`🔢 Nombre total de comptes : ${usersSnap.size}`);
+  }catch(e){ console.error(e); alert("Erreur lors du comptage."); }
 });
 </script>
 
