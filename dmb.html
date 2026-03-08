@@ -6,17 +6,17 @@
 <title>Bright Tup Up | Dashboard Demandes</title>
 
 <style>
-body {margin:0;font-family:'Poppins',sans-serif;background:#001a33;color:#e0f7ff;}
-header {background:rgba(5,10,20,0.95);padding:14px 22px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #00aaff;box-shadow:0 0 15px #00aaff;position:sticky;top:0;z-index:100;}
-header h1 {font-size:1.4rem;color:#00ccff;text-shadow:0 0 12px #00aaff;margin:0;font-weight:700;}
-.container {padding:20px;max-width:700px;margin:auto;}
-.card {background:rgba(255,255,255,0.05);border:1px solid rgba(0,174,239,0.35);border-radius:15px;padding:15px;margin-bottom:15px;box-shadow:0 0 10px #00aaff44;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
-.card div {margin:5px 0;}
-.btn-confirm {background:#00ccff;color:#000;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;margin-left:5px;}
-.btn-confirm:hover {background:#0099ff;color:#fff;box-shadow:0 0 10px #00aaff;}
-.btn-cancel {background:red;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;margin-left:5px;}
-.btn-cancel:hover {background:#cc0000;box-shadow:0 0 10px #ff4444;}
-footer {text-align:center;padding:15px;background:rgba(0,0,0,0.6);border-top:1px solid #00aaff;font-size:0.9rem;}
+body { margin:0; font-family:'Poppins',sans-serif; background:#001a33; color:#e0f7ff; }
+header { background:rgba(5,10,20,0.95); padding:14px 22px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #00aaff; box-shadow:0 0 15px #00aaff; position:sticky; top:0; z-index:100; }
+header h1 { font-size:1.4rem; color:#00ccff; text-shadow:0 0 12px #00aaff; margin:0; font-weight:700; }
+.container { padding:20px; max-width:700px; margin:auto; }
+.card { background:rgba(255,255,255,0.05); border:1px solid rgba(0,174,239,0.35); border-radius:15px; padding:15px; margin-bottom:15px; box-shadow:0 0 10px #00aaff44; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+.card div { margin:5px 0; }
+.btn-confirm { background:#00ccff; color:#000; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; margin-left:5px; }
+.btn-confirm:hover { background:#0099ff; color:#fff; box-shadow:0 0 10px #00aaff; }
+.btn-cancel { background:red; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; margin-left:5px; }
+.btn-cancel:hover { background:#cc0000; box-shadow:0 0 10px #ff4444; }
+footer { text-align:center; padding:15px; background:rgba(0,0,0,0.6); border-top:1px solid #00aaff; font-size:0.9rem; }
 </style>
 </head>
 <body>
@@ -25,16 +25,14 @@ footer {text-align:center;padding:15px;background:rgba(0,0,0,0.6);border-top:1px
   <h1>Dashboard Demandes 💳</h1>
 </header>
 
-<div class="container" id="requestsContainer">
-  <!-- Les demandes seront injectées ici -->
-</div>
+<div class="container" id="requestsContainer"></div>
 
 <footer>© 2026 Bright Tup Up</footer>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, query, where, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey:"AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
@@ -50,23 +48,43 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const adminEmails = ["christopherantoine773@gmail.com"];
-
-// Vérification admin
 onAuthStateChanged(auth, async (user)=>{
   if(!user) return location.href="index.html";
   if(!adminEmails.includes(user.email.toLowerCase())){
     alert("Accès refusé");
     location.href="profil.html";
   }
-
   loadRequests();
 });
 
-// Charger toutes les demandes depuis Firestore
+// Charger toutes les demandes
 async function loadRequests(){
   const container = document.getElementById("requestsContainer");
   container.innerHTML="";
 
+  // 1️⃣ LocalStorage
+  let localRequests = JSON.parse(localStorage.getItem("cart_recharge")) || [];
+  localRequests.forEach((req,index)=>{
+    const card = document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
+      <div>
+        <b>${req.fullname}</b><br>
+        Email : ${req.email || "—"}<br>
+        ${req.phone}<br>
+        Montant : ${req.amount}<br>
+        ID : ${req.transid}<br>
+        Status : <span>${req.status}</span>
+      </div>
+      <div>
+        <button class="btn-confirm" onclick="updateLocalStatus(${index},'Confirmé',${req.amount},'${req.email || ""}')">✔ Confirmer</button>
+        <button class="btn-cancel" onclick="updateLocalStatus(${index},'Annulé')">✖ Annuler</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  // 2️⃣ Firestore
   try{
     const snap = await getDocs(collection(db,"users_requests"));
     snap.forEach(docSnap=>{
@@ -76,13 +94,14 @@ async function loadRequests(){
       card.innerHTML=`
         <div>
           <b>${data.fullname}</b><br>
-          ${data.email}<br>
+          Email : ${data.email || "—"}<br>
+          ${data.phone}<br>
           Montant : ${data.amount}<br>
           ID : ${data.transid}<br>
           Status : <span>${data.status||'En attente'}</span>
         </div>
         <div>
-          <button class="btn-confirm" onclick="updateFirestoreStatus('${docSnap.id}','Confirmé')">✔ Confirmer</button>
+          <button class="btn-confirm" onclick="updateFirestoreStatus('${docSnap.id}','Confirmé',${data.amount},'${data.email || ""}')">✔ Confirmer</button>
           <button class="btn-cancel" onclick="updateFirestoreStatus('${docSnap.id}','Annulé')">✖ Annuler</button>
         </div>
       `;
@@ -93,50 +112,58 @@ async function loadRequests(){
   }
 }
 
-// Mettre à jour status Firestore et ajouter crédits si confirmé
-window.updateFirestoreStatus = async function(id,status){
+// Mettre à jour localStorage + créditer
+window.updateLocalStatus = async function(index,status,amount,email){
+  let cart = JSON.parse(localStorage.getItem("cart_recharge")) || [];
+  cart[index].status=status;
+
+  // Ajouter crédit si confirmé et email existant
+  if(status==="Confirmé" && email){
+    await creditUser(email,Number(amount));
+  }
+
+  localStorage.setItem("cart_recharge",JSON.stringify(cart));
+  alert("Status mis à jour : "+status);
+  loadRequests();
+}
+
+// Mettre à jour Firestore + créditer
+window.updateFirestoreStatus = async function(id,status,amount,email){
   try{
-    const requestRef = doc(db,"users_requests",id);
-    const requestSnap = await getDoc(requestRef);
-    if(!requestSnap.exists()){
-      alert("Demande introuvable !");
-      return;
-    }
-    const requestData = requestSnap.data();
+    const reqRef = doc(db,"users_requests",id);
+    await updateDoc(reqRef,{status});
 
-    // Si confirmé, ajouter crédits à l'utilisateur
-    if(status === "Confirmé"){
-      const usersSnap = await getDocs(collection(db,"users"));
-      let userDocId = null;
-      let currentCredits = 0;
-
-      usersSnap.forEach(docSnap=>{
-        const data = docSnap.data();
-        if(data.email?.toLowerCase() === requestData.email?.toLowerCase()){
-          userDocId = docSnap.id;
-          currentCredits = Number(data.credits||0);
-        }
-      });
-
-      if(userDocId){
-        await updateDoc(doc(db,"users",userDocId),{
-          credits: currentCredits + Number(requestData.amount || 0)
-        });
-        alert(`✅ ${requestData.amount} crédits ajoutés à ${requestData.fullname}`);
-      } else {
-        alert("Utilisateur introuvable pour ajouter crédits !");
-      }
+    if(status==="Confirmé" && email){
+      await creditUser(email,Number(amount));
     }
 
-    // Mettre à jour le status de la demande
-    await updateDoc(requestRef,{status});
+    alert("Status mis à jour : "+status);
     loadRequests();
-
   }catch(e){
     console.warn(e);
     alert("Erreur lors de la mise à jour");
   }
 }
+
+// Créditer le compte Firestore
+async function creditUser(email,amount){
+  try{
+    const usersSnap = await getDocs(collection(db,"users"));
+    for(const d of usersSnap.docs){
+      const data = d.data();
+      if(data.email?.toLowerCase() === email.toLowerCase()){
+        const userRef = doc(db,"users",d.id);
+        await updateDoc(userRef,{credits:(Number(data.credits||0)+amount)});
+        console.log(`Compte ${email} crédité de ${amount}`);
+        return;
+      }
+    }
+    console.warn("Utilisateur non trouvé pour crédit :", email);
+  }catch(e){
+    console.error("Erreur crédit :", e);
+  }
+}
+
 </script>
 
 </body>
