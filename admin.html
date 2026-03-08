@@ -1,53 +1,55 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Admin Panel — Bright Tup Up</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Admin — Bright Tup Up</title>
 
 <style>
-
-body{
-background:radial-gradient(circle at top,#000,#001a33);
-color:#e0f7ff;
-font-family:Poppins,sans-serif;
-margin:0;
+body {
+  background: radial-gradient(circle at top left, #000 40%, #001a33 100%);
+  color:#e0f7ff;
+  font-family:"Poppins",sans-serif;
+  text-align:center;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
 }
 
-header{
-padding:15px;
-background:#000;
-border-bottom:1px solid #00aaff;
-text-align:center;
+.profile-box{
+width:95%;
+max-width:700px;
+background:rgba(5,10,20,0.95);
+padding:25px;
+border-radius:12px;
+box-shadow:0 0 25px #00aaff,inset 0 0 15px #003355;
+border:1px solid #00aaff;
+overflow:auto;
+max-height:90vh;
 }
 
-h1{
+h2{
 color:#00ccff;
 text-shadow:0 0 15px #00aaff;
 }
 
-.container{
-padding:20px;
-max-width:900px;
-margin:auto;
-}
-
-.stats{
-background:#000;
-padding:15px;
-border-radius:10px;
-margin-bottom:20px;
-box-shadow:0 0 15px #00aaff;
+.user{
+border:1px solid #00aaff;
+padding:10px;
+margin:10px 0;
+border-radius:8px;
 }
 
 button{
-padding:10px 16px;
+padding:8px 12px;
 border:none;
 border-radius:8px;
 cursor:pointer;
+margin:4px;
 background:linear-gradient(90deg,#00aaff,#004466);
-color:white;
-margin:3px;
+color:black;
+font-weight:bold;
 }
 
 button:hover{
@@ -56,65 +58,33 @@ background:linear-gradient(90deg,#33bbff,#006699);
 
 .red{
 background:red;
-}
-
-input{
-padding:10px;
-border-radius:8px;
-border:1px solid #00aaff;
-background:black;
 color:white;
-width:100%;
-margin-bottom:10px;
 }
 
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
+.green{
+background:#00cc66;
+color:black;
 }
-
-th,td{
-padding:10px;
-border-bottom:1px solid #00aaff;
-text-align:center;
-}
-
 </style>
-
 </head>
 
 <body>
 
-<header>
-<h1>Admin Dashboard 🔝🧑‍💻</h1>
-</header>
+<div class="profile-box">
 
-<div class="container">
+<h2>Admin Panel 🔝🧑‍💻</h2>
 
-<div class="stats">
-<p>👥 Comptes total : <span id="totalUsers">0</span></p>
+<div id="users-list"></div>
 
-<button onclick="location.href='cmd.html'">📦 Commandes</button>
-<button onclick="logout()">🚪 Déconnexion</button>
-</div>
+<br>
 
-<input id="search" placeholder="Rechercher un utilisateur...">
+<button onclick="location.href='cmd.html'">📦 CMD</button>
 
-<table>
+<button onclick="location.href='dmb.html'">💳 DMB</button>
 
-<thead>
-<tr>
-<th>Email</th>
-<th>Crédits</th>
-<th>Rôle</th>
-<th>Actions</th>
-</tr>
-</thead>
+<br><br>
 
-<tbody id="usersTable"></tbody>
-
-</table>
+<button class="red" onclick="logout()">❌ Déconnexion</button>
 
 </div>
 
@@ -122,9 +92,9 @@ text-align:center;
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth,onAuthStateChanged,signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore,collection,getDocs,doc,updateDoc,deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore,collection,getDocs,doc,updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const firebaseConfig={
+const firebaseConfig = {
 apiKey:"AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
 authDomain:"brighttupup.firebaseapp.com",
 projectId:"brighttupup",
@@ -133,15 +103,11 @@ messagingSenderId:"812394183947",
 appId:"1:812394183947:web:d65d60d6aeee39bcc3b60e"
 };
 
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-const adminEmails=[
-"christopherantoine773@gmail.com"
-];
-
-let users=[];
+const adminEmails = ["christopherantoine773@gmail.com"];
 
 onAuthStateChanged(auth,(user)=>{
 
@@ -160,89 +126,68 @@ loadUsers();
 
 });
 
+window.logout=function(){
+signOut(auth).then(()=>{
+location.href="index.html";
+});
+}
+
 async function loadUsers(){
+
+const list=document.getElementById("users-list");
+
+list.innerHTML="Chargement...";
 
 const snap=await getDocs(collection(db,"users"));
 
-users=[];
+list.innerHTML="";
 
 snap.forEach(docSnap=>{
 
-users.push({
-id:docSnap.id,
-...docSnap.data()
-});
+const data=docSnap.data();
 
-});
+const div=document.createElement("div");
+div.className="user";
 
-document.getElementById("totalUsers").textContent=users.length;
+div.innerHTML=`
+<b>${data.username || "Utilisateur"}</b><br>
+${data.email}<br>
+💰 ${data.credits || 0} crédits<br>
+Rôle : ${data.role || "user"}<br>
 
-displayUsers(users);
-
-}
-
-function displayUsers(list){
-
-const table=document.getElementById("usersTable");
-
-table.innerHTML="";
-
-list.forEach(user=>{
-
-const tr=document.createElement("tr");
-
-tr.innerHTML=`
-
-<td>${user.email||""}</td>
-<td>${user.credits||0}</td>
-<td>${user.role||"user"}</td>
-
-<td>
-
-<button onclick="addMoney('${user.id}',${user.credits||0})">+💰</button>
-
-<button onclick="removeMoney('${user.id}',${user.credits||0})">-💸</button>
-
-<button onclick="makeAdmin('${user.id}')">👑</button>
-
-<button class="red" onclick="deleteUser('${user.id}')">🗑</button>
-
-</td>
-
+<button onclick="addCredits('${docSnap.id}',${data.credits||0})">➕</button>
+<button onclick="removeCredits('${docSnap.id}',${data.credits||0})">➖</button>
+<button class="green" onclick="makeAdmin('${docSnap.id}')">👑 Admin</button>
 `;
 
-table.appendChild(tr);
+list.appendChild(div);
 
 });
 
 }
 
-window.addMoney=async function(id,credits){
+window.addCredits=async function(id,credits){
 
-let amount=prompt("Montant à ajouter");
+const amount=prompt("Combien ajouter ?");
 
-if(!amount)return;
-
-amount=Number(amount);
+if(!amount) return;
 
 await updateDoc(doc(db,"users",id),{
-credits:(Number(credits)||0)+amount
+credits:(Number(credits)||0)+Number(amount)
 });
 
 loadUsers();
 
 }
 
-window.removeMoney=async function(id,credits){
+window.removeCredits=async function(id,credits){
 
-let amount=prompt("Montant à retirer");
+const amount=prompt("Combien retirer ?");
 
-if(!amount)return;
-
-amount=Number(amount);
+if(!amount) return;
 
 await updateDoc(doc(db,"users",id),{
-credits:Math.max(0,(Number(credits)||0)-amount)
+credits:Math.max(0,(Number(credits)||0)-Number(amount))
 });
 
 loadUsers();
@@ -255,39 +200,11 @@ await updateDoc(doc(db,"users",id),{
 role:"admin"
 });
 
-loadUsers();
-
-}
-
-window.deleteUser=async function(id){
-
-if(!confirm("Supprimer utilisateur ?")) return;
-
-await deleteDoc(doc(db,"users",id));
+alert("Utilisateur devenu admin");
 
 loadUsers();
 
 }
-
-window.logout=function(){
-
-signOut(auth).then(()=>{
-location.href="index.html";
-});
-
-}
-
-document.getElementById("search").addEventListener("input",(e)=>{
-
-const value=e.target.value.toLowerCase();
-
-const filtered=users.filter(u=>
-(u.email||"").toLowerCase().includes(value)
-);
-
-displayUsers(filtered);
-
-});
 
 </script>
 
