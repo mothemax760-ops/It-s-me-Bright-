@@ -62,57 +62,71 @@ async function loadRequests(){
   const container = document.getElementById("requestsContainer");
   container.innerHTML="";
 
+  let allRequests = [];
+
+  // 1️⃣ LocalStorage
   let localRequests = JSON.parse(localStorage.getItem("cart_recharge")) || [];
-  let firestoreRequests = [];
+  localRequests.forEach((req,index)=>{
+    allRequests.push({
+      source:"local",
+      index:index,
+      ...req
+    });
+  });
+
+  // 2️⃣ Firestore
   try{
     const snap = await getDocs(collection(db,"users_requests"));
     snap.forEach(docSnap=>{
       const data = docSnap.data();
-      firestoreRequests.push({...data, id:docSnap.id});
+      allRequests.push({
+        source:"firestore",
+        id:docSnap.id,
+        ...data
+      });
     });
   }catch(e){
     console.warn("Erreur Firestore:", e);
   }
 
-  // Combiner et trier : "En attente" en haut
-  let allRequests = [...localRequests.map(r=>({...r, source:'local'})), ...firestoreRequests.map(r=>({...r, source:'firestore'}))];
+  // Trier : demandes en attente en haut
   allRequests.sort((a,b)=>{
     if(a.status==="En attente" && b.status!=="En attente") return -1;
     if(a.status!=="En attente" && b.status==="En attente") return 1;
     return 0;
   });
 
-  allRequests.forEach((req,index)=>{
+  // Affichage
+  allRequests.forEach(req=>{
     const card = document.createElement("div");
     card.className="card";
-
-    const statusText = req.status || "En attente";
-
-    let btnsHtml = "";
-    if(req.source==="local"){
-      btnsHtml = `
-        <button class="btn-confirm" onclick="updateLocalStatus(${index},'Confirmé',${req.amount},'${req.email || ""}')">✔ Confirmer</button>
-        <button class="btn-cancel" onclick="updateLocalStatus(${index},'Annulé')">✖ Annuler</button>
-      `;
-    } else {
-      btnsHtml = `
-        <button class="btn-confirm" onclick="updateFirestoreStatus('${req.id}','Confirmé',${req.amount},'${req.email || ""}')">✔ Confirmer</button>
-        <button class="btn-cancel" onclick="updateFirestoreStatus('${req.id}','Annulé')">✖ Annuler</button>
-      `;
+    let actions = "";
+    if(req.status==="En attente"){
+      if(req.source==="local"){
+        actions = `
+          <button class="btn-confirm" onclick="updateLocalStatus(${req.index},'Confirmé',${req.amount},'${req.email || ""}')">✔ Confirmer</button>
+          <button class="btn-cancel" onclick="updateLocalStatus(${req.index},'Annulé')">✖ Annuler</button>
+        `;
+      }else{
+        actions = `
+          <button class="btn-confirm" onclick="updateFirestoreStatus('${req.id}','Confirmé',${req.amount},'${req.email || ""}')">✔ Confirmer</button>
+          <button class="btn-cancel" onclick="updateFirestoreStatus('${req.id}','Annulé')">✖ Annuler</button>
+        `;
+      }
     }
-
-    card.innerHTML = `
+    card.innerHTML=`
       <div>
         <b>${req.fullname}</b><br>
         Email : ${req.email || "—"}<br>
         ${req.phone}<br>
         Montant : ${req.amount}<br>
         ID : ${req.transid}<br>
-        Status : <span>${statusText}</span>
+        Status : <span>${req.status || 'En attente'}</span>
       </div>
-      <div>${btnsHtml}</div>
+      <div>
+        ${actions}
+      </div>
     `;
-
     container.appendChild(card);
   });
 }
@@ -167,6 +181,7 @@ async function creditUser(email,amount){
     console.error("Erreur crédit :", e);
   }
 }
+
 </script>
 
 </body>
