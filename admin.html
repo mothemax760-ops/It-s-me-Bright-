@@ -1,231 +1,293 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Admin — Bright Tup Up</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Panel — Bright Tup Up</title>
 
 <style>
-body {
-  background: radial-gradient(circle at top left, #000 40%, #001a33 100%);
-  color: #e0f7ff;
-  font-family: "Poppins", sans-serif;
-  text-align:center;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
+
+body{
+background:radial-gradient(circle at top,#000,#001a33);
+color:#e0f7ff;
+font-family:Poppins,sans-serif;
+margin:0;
 }
 
-.profile-box {
-  width:90%; max-width:420px;
-  background:rgba(5,10,20,0.95);
-  padding:25px;
-  border-radius:12px;
-  box-shadow:0 0 25px #00aaff, inset 0 0 15px #003355;
-  border:1px solid #00aaff;
+header{
+padding:15px;
+background:#000;
+border-bottom:1px solid #00aaff;
+text-align:center;
 }
 
-h2 { color:#00ccff; text-shadow:0 0 15px #00aaff; }
-
-input {
-  padding:10px;
-  margin:6px;
-  width:90%;
-  border-radius:8px;
-  border:1px solid #00ccff;
-  background:#000;
-  color:#e0f7ff;
+h1{
+color:#00ccff;
+text-shadow:0 0 15px #00aaff;
 }
 
-button {
-  padding:12px 20px;
-  border:none; border-radius:10px;
-  cursor:pointer; font-weight:bold;
-  margin-top:10px;
-  background:linear-gradient(90deg,#00aaff,#004466);
-  color:#000;
-  box-shadow:0 0 12px #00aaff;
-  text-transform:uppercase;
+.container{
+padding:20px;
+max-width:900px;
+margin:auto;
 }
 
-button:hover {
-  background:linear-gradient(90deg,#33bbff,#006699);
-  box-shadow:0 0 20px #33bbff;
+.stats{
+background:#000;
+padding:15px;
+border-radius:10px;
+margin-bottom:20px;
+box-shadow:0 0 15px #00aaff;
+}
+
+button{
+padding:10px 16px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:linear-gradient(90deg,#00aaff,#004466);
+color:white;
+margin:3px;
+}
+
+button:hover{
+background:linear-gradient(90deg,#33bbff,#006699);
 }
 
 .red{
 background:red;
-color:white;
 }
+
+input{
+padding:10px;
+border-radius:8px;
+border:1px solid #00aaff;
+background:black;
+color:white;
+width:100%;
+margin-bottom:10px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #00aaff;
+text-align:center;
+}
+
 </style>
 
 </head>
+
 <body>
 
-<div class="profile-box">
+<header>
+<h1>Admin Dashboard 🔝🧑‍💻</h1>
+</header>
 
-<h2>Admin Panel 🔝🧑‍💻</h2>
+<div class="container">
 
-<input id="email" placeholder="Email utilisateur">
-<input id="amount" type="number" placeholder="Montant">
+<div class="stats">
+<p>👥 Comptes total : <span id="totalUsers">0</span></p>
 
-<button onclick="addMoney()">Ajouter 💰</button>
-<button onclick="removeMoney()">Retirer 💸</button>
+<button onclick="location.href='cmd.html'">📦 Commandes</button>
+<button onclick="logout()">🚪 Déconnexion</button>
+</div>
 
-<br><br>
+<input id="search" placeholder="Rechercher un utilisateur...">
 
-<input id="newAdmin" placeholder="Email nouvel admin">
-<button onclick="addAdmin()">Ajouter Admin</button>
+<table>
 
-<br><br>
+<thead>
+<tr>
+<th>Email</th>
+<th>Crédits</th>
+<th>Rôle</th>
+<th>Actions</th>
+</tr>
+</thead>
 
-<button onclick="countUsers()">Nombre de comptes</button>
+<tbody id="usersTable"></tbody>
 
-<br>
-
-<button onclick="location.href='cmd.html'">CMD</button>
-
-<br>
-
-<button class="red" onclick="logout()">Déconnexion</button>
+</table>
 
 </div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth,onAuthStateChanged,signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore,collection,getDocs,doc,updateDoc,deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
-  authDomain: "brighttupup.firebaseapp.com",
-  projectId: "brighttupup",
-  storageBucket: "brighttupup.appspot.com",
-  messagingSenderId: "812394183947",
-  appId: "1:812394183947:web:d65d60d6aeee39bcc3b60e"
+const firebaseConfig={
+apiKey:"AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
+authDomain:"brighttupup.firebaseapp.com",
+projectId:"brighttupup",
+storageBucket:"brighttupup.appspot.com",
+messagingSenderId:"812394183947",
+appId:"1:812394183947:web:d65d60d6aeee39bcc3b60e"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
 
-const adminEmails = [
+const adminEmails=[
 "christopherantoine773@gmail.com"
 ];
 
-let currentUser = null;
+let users=[];
 
-onAuthStateChanged(auth, async(user)=>{
+onAuthStateChanged(auth,(user)=>{
 
 if(!user){
 location.href="index.html";
 return;
 }
 
-currentUser = user;
-
 if(!adminEmails.includes(user.email.toLowerCase())){
 alert("Accès refusé");
 location.href="profil.html";
+return;
 }
+
+loadUsers();
 
 });
 
-window.logout = function(){
-signOut(auth).then(()=>{
-location.href="index.html";
+async function loadUsers(){
+
+const snap=await getDocs(collection(db,"users"));
+
+users=[];
+
+snap.forEach(docSnap=>{
+
+users.push({
+id:docSnap.id,
+...docSnap.data()
 });
-}
-
-window.addMoney = async function(){
-
-const email = document.getElementById("email").value.toLowerCase();
-const amount = Number(document.getElementById("amount").value);
-
-const users = await getDocs(collection(db,"users"));
-
-users.forEach(async(d)=>{
-
-const data = d.data();
-
-if(data.email.toLowerCase() === email){
-
-const ref = doc(db,"users",d.id);
-
-await updateDoc(ref,{
-credits:(Number(data.credits)||0)+amount
-});
-
-alert("Argent ajouté");
-
-}
 
 });
 
-}
+document.getElementById("totalUsers").textContent=users.length;
 
-window.removeMoney = async function(){
-
-const email = document.getElementById("email").value.toLowerCase();
-const amount = Number(document.getElementById("amount").value);
-
-const users = await getDocs(collection(db,"users"));
-
-users.forEach(async(d)=>{
-
-const data = d.data();
-
-if(data.email.toLowerCase() === email){
-
-const ref = doc(db,"users",d.id);
-
-await updateDoc(ref,{
-credits:Math.max(0,(Number(data.credits)||0)-amount)
-});
-
-alert("Argent retiré");
+displayUsers(users);
 
 }
+
+function displayUsers(list){
+
+const table=document.getElementById("usersTable");
+
+table.innerHTML="";
+
+list.forEach(user=>{
+
+const tr=document.createElement("tr");
+
+tr.innerHTML=`
+
+<td>${user.email||""}</td>
+<td>${user.credits||0}</td>
+<td>${user.role||"user"}</td>
+
+<td>
+
+<button onclick="addMoney('${user.id}',${user.credits||0})">+💰</button>
+
+<button onclick="removeMoney('${user.id}',${user.credits||0})">-💸</button>
+
+<button onclick="makeAdmin('${user.id}')">👑</button>
+
+<button class="red" onclick="deleteUser('${user.id}')">🗑</button>
+
+</td>
+
+`;
+
+table.appendChild(tr);
 
 });
 
 }
 
-window.addAdmin = async function(){
+window.addMoney=async function(id,credits){
 
-const email = document.getElementById("newAdmin").value.toLowerCase();
+let amount=prompt("Montant à ajouter");
 
-const users = await getDocs(collection(db,"users"));
+if(!amount)return;
 
-users.forEach(async(d)=>{
+amount=Number(amount);
 
-const data = d.data();
+await updateDoc(doc(db,"users",id),{
+credits:(Number(credits)||0)+amount
+});
 
-if(data.email.toLowerCase() === email){
+loadUsers();
 
-const ref = doc(db,"users",d.id);
+}
 
-await updateDoc(ref,{
+window.removeMoney=async function(id,credits){
+
+let amount=prompt("Montant à retirer");
+
+if(!amount)return;
+
+amount=Number(amount);
+
+await updateDoc(doc(db,"users",id),{
+credits:Math.max(0,(Number(credits)||0)-amount)
+});
+
+loadUsers();
+
+}
+
+window.makeAdmin=async function(id){
+
+await updateDoc(doc(db,"users",id),{
 role:"admin"
 });
 
-alert("Admin ajouté");
+loadUsers();
 
 }
 
+window.deleteUser=async function(id){
+
+if(!confirm("Supprimer utilisateur ?")) return;
+
+await deleteDoc(doc(db,"users",id));
+
+loadUsers();
+
+}
+
+window.logout=function(){
+
+signOut(auth).then(()=>{
+location.href="index.html";
 });
 
 }
 
-window.countUsers = async function(){
+document.getElementById("search").addEventListener("input",(e)=>{
 
-const users = await getDocs(collection(db,"users"));
+const value=e.target.value.toLowerCase();
 
-alert("Nombre de comptes : "+users.size);
+const filtered=users.filter(u=>
+(u.email||"").toLowerCase().includes(value)
+);
 
-}
+displayUsers(filtered);
+
+});
 
 </script>
 
