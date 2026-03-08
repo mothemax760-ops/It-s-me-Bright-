@@ -250,6 +250,7 @@ function confirmRecharge(){
   const amount=document.getElementById("amount").value;
   const country=document.getElementById("country").value;
   const phone=document.getElementById("phone").value;
+  const account = JSON.parse(sessionStorage.getItem("dpstore_user")) || {};
 
   if(!fullname||!transid||!amount||!phone){
     alert("Remplis tous les champs");
@@ -261,6 +262,7 @@ function confirmRecharge(){
   cart.push({
     type:"Recharge MonCash",
     fullname,
+    email: account.email || "",
     transid,
     amount,
     phone:country+phone,
