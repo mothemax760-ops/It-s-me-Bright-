@@ -62,7 +62,6 @@
     <img src="ton_image_profil.jpg" alt="Photo de profil" class="profile-pic" />
     <h1>Bright Tup Up</h1>
 
-    <!-- Connexion sociale uniquement -->
     <div class="social-btn">
       <button onclick="loginGoogle()">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="social-icon" alt="Google Logo" />
@@ -74,7 +73,6 @@
       </button>
     </div>
 
-    <!-- Bouton Déconnexion -->
     <div id="logout" style="display:none; margin-top:20px;">
       <button onclick="logoutUser()">❌ Déconnexion</button>
     </div>
@@ -82,7 +80,6 @@
 
   <p class="footer">© 2026 Bright Tup Up — Mothemax760@gmail.com</p>
 
-  <!-- Firebase SDK v10 en mode module -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
@@ -93,7 +90,9 @@
       signOut 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // Configuration Firebase
+    /* AJOUT FIRESTORE */
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
       authDomain: "brighttupup.firebaseapp.com",
@@ -103,37 +102,61 @@
       appId: "1:812394183947:web:d65d60d6aeee39bcc3b60e"
     };
 
-    // Initialisation
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Connexion Google
+    /* AJOUT FIRESTORE */
+    const db = getFirestore(app);
+
+    /* AJOUT : création utilisateur si inexistant */
+    async function createUserIfNotExists(user){
+      const ref = doc(db,"users",user.uid);
+      const snap = await getDoc(ref);
+
+      if(!snap.exists()){
+        await setDoc(ref,{
+          email:user.email,
+          username:user.displayName || "Utilisateur",
+          credits:0,
+          role:"user",
+          photo:user.photoURL || "",
+          createdAt:new Date().toISOString()
+        });
+      }
+    }
+
     window.loginGoogle = async function() {
       const provider = new GoogleAuthProvider();
       try {
         const result = await signInWithPopup(auth, provider);
+
+        /* AJOUT */
+        await createUserIfNotExists(result.user);
+
         alert("🔵 Connecté avec Google : " + result.user.displayName);
         document.getElementById("logout").style.display = "block";
-        location.href = "profil.html"; // redirection automatique
+        location.href = "profil.html";
       } catch (error) {
         alert("Erreur Google : " + error.message);
       }
     }
 
-    // Connexion Apple
     window.loginApple = async function() {
       const provider = new OAuthProvider('apple.com');
       try {
         const result = await signInWithPopup(auth, provider);
+
+        /* AJOUT */
+        await createUserIfNotExists(result.user);
+
         alert("🍏 Connecté avec Apple : " + (result.user.displayName || "Utilisateur Apple"));
         document.getElementById("logout").style.display = "block";
-        location.href = "profil.html"; // redirection automatique
+        location.href = "profil.html";
       } catch (error) {
         alert("Erreur Apple : " + error.message);
       }
     }
 
-    // Déconnexion
     window.logoutUser = async function() {
       try {
         await signOut(auth);
