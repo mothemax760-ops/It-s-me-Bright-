@@ -1,1 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bright Tup Up | Commandes Globales</title>
 
+<style>
+body{margin:0;font-family:'Poppins',sans-serif;background:#001a33;color:#e0f7ff;}
+header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:rgba(5,10,20,0.95);border-bottom:2px solid #00aaff;box-shadow:0 0 15px #00aaff;position:sticky;top:0;}
+.logo{font-size:1.3rem;font-weight:bold;color:#00ccff;}
+.top-btn{background:none;border:1px solid #00aaff;padding:6px 12px;border-radius:8px;color:#00ccff;cursor:pointer;font-weight:bold;}
+.top-btn:hover{background:#00aaff;color:#000;}
+.container{padding:20px;}
+.order-card{background:rgba(5,10,20,0.95);border:1px solid #00aaff33;border-radius:15px;padding:18px;margin-bottom:18px;box-shadow:0 0 12px #00aaff22;transition:0.3s;}
+.order-card:hover{transform:translateY(-3px);box-shadow:0 0 18px #00aaff88;}
+.order-header{font-weight:bold;font-size:1.1rem;color:#00ccff;margin-bottom:8px;}
+.order-detail{margin:3px 0;color:#ccc;font-size:0.9rem;}
+.status{margin-top:6px;font-size:0.85rem;color:#aaa;}
+.btn{margin-top:10px;padding:8px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;}
+.confirm-btn{background:#00c853;color:#000;}
+.message-btn{background:#0099ff;color:#fff;margin-left:5px;}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="top-btn" onclick="window.location.href='profil.html'">← Profil</button>
+  <div class="logo">COMMANDES GLOBALES</div>
+  <button class="top-btn" onclick="window.location.href='index.html'">🏠 Accueil</button>
+</header>
+
+<div class="container" id="ordersContainer"></div>
+
+<script>
+/* =================== ADMIN CHECK =================== */
+const adminEmails = ["christopherantoine773@gmail.com"];
+let user = JSON.parse(sessionStorage.getItem("dpstore_user")||"{}");
+if(!user.email) location.href="index.html";
+if(!adminEmails.includes(user.email.toLowerCase())) {
+  alert("Accès refusé !");
+  location.href="profil.html";
+}
+
+/* =================== GLOBAL ORDERS =================== */
+function loadGlobalOrders(){
+  const ordersContainer = document.getElementById("ordersContainer");
+  ordersContainer.innerHTML="";
+  let orders = JSON.parse(localStorage.getItem("global_orders")||"[]");
+
+  if(orders.length===0){
+    ordersContainer.innerHTML="<p>Aucune commande pour le moment.</p>";
+    return;
+  }
+
+  orders.forEach((order,index)=>{
+    const card = document.createElement("div");
+    card.className="order-card";
+    card.innerHTML=`
+      <div class="order-header">${order.name || order.type || "Commande"}</div>
+      <div class="order-detail"><strong>Nom :</strong> ${order.username || order.fullname}</div>
+      <div class="order-detail"><strong>Email :</strong> ${order.email}</div>
+      <div class="order-detail"><strong>Montant :</strong> ${order.price || order.amount} HTG</div>
+      <div class="order-detail"><strong>Téléphone :</strong> ${order.phone || "—"}</div>
+      <div class="order-detail"><strong>Date :</strong> ${order.validatedDate || order.date || "—"}</div>
+      <div class="status"><strong>Statut :</strong> ${order.status || "En attente"}</div>
+      <button class="btn confirm-btn" onclick="confirmOrder(${index})">✔ Confirmer</button>
+      <button class="btn message-btn" onclick="addMessage(${index})">💬 Ajouter message/code</button>
+      <div id="messageBox-${index}" style="margin-top:6px;color:#0ff;"></div>
+    `;
+    ordersContainer.appendChild(card);
+  });
+}
+
+/* =================== ACTIONS =================== */
+function confirmOrder(index){
+  let orders = JSON.parse(localStorage.getItem("global_orders")||"[]");
+  let order = orders[index];
+  if(order.status==="Confirmé"){
+    alert("Commande déjà confirmée !");
+    return;
+  }
+  order.status="Confirmé";
+  order.confirmedDate = new Date().toLocaleString();
+  orders[index]=order;
+  localStorage.setItem("global_orders",JSON.stringify(orders));
+  alert("Commande confirmée !");
+  loadGlobalOrders();
+}
+
+function addMessage(index){
+  let msg = prompt("Entrez le message ou le code pour cette commande :");
+  if(!msg) return;
+  let orders = JSON.parse(localStorage.getItem("global_orders")||"[]");
+  orders[index].adminMessage = msg;
+  localStorage.setItem("global_orders",JSON.stringify(orders));
+  document.getElementById(`messageBox-${index}`).textContent = "Message ajouté : " + msg;
+}
+
+/* =================== INIT =================== */
+loadGlobalOrders();
+</script>
+
+</body>
+</html>
