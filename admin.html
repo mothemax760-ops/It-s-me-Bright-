@@ -88,6 +88,10 @@ color:white;
 
 <br>
 
+<button onclick="location.href='dmb.html'">DMB</button>
+
+<br><br>
+
 <button class="red" onclick="logout()">Déconnexion</button>
 
 </div>
@@ -111,17 +115,36 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Vérification admin (email + rôle Firestore)
 const adminEmails = ["christopherantoine773@gmail.com"];
 
-// vérifie admin
-onAuthStateChanged(auth,(user)=>{
+onAuthStateChanged(auth, async (user)=>{
 
 if(!user){
 location.href="index.html";
 return;
 }
 
-if(!adminEmails.includes(user.email.toLowerCase())){
+let role="user";
+
+try{
+
+const users=await getDocs(collection(db,"users"));
+
+users.forEach(d=>{
+const data=d.data();
+
+if(data.email && data.email.toLowerCase()===user.email.toLowerCase()){
+role=data.role ?? "user";
+}
+
+});
+
+}catch(e){
+console.warn(e);
+}
+
+if(!adminEmails.includes(user.email.toLowerCase()) && role!=="admin"){
 alert("Accès refusé");
 location.href="profil.html";
 }
