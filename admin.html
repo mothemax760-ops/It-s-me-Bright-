@@ -18,38 +18,34 @@ body {
 }
 
 .profile-box{
-width:95%;
-max-width:700px;
+width:90%;
+max-width:420px;
 background:rgba(5,10,20,0.95);
 padding:25px;
 border-radius:12px;
 box-shadow:0 0 25px #00aaff,inset 0 0 15px #003355;
 border:1px solid #00aaff;
-overflow:auto;
-max-height:90vh;
 }
 
-h2{
-color:#00ccff;
-text-shadow:0 0 15px #00aaff;
-}
-
-.user{
-border:1px solid #00aaff;
+input{
 padding:10px;
-margin:10px 0;
+margin:6px;
+width:90%;
 border-radius:8px;
+border:1px solid #00ccff;
+background:black;
+color:white;
 }
 
 button{
-padding:8px 12px;
+padding:12px 20px;
 border:none;
-border-radius:8px;
+border-radius:10px;
 cursor:pointer;
-margin:4px;
+margin-top:10px;
 background:linear-gradient(90deg,#00aaff,#004466);
-color:black;
-font-weight:bold;
+color:#000;
+box-shadow:0 0 12px #00aaff;
 }
 
 button:hover{
@@ -60,11 +56,6 @@ background:linear-gradient(90deg,#33bbff,#006699);
 background:red;
 color:white;
 }
-
-.green{
-background:#00cc66;
-color:black;
-}
 </style>
 </head>
 
@@ -74,17 +65,30 @@ color:black;
 
 <h2>Admin Panel 🔝🧑‍💻</h2>
 
-<div id="users-list"></div>
+<input id="email" placeholder="Email utilisateur">
+<input id="amount" type="number" placeholder="Montant">
 
 <br>
 
-<button onclick="location.href='cmd.html'">📦 CMD</button>
-
-<button onclick="location.href='dmb.html'">💳 DMB</button>
+<button onclick="addMoney()">Ajouter 💰</button>
+<button onclick="removeMoney()">Retirer 💸</button>
 
 <br><br>
 
-<button class="red" onclick="logout()">❌ Déconnexion</button>
+<input id="newAdmin" placeholder="Email nouvel admin">
+<button onclick="addAdmin()">Ajouter Admin</button>
+
+<br><br>
+
+<button onclick="countUsers()">Nombre comptes</button>
+
+<br>
+
+<button onclick="location.href='cmd.html'">CMD</button>
+
+<br>
+
+<button class="red" onclick="logout()">Déconnexion</button>
 
 </div>
 
@@ -109,6 +113,7 @@ const db = getFirestore(app);
 
 const adminEmails = ["christopherantoine773@gmail.com"];
 
+// vérifie admin
 onAuthStateChanged(auth,(user)=>{
 
 if(!user){
@@ -119,90 +124,109 @@ return;
 if(!adminEmails.includes(user.email.toLowerCase())){
 alert("Accès refusé");
 location.href="profil.html";
-return;
 }
-
-loadUsers();
 
 });
 
+// logout
 window.logout=function(){
 signOut(auth).then(()=>{
 location.href="index.html";
 });
 }
 
-async function loadUsers(){
+// ajouter argent
+window.addMoney=async function(){
 
-const list=document.getElementById("users-list");
+const email=document.getElementById("email").value.toLowerCase();
+const amount=Number(document.getElementById("amount").value);
 
-list.innerHTML="Chargement...";
+const users=await getDocs(collection(db,"users"));
 
-const snap=await getDocs(collection(db,"users"));
+for(const d of users.docs){
 
-list.innerHTML="";
+const data=d.data();
 
-snap.forEach(docSnap=>{
+if(data.email && data.email.toLowerCase()===email){
 
-const data=docSnap.data();
-
-const div=document.createElement("div");
-div.className="user";
-
-div.innerHTML=`
-<b>${data.username || "Utilisateur"}</b><br>
-${data.email}<br>
-💰 ${data.credits || 0} crédits<br>
-Rôle : ${data.role || "user"}<br>
-
-<button onclick="addCredits('${docSnap.id}',${data.credits||0})">➕</button>
-<button onclick="removeCredits('${docSnap.id}',${data.credits||0})">➖</button>
-<button class="green" onclick="makeAdmin('${docSnap.id}')">👑 Admin</button>
-`;
-
-list.appendChild(div);
-
+await updateDoc(doc(db,"users",d.id),{
+credits:(Number(data.credits)||0)+amount
 });
+
+alert("Argent ajouté");
+return;
 
 }
 
-window.addCredits=async function(id,credits){
+}
 
-const amount=prompt("Combien ajouter ?");
-
-if(!amount) return;
-
-await updateDoc(doc(db,"users",id),{
-credits:(Number(credits)||0)+Number(amount)
-});
-
-loadUsers();
+alert("Utilisateur introuvable");
 
 }
 
-window.removeCredits=async function(id,credits){
+// retirer argent
+window.removeMoney=async function(){
 
-const amount=prompt("Combien retirer ?");
+const email=document.getElementById("email").value.toLowerCase();
+const amount=Number(document.getElementById("amount").value);
 
-if(!amount) return;
+const users=await getDocs(collection(db,"users"));
 
-await updateDoc(doc(db,"users",id),{
-credits:Math.max(0,(Number(credits)||0)-Number(amount))
+for(const d of users.docs){
+
+const data=d.data();
+
+if(data.email && data.email.toLowerCase()===email){
+
+await updateDoc(doc(db,"users",d.id),{
+credits:Math.max(0,(Number(data.credits)||0)-amount)
 });
 
-loadUsers();
+alert("Argent retiré");
+return;
 
 }
 
-window.makeAdmin=async function(id){
+}
 
-await updateDoc(doc(db,"users",id),{
+alert("Utilisateur introuvable");
+
+}
+
+// ajouter admin
+window.addAdmin=async function(){
+
+const email=document.getElementById("newAdmin").value.toLowerCase();
+
+const users=await getDocs(collection(db,"users"));
+
+for(const d of users.docs){
+
+const data=d.data();
+
+if(data.email && data.email.toLowerCase()===email){
+
+await updateDoc(doc(db,"users",d.id),{
 role:"admin"
 });
 
-alert("Utilisateur devenu admin");
+alert("Admin ajouté");
+return;
 
-loadUsers();
+}
+
+}
+
+alert("Utilisateur introuvable");
+
+}
+
+// compter comptes
+window.countUsers=async function(){
+
+const users=await getDocs(collection(db,"users"));
+
+alert("Nombre comptes : "+users.size);
 
 }
 
