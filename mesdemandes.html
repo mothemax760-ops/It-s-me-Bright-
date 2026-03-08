@@ -7,135 +7,23 @@
 
 <style>
 body {margin:0;font-family:'Poppins',sans-serif;background:#001a33;color:#e0f7ff;}
-
-header {
-  background:rgba(5,10,20,0.95);
-  padding:14px 22px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:1px solid #00aaff;
-  box-shadow:0 0 15px #00aaff;
-  position:sticky;
-  top:0;
-  z-index:100;
-}
-
-header h1 {
-  font-size:1.4rem;
-  color:#00ccff;
-  text-shadow:0 0 12px #00aaff;
-  margin:0;
-  font-weight:700;
-}
-
-.menu-btn {
-  font-size:26px;
-  cursor:pointer;
-  background:none;
-  border:none;
-  color:#00ccff;
-  text-shadow:0 0 10px #00aaff;
-}
-
-.menu-block {
-  position:absolute;
-  top:60px;
-  right:20px;
-  background:rgba(5,10,20,0.95);
-  border:1px solid #00aaff;
-  border-radius:12px;
-  box-shadow:0 0 15px #00aaff;
-  padding:15px;
-  display:none;
-  flex-direction:column;
-  gap:10px;
-  z-index:200;
-}
-
+header { background:rgba(5,10,20,0.95); padding:14px 22px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #00aaff; box-shadow:0 0 15px #00aaff; position:sticky; top:0; z-index:100; }
+header h1 { font-size:1.4rem; color:#00ccff; text-shadow:0 0 12px #00aaff; margin:0; font-weight:700; }
+.menu-btn { font-size:26px; cursor:pointer; background:none; border:none; color:#00ccff; text-shadow:0 0 10px #00aaff; }
+.menu-block { position:absolute; top:60px; right:20px; background:rgba(5,10,20,0.95); border:1px solid #00aaff; border-radius:12px; box-shadow:0 0 15px #00aaff; padding:15px; display:none; flex-direction:column; gap:10px; z-index:200; }
 .menu-block.show {display:flex;}
-
-.menu-block button,.menu-block select {
-  border:1px solid #00aaff;
-  padding:7px 12px;
-  border-radius:10px;
-  background:rgba(0,0,0,0.35);
-  color:white;
-  cursor:pointer;
-  font-weight:600;
-}
-
-.menu-block button:hover,.menu-block select:hover {
-  background:#00aaff;
-  color:#000;
-  box-shadow:0 0 12px #00aaff;
-}
-
-#profile-pic {
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  border:2px solid #00ccff;
-  object-fit:cover;
-  box-shadow:0 0 10px #00aaff;
-}
-
-#user-name,#user-balance {
-  font-weight:600;
-  font-size:0.9rem;
-  color:#00ccff;
-}
-
-.container {
-  padding:30px;
-  max-width:700px;
-  margin:auto;
-}
-
-.section-title {
-  font-size:1.5rem;
-  margin:20px 0 15px;
-  text-shadow:0 0 10px #00ccff;
-}
-
-.card {
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(0,174,239,0.35);
-  border-radius:15px;
-  padding:20px;
-  margin-bottom:15px;
-  box-shadow:0 0 10px #00aaff44;
-  transition:0.3s;
-}
-
-.card:hover {
-  transform:translateY(-3px);
-  box-shadow:0 0 15px #00aaffaa;
-}
-
-.card h3 {
-  margin-bottom:10px;
-  color:#00ccff;
-}
-
-.card p {
-  font-size:0.9rem;
-  color:#ccc;
-  margin:3px 0;
-}
-
-.status {
-  font-weight:bold;
-  margin-top:8px;
-}
-
-footer {
-  text-align:center;
-  padding:20px;
-  background:rgba(0,0,0,0.6);
-  font-size:0.9rem;
-  border-top:1px solid #00aaff;
-}
+.menu-block button,.menu-block select { border:1px solid #00aaff; padding:7px 12px; border-radius:10px; background:rgba(0,0,0,0.35); color:white; cursor:pointer; font-weight:600; }
+.menu-block button:hover,.menu-block select:hover { background:#00aaff; color:#000; box-shadow:0 0 12px #00aaff; }
+#profile-pic { width:40px; height:40px; border-radius:50%; border:2px solid #00ccff; object-fit:cover; box-shadow:0 0 10px #00aaff; }
+#user-name,#user-balance { font-weight:600; font-size:0.9rem; color:#00ccff; }
+.container { padding:30px; max-width:700px; margin:auto; }
+.section-title { font-size:1.5rem; margin:20px 0 15px; text-shadow:0 0 10px #00ccff; }
+.card { background:rgba(255,255,255,0.05); border:1px solid rgba(0,174,239,0.35); border-radius:15px; padding:20px; margin-bottom:15px; box-shadow:0 0 10px #00aaff44; transition:0.3s; }
+.card:hover { transform:translateY(-3px); box-shadow:0 0 15px #00aaffaa; }
+.card h3 { margin-bottom:10px; color:#00ccff; }
+.card p { font-size:0.9rem; color:#ccc; margin:3px 0; }
+.status { font-weight:bold; margin-top:8px; }
+footer { text-align:center; padding:20px; background:rgba(0,0,0,0.6); font-size:0.9rem; border-top:1px solid #00aaff; }
 </style>
 </head>
 <body>
@@ -171,20 +59,68 @@ function openRecharge(){ window.location.href="rechargex.html"; }
 function openProfile(){ window.location.href="profil.html"; }
 function openCart(){ window.location.href="cart.html"; }
 function openContact(){ window.location.href="contact.html"; }
+</script>
 
-function loadDemandes(){
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
+  authDomain:"brighttupup.firebaseapp.com",
+  projectId:"brighttupup",
+  storageBucket:"brighttupup.appspot.com",
+  messagingSenderId:"812394183947",
+  appId:"1:812394183947:web:d65d60d6aeee39bcc3b60e"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+onAuthStateChanged(auth, async (user) => {
+  if(!user) return location.href="index.html";
+
+  // Mettre à jour le menu avec les infos utilisateur
+  document.getElementById("user-name").textContent = user.displayName || "Utilisateur";
+  document.getElementById("user-balance").textContent = "Solde : 0 G";
+  document.getElementById("profile-pic").src = user.photoURL || "https://via.placeholder.com/40";
+
+  // Charger les demandes de cet utilisateur
+  loadDemandes(user.email);
+});
+
+async function loadDemandes(email){
   const grid = document.getElementById("demandesGrid");
   grid.innerHTML = "";
-  const demandes = JSON.parse(localStorage.getItem("cart_recharge")) || [];
+
+  let demandes = JSON.parse(localStorage.getItem("cart_recharge")) || [];
+
+  // Filtrer pour l'utilisateur connecté
+  demandes = demandes.filter(d => d.email?.toLowerCase() === email.toLowerCase());
+
+  // Charger Firestore
+  try {
+    const q = query(collection(db,"users_requests"), where("email","==",email));
+    const snap = await getDocs(q);
+    snap.forEach(docSnap=>{
+      demandes.push(docSnap.data());
+    });
+  } catch(e) {
+    console.warn("Erreur Firestore:", e);
+  }
+
   if(demandes.length === 0){
     grid.innerHTML = "<p>Aucune demande pour le moment.</p>";
     return;
   }
+
   demandes.forEach(d => {
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
-      <h3>${d.type}</h3>
+      <h3>${d.type || "Recharge MonCash"}</h3>
       <p><strong>Nom complet :</strong> ${d.fullname}</p>
       <p><strong>Transaction ID / Transcode :</strong> ${d.transid}</p>
       <p><strong>Montant :</strong> ${d.amount} HTG</p>
@@ -195,8 +131,6 @@ function loadDemandes(){
     grid.appendChild(card);
   });
 }
-
-window.onload = loadDemandes;
 </script>
 
 </body>
