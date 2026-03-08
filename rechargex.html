@@ -234,6 +234,8 @@ Après le paiement, remplissez correctement les informations pour recevoir votre
 
 <script>
 
+let currentUserEmail=""; // nouvelle variable pour stocker email
+
 function toggleMenu(){
   document.getElementById("menuBlock").classList.toggle("show");
 }
@@ -250,7 +252,6 @@ function confirmRecharge(){
   const amount=document.getElementById("amount").value;
   const country=document.getElementById("country").value;
   const phone=document.getElementById("phone").value;
-  const account = JSON.parse(sessionStorage.getItem("dpstore_user")) || {};
 
   if(!fullname||!transid||!amount||!phone){
     alert("Remplis tous les champs");
@@ -262,7 +263,7 @@ function confirmRecharge(){
   cart.push({
     type:"Recharge MonCash",
     fullname,
-    email: account.email || "",
+    email:currentUserEmail, // ajouter automatiquement l'email
     transid,
     amount,
     phone:country+phone,
@@ -312,6 +313,9 @@ username:user.displayName||"Utilisateur",
 photo:user.photoURL||"https://via.placeholder.com/40",
 credits:0
 };
+
+// sauvegarde email pour utilisation dans confirmRecharge
+currentUserEmail=user.email;
 
 const snap=await getDocs(collection(db,"users"));
 
