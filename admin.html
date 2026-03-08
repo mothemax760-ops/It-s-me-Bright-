@@ -3,99 +3,92 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Profil — Bright Tup Up</title>
+<title>Admin — Bright Tup Up</title>
+
 <style>
-  body {
-    background: radial-gradient(circle at top left, #000 40%, #001a33 100%);
-    color: #e0f7ff;
-    font-family: "Poppins", sans-serif;
-    text-align:center;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-  }
-  .profile-box {
-    width:90%; max-width:420px;
-    background:rgba(5,10,20,0.95);
-    padding:25px;
-    border-radius:12px;
-    box-shadow:0 0 25px #00aaff, inset 0 0 15px #003355;
-    border:1px solid #00aaff;
-    position:relative;
-  }
-  #profile-pic {
-    width:120px; height:120px;
-    border-radius:50%;
-    border:3px solid #00ccff;
-    object-fit:cover;
-    box-shadow:0 0 15px #00aaff;
-    margin-bottom:15px;
-  }
-  h2 { color:#00ccff; margin:10px 0; text-shadow:0 0 15px #00aaff; }
-  h3 { color:#00aaff; }
-  p { margin:5px 0; }
-  .highlight { color:#00aaff; font-weight:bold; }
-  .yellow { color:yellow; font-size:18px; }
+body {
+  background: radial-gradient(circle at top left, #000 40%, #001a33 100%);
+  color: #e0f7ff;
+  font-family: "Poppins", sans-serif;
+  text-align:center;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
 
-  button {
-    padding:12px 20px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight:bold;
-    margin-top:10px;
-    background:linear-gradient(90deg,#00aaff,#004466);
-    color:#000;
-    box-shadow:0 0 12px #00aaff;
-    text-transform:uppercase;
-    transition: all 0.3s ease;
-  }
+.profile-box {
+  width:90%; max-width:420px;
+  background:rgba(5,10,20,0.95);
+  padding:25px;
+  border-radius:12px;
+  box-shadow:0 0 25px #00aaff, inset 0 0 15px #003355;
+  border:1px solid #00aaff;
+}
 
-  button:hover {
-    background:linear-gradient(90deg,#33bbff,#006699);
-    box-shadow:0 0 20px #33bbff;
-  }
+h2 { color:#00ccff; text-shadow:0 0 15px #00aaff; }
 
-  .red { background:red; color:white; }
+input {
+  padding:10px;
+  margin:6px;
+  width:90%;
+  border-radius:8px;
+  border:1px solid #00ccff;
+  background:#000;
+  color:#e0f7ff;
+}
+
+button {
+  padding:12px 20px;
+  border:none; border-radius:10px;
+  cursor:pointer; font-weight:bold;
+  margin-top:10px;
+  background:linear-gradient(90deg,#00aaff,#004466);
+  color:#000;
+  box-shadow:0 0 12px #00aaff;
+  text-transform:uppercase;
+}
+
+button:hover {
+  background:linear-gradient(90deg,#33bbff,#006699);
+  box-shadow:0 0 20px #33bbff;
+}
+
+.red{
+background:red;
+color:white;
+}
 </style>
-</head>
 
+</head>
 <body>
 
 <div class="profile-box">
 
-<img id="profile-pic" src="https://via.placeholder.com/120">
-<h2 id="username">Utilisateur</h2>
-<h3 id="dp-id"></h3>
-<p id="email"></p>
+<h2>Admin Panel 🔝🧑‍💻</h2>
 
-<p>
-Rôle :
-<span id="role" class="highlight"></span>
-</p>
+<input id="email" placeholder="Email utilisateur">
+<input id="amount" type="number" placeholder="Montant">
 
-<p class="yellow">
-💰 Solde : <span id="credits">0</span> crédits
-</p>
+<button onclick="addMoney()">Ajouter 💰</button>
+<button onclick="removeMoney()">Retirer 💸</button>
 
-<p>
-Dernière connexion :
-<span id="lastLogin"></span>
-</p>
+<br><br>
 
-<button onclick="logout()">❌ Déconnexion</button>
+<input id="newAdmin" placeholder="Email nouvel admin">
+<button onclick="addAdmin()">Ajouter Admin</button>
+
+<br><br>
+
+<button onclick="countUsers()">Nombre de comptes</button>
 
 <br>
 
-<button onclick="location.href='produits.html'">
-🛒 Produits
-</button>
+<button onclick="location.href='cmd.html'">CMD</button>
 
-<button id="admin-btn" style="display:none"
-onclick="location.href='admin.html'">
-Admin 🔝 🧑‍💻
-</button>
+<br>
+
+<button class="red" onclick="logout()">Déconnexion</button>
 
 </div>
 
@@ -103,179 +96,136 @@ Admin 🔝 🧑‍💻
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
-
-apiKey: "AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
-
-authDomain: "brighttupup.firebaseapp.com",
-
-projectId: "brighttupup",
-
-storageBucket: "brighttupup.appspot.com",
-
-messagingSenderId: "812394183947",
-
-appId: "1:812394183947:web:d65d60d6aeee39bcc3b60e"
-
+  apiKey: "AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
+  authDomain: "brighttupup.firebaseapp.com",
+  projectId: "brighttupup",
+  storageBucket: "brighttupup.appspot.com",
+  messagingSenderId: "812394183947",
+  appId: "1:812394183947:web:d65d60d6aeee39bcc3b60e"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-function updateRoleDisplay(account){
-
-const roleSpan = document.getElementById("role");
-const adminBtn = document.getElementById("admin-btn");
-
 const adminEmails = [
 "christopherantoine773@gmail.com"
 ];
 
-let isAdmin = false;
+let currentUser = null;
 
-if(
-adminEmails.includes(account.email.toLowerCase())
-|| account.role === "admin"
-|| localStorage.getItem("bright_admin") === account.email
-){
-isAdmin = true;
-}
-
-if(isAdmin){
-
-roleSpan.textContent = "Administrateur 🔝🧑‍💻";
-
-adminBtn.style.display = "inline-block";
-
-localStorage.setItem("bright_admin", account.email);
-
-}else{
-
-roleSpan.textContent = "Utilisateur";
-
-adminBtn.style.display = "none";
-
-}
-
-}
-
-onAuthStateChanged(auth, async (user)=>{
+onAuthStateChanged(auth, async(user)=>{
 
 if(!user){
-
-location.href = "index.html";
+location.href="index.html";
 return;
-
 }
 
-let account = {
+currentUser = user;
 
-email: user.email,
-
-username: user.displayName || "Utilisateur",
-
-photo: user.photoURL || "https://via.placeholder.com/120",
-
-role: "user",
-
-credits: 0,
-
-lastLogin: new Date().toLocaleString()
-
-};
-
-try{
-
-const usersSnap = await getDocs(collection(db,"users"));
-
-usersSnap.forEach(docSnap=>{
-
-const data = docSnap.data();
-
-if(
-data.email &&
-data.email.toLowerCase() === user.email.toLowerCase()
-){
-
-account = {
-
-email: data.email,
-
-username: data.username ?? account.username,
-
-dp: data.dp ?? "—",
-
-role: data.role ?? "user",
-
-credits: Number(data.credits ?? 0),
-
-photo: data.photo ?? account.photo,
-
-lastLogin: data.lastLogin ?? account.lastLogin
-
-};
-
+if(!adminEmails.includes(user.email.toLowerCase())){
+alert("Accès refusé");
+location.href="profil.html";
 }
 
 });
 
-}catch(e){
-
-console.warn(e);
-
-}
-
-sessionStorage.setItem(
-"dpstore_user",
-JSON.stringify(account)
-);
-
-document.getElementById("username").textContent = account.username;
-
-document.getElementById("email").textContent = account.email;
-
-document.getElementById("dp-id").textContent = account.dp || "";
-
-document.getElementById("credits").textContent = account.credits;
-
-document.getElementById("lastLogin").textContent = account.lastLogin;
-
-document.getElementById("profile-pic").src = account.photo;
-
-updateRoleDisplay(account);
-
-});
-
-function logout(){
-
+window.logout = function(){
 signOut(auth).then(()=>{
+location.href="index.html";
+});
+}
 
-sessionStorage.removeItem("dpstore_user");
+window.addMoney = async function(){
 
-location.href = "index.html";
+const email = document.getElementById("email").value.toLowerCase();
+const amount = Number(document.getElementById("amount").value);
+
+const users = await getDocs(collection(db,"users"));
+
+users.forEach(async(d)=>{
+
+const data = d.data();
+
+if(data.email.toLowerCase() === email){
+
+const ref = doc(db,"users",d.id);
+
+await updateDoc(ref,{
+credits:(Number(data.credits)||0)+amount
+});
+
+alert("Argent ajouté");
+
+}
 
 });
 
 }
 
-window.logout = logout;
+window.removeMoney = async function(){
 
-window.addEventListener("load", ()=>{
+const email = document.getElementById("email").value.toLowerCase();
+const amount = Number(document.getElementById("amount").value);
 
-const account = JSON.parse(
-sessionStorage.getItem("dpstore_user")
-) || {};
+const users = await getDocs(collection(db,"users"));
 
-if(account.email){
+users.forEach(async(d)=>{
 
-updateRoleDisplay(account);
+const data = d.data();
+
+if(data.email.toLowerCase() === email){
+
+const ref = doc(db,"users",d.id);
+
+await updateDoc(ref,{
+credits:Math.max(0,(Number(data.credits)||0)-amount)
+});
+
+alert("Argent retiré");
 
 }
 
 });
+
+}
+
+window.addAdmin = async function(){
+
+const email = document.getElementById("newAdmin").value.toLowerCase();
+
+const users = await getDocs(collection(db,"users"));
+
+users.forEach(async(d)=>{
+
+const data = d.data();
+
+if(data.email.toLowerCase() === email){
+
+const ref = doc(db,"users",d.id);
+
+await updateDoc(ref,{
+role:"admin"
+});
+
+alert("Admin ajouté");
+
+}
+
+});
+
+}
+
+window.countUsers = async function(){
+
+const users = await getDocs(collection(db,"users"));
+
+alert("Nombre de comptes : "+users.size);
+
+}
 
 </script>
 
