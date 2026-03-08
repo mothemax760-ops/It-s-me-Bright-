@@ -1,213 +1,281 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bright Admin</title>
-
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Profil — Bright Tup Up</title>
 <style>
-body{
-font-family:Poppins,sans-serif;
-background:radial-gradient(circle,#001a33,#000);
-color:#e0f7ff;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-margin:0;
-}
+  body {
+    background: radial-gradient(circle at top left, #000 40%, #001a33 100%);
+    color: #e0f7ff;
+    font-family: "Poppins", sans-serif;
+    text-align:center;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+  }
+  .profile-box {
+    width:90%; max-width:420px;
+    background:rgba(5,10,20,0.95);
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 0 25px #00aaff, inset 0 0 15px #003355;
+    border:1px solid #00aaff;
+    position:relative;
+  }
+  #profile-pic {
+    width:120px; height:120px;
+    border-radius:50%;
+    border:3px solid #00ccff;
+    object-fit:cover;
+    box-shadow:0 0 15px #00aaff;
+    margin-bottom:15px;
+  }
+  h2 { color:#00ccff; margin:10px 0; text-shadow:0 0 15px #00aaff; }
+  h3 { color:#00aaff; }
+  p { margin:5px 0; }
+  .highlight { color:#00aaff; font-weight:bold; }
+  .yellow { color:yellow; font-size:18px; }
 
-.panel{
-background:#020b18;
-padding:30px;
-border-radius:15px;
-box-shadow:0 0 25px #00ccff;
-text-align:center;
-width:350px;
-}
+  button {
+    padding:12px 20px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+    margin-top:10px;
+    background:linear-gradient(90deg,#00aaff,#004466);
+    color:#000;
+    box-shadow:0 0 12px #00aaff;
+    text-transform:uppercase;
+    transition: all 0.3s ease;
+  }
 
-h2{
-color:#00ccff;
-}
+  button:hover {
+    background:linear-gradient(90deg,#33bbff,#006699);
+    box-shadow:0 0 20px #33bbff;
+  }
 
-input{
-width:90%;
-padding:10px;
-margin:8px;
-border-radius:8px;
-border:none;
-outline:none;
-}
-
-button{
-padding:10px 18px;
-margin:6px;
-border:none;
-border-radius:8px;
-cursor:pointer;
-background:#00ccff;
-color:#000;
-font-weight:bold;
-}
-
-button:hover{
-background:#00e1ff;
-}
-
+  .red { background:red; color:white; }
 </style>
 </head>
 
 <body>
 
-<div class="panel">
+<div class="profile-box">
 
-<h2>Admin Panel 🔝🧑‍💻</h2>
+<img id="profile-pic" src="https://via.placeholder.com/120">
+<h2 id="username">Utilisateur</h2>
+<h3 id="dp-id"></h3>
+<p id="email"></p>
 
-<input id="email" placeholder="email utilisateur">
+<p>
+Rôle :
+<span id="role" class="highlight"></span>
+</p>
 
-<input id="amount" type="number" placeholder="montant">
+<p class="yellow">
+💰 Solde : <span id="credits">0</span> crédits
+</p>
+
+<p>
+Dernière connexion :
+<span id="lastLogin"></span>
+</p>
+
+<button onclick="logout()">❌ Déconnexion</button>
 
 <br>
 
-<button id="addMoney">Ajouter argent</button>
+<button onclick="location.href='produits.html'">
+🛒 Produits
+</button>
 
-<button id="removeMoney">Retirer argent</button>
-
-<br><br>
-
-<button id="countUsers">Nombre de comptes</button>
-
-<br><br>
-
-<button onclick="window.location='cmd.html'">Voir Commandes</button>
+<button id="admin-btn" style="display:none"
+onclick="location.href='admin.html'">
+Admin 🔝 🧑‍💻
+</button>
 
 </div>
 
-
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import { getFirestore, doc, updateDoc, getDocs, collection, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
+
 apiKey: "AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
+
 authDomain: "brighttupup.firebaseapp.com",
+
 projectId: "brighttupup",
+
 storageBucket: "brighttupup.appspot.com",
+
 messagingSenderId: "812394183947",
+
 appId: "1:812394183947:web:d65d60d6aeee39bcc3b60e"
+
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
+function updateRoleDisplay(account){
 
+const roleSpan = document.getElementById("role");
+const adminBtn = document.getElementById("admin-btn");
 
-/* verification admin */
+const adminEmails = [
+"christopherantoine773@gmail.com"
+];
 
-onAuthStateChanged(auth, async(user)=>{
+let isAdmin = false;
+
+if(
+adminEmails.includes(account.email.toLowerCase())
+|| account.role === "admin"
+|| localStorage.getItem("bright_admin") === account.email
+){
+isAdmin = true;
+}
+
+if(isAdmin){
+
+roleSpan.textContent = "Administrateur 🔝🧑‍💻";
+
+adminBtn.style.display = "inline-block";
+
+localStorage.setItem("bright_admin", account.email);
+
+}else{
+
+roleSpan.textContent = "Utilisateur";
+
+adminBtn.style.display = "none";
+
+}
+
+}
+
+onAuthStateChanged(auth, async (user)=>{
 
 if(!user){
 
-alert("connecte toi");
-
-location="login.html";
-
+location.href = "index.html";
 return;
 
 }
 
-const ref = doc(db,"users",user.uid);
+let account = {
 
-const snap = await getDoc(ref);
+email: user.email,
 
-if(!snap.exists() || snap.data().admin !== true){
+username: user.displayName || "Utilisateur",
 
-alert("Accès refusé");
+photo: user.photoURL || "https://via.placeholder.com/120",
 
-location="profil.html";
+role: "user",
+
+credits: 0,
+
+lastLogin: new Date().toLocaleString()
+
+};
+
+try{
+
+const usersSnap = await getDocs(collection(db,"users"));
+
+usersSnap.forEach(docSnap=>{
+
+const data = docSnap.data();
+
+if(
+data.email &&
+data.email.toLowerCase() === user.email.toLowerCase()
+){
+
+account = {
+
+email: data.email,
+
+username: data.username ?? account.username,
+
+dp: data.dp ?? "—",
+
+role: data.role ?? "user",
+
+credits: Number(data.credits ?? 0),
+
+photo: data.photo ?? account.photo,
+
+lastLogin: data.lastLogin ?? account.lastLogin
+
+};
 
 }
 
 });
 
+}catch(e){
 
-/* ajouter argent */
+console.warn(e);
 
-addMoney.onclick = async()=>{
+}
 
-const email = document.getElementById("email").value;
-const amount = Number(document.getElementById("amount").value);
+sessionStorage.setItem(
+"dpstore_user",
+JSON.stringify(account)
+);
 
-const users = await getDocs(collection(db,"users"));
+document.getElementById("username").textContent = account.username;
 
-users.forEach(async(u)=>{
+document.getElementById("email").textContent = account.email;
 
-if(u.data().email === email){
+document.getElementById("dp-id").textContent = account.dp || "";
 
-const current = u.data().money || 0;
+document.getElementById("credits").textContent = account.credits;
 
-await updateDoc(doc(db,"users",u.id),{
+document.getElementById("lastLogin").textContent = account.lastLogin;
 
-money: current + amount
+document.getElementById("profile-pic").src = account.photo;
+
+updateRoleDisplay(account);
 
 });
 
-alert("argent ajouté");
+function logout(){
+
+signOut(auth).then(()=>{
+
+sessionStorage.removeItem("dpstore_user");
+
+location.href = "index.html";
+
+});
+
+}
+
+window.logout = logout;
+
+window.addEventListener("load", ()=>{
+
+const account = JSON.parse(
+sessionStorage.getItem("dpstore_user")
+) || {};
+
+if(account.email){
+
+updateRoleDisplay(account);
 
 }
 
 });
-
-};
-
-
-
-/* retirer argent */
-
-removeMoney.onclick = async()=>{
-
-const email = document.getElementById("email").value;
-const amount = Number(document.getElementById("amount").value);
-
-const users = await getDocs(collection(db,"users"));
-
-users.forEach(async(u)=>{
-
-if(u.data().email === email){
-
-const current = u.data().money || 0;
-
-await updateDoc(doc(db,"users",u.id),{
-
-money: current - amount
-
-});
-
-alert("argent retiré");
-
-}
-
-});
-
-};
-
-
-
-/* nombre comptes */
-
-countUsers.onclick = async()=>{
-
-const users = await getDocs(collection(db,"users"));
-
-alert("Nombre comptes : " + users.size);
-
-};
 
 </script>
 
