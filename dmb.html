@@ -10,6 +10,7 @@ body { margin:0; font-family:'Poppins',sans-serif; background:#001a33; color:#e0
 header { background:rgba(5,10,20,0.95); padding:14px 22px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #00aaff; box-shadow:0 0 15px #00aaff; position:sticky; top:0; z-index:100; }
 header h1 { font-size:1.4rem; color:#00ccff; text-shadow:0 0 12px #00aaff; margin:0; font-weight:700; }
 .container { padding:20px; max-width:700px; margin:auto; }
+.section-title { margin:20px 0 10px 0; font-size:1.1rem; font-weight:700; color:#33ffcc; border-bottom:1px solid #00aaff; padding-bottom:5px; }
 .card { background:rgba(255,255,255,0.05); border:1px solid rgba(0,174,239,0.35); border-radius:15px; padding:15px; margin-bottom:15px; box-shadow:0 0 10px #00aaff44; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
 .card div { margin:5px 0; }
 .btn-confirm { background:#00ccff; color:#000; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; margin-left:5px; }
@@ -25,7 +26,13 @@ footer { text-align:center; padding:15px; background:rgba(0,0,0,0.6); border-top
   <h1>Dashboard Demandes 💳</h1>
 </header>
 
-<div class="container" id="requestsContainer"></div>
+<div class="container" id="requestsContainer">
+  <div class="section-title">🔹 Commandes non traitées</div>
+  <div id="pendingRequests"></div>
+
+  <div class="section-title">✅ Commandes traitées</div>
+  <div id="processedRequests"></div>
+</div>
 
 <footer>© 2026 Bright Tup Up</footer>
 
@@ -59,61 +66,16 @@ onAuthStateChanged(auth, async (user)=>{
 
 // Charger toutes les demandes
 async function loadRequests(){
-  const container = document.getElementById("requestsContainer");
-  container.innerHTML="";
-
-  let allRequests = [];
+  const pendingContainer = document.getElementById("pendingRequests");
+  const processedContainer = document.getElementById("processedRequests");
+  pendingContainer.innerHTML="";
+  processedContainer.innerHTML="";
 
   // 1️⃣ LocalStorage
   let localRequests = JSON.parse(localStorage.getItem("cart_recharge")) || [];
   localRequests.forEach((req,index)=>{
-    allRequests.push({
-      source:"local",
-      index:index,
-      ...req
-    });
-  });
-
-  // 2️⃣ Firestore
-  try{
-    const snap = await getDocs(collection(db,"users_requests"));
-    snap.forEach(docSnap=>{
-      const data = docSnap.data();
-      allRequests.push({
-        source:"firestore",
-        id:docSnap.id,
-        ...data
-      });
-    });
-  }catch(e){
-    console.warn("Erreur Firestore:", e);
-  }
-
-  // Trier : demandes en attente en haut
-  allRequests.sort((a,b)=>{
-    if(a.status==="En attente" && b.status!=="En attente") return -1;
-    if(a.status!=="En attente" && b.status==="En attente") return 1;
-    return 0;
-  });
-
-  // Affichage
-  allRequests.forEach(req=>{
     const card = document.createElement("div");
     card.className="card";
-    let actions = "";
-    if(req.status==="En attente"){
-      if(req.source==="local"){
-        actions = `
-          <button class="btn-confirm" onclick="updateLocalStatus(${req.index},'Confirmé',${req.amount},'${req.email || ""}')">✔ Confirmer</button>
-          <button class="btn-cancel" onclick="updateLocalStatus(${req.index},'Annulé')">✖ Annuler</button>
-        `;
-      }else{
-        actions = `
-          <button class="btn-confirm" onclick="updateFirestoreStatus('${req.id}','Confirmé',${req.amount},'${req.email || ""}')">✔ Confirmer</button>
-          <button class="btn-cancel" onclick="updateFirestoreStatus('${req.id}','Annulé')">✖ Annuler</button>
-        `;
-      }
-    }
     card.innerHTML=`
       <div>
         <b>${req.fullname}</b><br>
@@ -121,14 +83,44 @@ async function loadRequests(){
         ${req.phone}<br>
         Montant : ${req.amount}<br>
         ID : ${req.transid}<br>
-        Status : <span>${req.status || 'En attente'}</span>
+        Status : <span>${req.status}</span>
       </div>
       <div>
-        ${actions}
+        <button class="btn-confirm" onclick="updateLocalStatus(${index},'Confirmé',${req.amount},'${req.email || ""}')">✔ Confirmer</button>
+        <button class="btn-cancel" onclick="updateLocalStatus(${index},'Annulé')">✖ Annuler</button>
       </div>
     `;
-    container.appendChild(card);
+    if(req.status==="En attente") pendingContainer.appendChild(card);
+    else processedContainer.appendChild(card);
   });
+
+  // 2️⃣ Firestore
+  try{
+    const snap = await getDocs(collection(db,"users_requests"));
+    snap.forEach(docSnap=>{
+      const data = docSnap.data();
+      const card = document.createElement("div");
+      card.className="card";
+      card.innerHTML=`
+        <div>
+          <b>${data.fullname}</b><br>
+          Email : ${data.email || "—"}<br>
+          ${data.phone}<br>
+          Montant : ${data.amount}<br>
+          ID : ${data.transid}<br>
+          Status : <span>${data.status||'En attente'}</span>
+        </div>
+        <div>
+          <button class="btn-confirm" onclick="updateFirestoreStatus('${docSnap.id}','Confirmé',${data.amount},'${data.email || ""}')">✔ Confirmer</button>
+          <button class="btn-cancel" onclick="updateFirestoreStatus('${docSnap.id}','Annulé')">✖ Annuler</button>
+        </div>
+      `;
+      if(!data.status || data.status==="En attente") pendingContainer.appendChild(card);
+      else processedContainer.appendChild(card);
+    });
+  }catch(e){
+    console.warn("Erreur Firestore:", e);
+  }
 }
 
 // Mettre à jour localStorage + créditer
@@ -136,6 +128,7 @@ window.updateLocalStatus = async function(index,status,amount,email){
   let cart = JSON.parse(localStorage.getItem("cart_recharge")) || [];
   cart[index].status=status;
 
+  // Ajouter crédit si confirmé et email existant
   if(status==="Confirmé" && email){
     await creditUser(email,Number(amount));
   }
@@ -181,7 +174,6 @@ async function creditUser(email,amount){
     console.error("Erreur crédit :", e);
   }
 }
-
 </script>
 
 </body>
