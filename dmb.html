@@ -32,7 +32,7 @@ footer { text-align:center; padding:15px; background:rgba(0,0,0,0.6); border-top
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, query, where, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey:"AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
@@ -62,54 +62,59 @@ async function loadRequests(){
   const container = document.getElementById("requestsContainer");
   container.innerHTML="";
 
-  // 1️⃣ LocalStorage
   let localRequests = JSON.parse(localStorage.getItem("cart_recharge")) || [];
-  localRequests.forEach((req,index)=>{
+  let firestoreRequests = [];
+  try{
+    const snap = await getDocs(collection(db,"users_requests"));
+    snap.forEach(docSnap=>{
+      const data = docSnap.data();
+      firestoreRequests.push({...data, id:docSnap.id});
+    });
+  }catch(e){
+    console.warn("Erreur Firestore:", e);
+  }
+
+  // Combiner et trier : "En attente" en haut
+  let allRequests = [...localRequests.map(r=>({...r, source:'local'})), ...firestoreRequests.map(r=>({...r, source:'firestore'}))];
+  allRequests.sort((a,b)=>{
+    if(a.status==="En attente" && b.status!=="En attente") return -1;
+    if(a.status!=="En attente" && b.status==="En attente") return 1;
+    return 0;
+  });
+
+  allRequests.forEach((req,index)=>{
     const card = document.createElement("div");
     card.className="card";
-    card.innerHTML=`
+
+    const statusText = req.status || "En attente";
+
+    let btnsHtml = "";
+    if(req.source==="local"){
+      btnsHtml = `
+        <button class="btn-confirm" onclick="updateLocalStatus(${index},'Confirmé',${req.amount},'${req.email || ""}')">✔ Confirmer</button>
+        <button class="btn-cancel" onclick="updateLocalStatus(${index},'Annulé')">✖ Annuler</button>
+      `;
+    } else {
+      btnsHtml = `
+        <button class="btn-confirm" onclick="updateFirestoreStatus('${req.id}','Confirmé',${req.amount},'${req.email || ""}')">✔ Confirmer</button>
+        <button class="btn-cancel" onclick="updateFirestoreStatus('${req.id}','Annulé')">✖ Annuler</button>
+      `;
+    }
+
+    card.innerHTML = `
       <div>
         <b>${req.fullname}</b><br>
         Email : ${req.email || "—"}<br>
         ${req.phone}<br>
         Montant : ${req.amount}<br>
         ID : ${req.transid}<br>
-        Status : <span>${req.status}</span>
+        Status : <span>${statusText}</span>
       </div>
-      <div>
-        <button class="btn-confirm" onclick="updateLocalStatus(${index},'Confirmé',${req.amount},'${req.email || ""}')">✔ Confirmer</button>
-        <button class="btn-cancel" onclick="updateLocalStatus(${index},'Annulé')">✖ Annuler</button>
-      </div>
+      <div>${btnsHtml}</div>
     `;
+
     container.appendChild(card);
   });
-
-  // 2️⃣ Firestore
-  try{
-    const snap = await getDocs(collection(db,"users_requests"));
-    snap.forEach(docSnap=>{
-      const data = docSnap.data();
-      const card = document.createElement("div");
-      card.className="card";
-      card.innerHTML=`
-        <div>
-          <b>${data.fullname}</b><br>
-          Email : ${data.email || "—"}<br>
-          ${data.phone}<br>
-          Montant : ${data.amount}<br>
-          ID : ${data.transid}<br>
-          Status : <span>${data.status||'En attente'}</span>
-        </div>
-        <div>
-          <button class="btn-confirm" onclick="updateFirestoreStatus('${docSnap.id}','Confirmé',${data.amount},'${data.email || ""}')">✔ Confirmer</button>
-          <button class="btn-cancel" onclick="updateFirestoreStatus('${docSnap.id}','Annulé')">✖ Annuler</button>
-        </div>
-      `;
-      container.appendChild(card);
-    });
-  }catch(e){
-    console.warn("Erreur Firestore:", e);
-  }
 }
 
 // Mettre à jour localStorage + créditer
@@ -117,7 +122,6 @@ window.updateLocalStatus = async function(index,status,amount,email){
   let cart = JSON.parse(localStorage.getItem("cart_recharge")) || [];
   cart[index].status=status;
 
-  // Ajouter crédit si confirmé et email existant
   if(status==="Confirmé" && email){
     await creditUser(email,Number(amount));
   }
@@ -163,7 +167,6 @@ async function creditUser(email,amount){
     console.error("Erreur crédit :", e);
   }
 }
-
 </script>
 
 </body>
