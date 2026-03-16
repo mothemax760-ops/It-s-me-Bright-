@@ -58,7 +58,7 @@
 <body>
 
 <div class="profile-box">
-  <img id="profile-pic" src="https://via.placeholder.com/120" alt="Photo de profil"><br>
+  <img id="profile-pic" src="https://via.placeholder.com/120"><br>
   <h2 id="username">Utilisateur</h2>
   <h3 id="dp-id"></h3>
   <p id="email"></p>
@@ -69,15 +69,13 @@
   <button onclick="logout()">❌ Déconnexion</button>
   <br>
   <button onclick="location.href='produits.html'">🛒 Produits</button>
-  
-  <!-- Bouton Admin, visible uniquement pour admin -->
   <button id="admin-btn" style="display:none;" onclick="location.href='admin.html'">Admin 🔝 🧑‍💻</button>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
@@ -92,12 +90,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Fonction pour afficher rôle et bouton admin
 function updateRoleDisplay(account){
   const roleSpan = document.getElementById("role");
   const adminBtn = document.getElementById("admin-btn");
 
-  // Vérifier si l’utilisateur est admin par Firestore ou par email
   const adminEmails = ["christopherantoine773@gmail.com"];
   if(adminEmails.includes(account.email.toLowerCase()) || account.role === "admin"){
     roleSpan.textContent = "Administrateur 🔝🧑‍💻";
@@ -114,7 +110,6 @@ function updateRoleDisplay(account){
   }
 }
 
-// Vérifier l'état de connexion
 onAuthStateChanged(auth, async (user) => {
   if(!user) return location.href = "index.html";
 
@@ -157,9 +152,24 @@ onAuthStateChanged(auth, async (user) => {
   document.getElementById("profile-pic").src = account.photo;
 
   updateRoleDisplay(account);
+
+  // 🔥 AJOUT TEMPS RÉEL (NE CASSE RIEN)
+  onSnapshot(collection(db,"users"), (snapshot)=>{
+    snapshot.forEach(docSnap=>{
+      const data = docSnap.data();
+
+      if(data.email && data.email.toLowerCase() === user.email.toLowerCase()){
+        document.getElementById("credits").textContent = data.credits;
+
+        // 🔥 synchro session
+        account.credits = data.credits;
+        sessionStorage.setItem("dpstore_user", JSON.stringify(account));
+      }
+    });
+  });
+
 });
 
-// Déconnexion
 function logout(){
   signOut(auth).then(()=>{
     sessionStorage.removeItem("dpstore_user");
@@ -168,7 +178,6 @@ function logout(){
 }
 window.logout = logout;
 
-// Maintenir admin après rechargement
 window.addEventListener("load", ()=>{
   const account = JSON.parse(sessionStorage.getItem("dpstore_user")) || {};
   if(account.email) updateRoleDisplay(account);
