@@ -12,7 +12,6 @@ body{
   background:radial-gradient(circle at top,#001a33,#000);
   color:#e0f7ff;
 }
-
 header{
   display:flex;
   justify-content:space-between;
@@ -24,13 +23,11 @@ header{
   position:sticky;
   top:0;
 }
-
 .logo{
   font-size:1.3rem;
   font-weight:bold;
   color:#00ccff;
 }
-
 .top-btn{
   background:none;
   border:1px solid #00aaff;
@@ -40,16 +37,13 @@ header{
   cursor:pointer;
   font-weight:bold;
 }
-
 .top-btn:hover{
   background:#00aaff;
   color:#000;
 }
-
 .container{
   padding:20px;
 }
-
 .balance-box{
   background:rgba(0,170,255,0.1);
   border:1px solid #00aaff;
@@ -58,7 +52,6 @@ header{
   margin-bottom:20px;
   box-shadow:0 0 12px #00aaff55;
 }
-
 .cart-card{
   background:rgba(5,10,20,0.95);
   border:1px solid #00aaff33;
@@ -68,30 +61,25 @@ header{
   box-shadow:0 0 12px #00aaff22;
   transition:0.3s;
 }
-
 .cart-card:hover{
   transform:translateY(-3px);
   box-shadow:0 0 18px #00aaff88;
 }
-
 .product-name{
   font-weight:bold;
   font-size:1.1rem;
   color:#00ccff;
 }
-
 .price{
   font-weight:bold;
   margin-top:8px;
   color:#00ccff;
 }
-
 .status{
   margin-top:6px;
   font-size:0.85rem;
   color:#aaa;
 }
-
 .btn{
   margin-top:10px;
   padding:8px 14px;
@@ -100,18 +88,15 @@ header{
   cursor:pointer;
   font-weight:bold;
 }
-
 .validate-btn{
   background:#00c853;
   color:#000;
 }
-
 .remove-btn{
   background:red;
   color:#fff;
   margin-left:5px;
 }
-
 .total-box{
   margin-top:25px;
   padding:18px;
@@ -120,7 +105,6 @@ header{
   text-align:center;
   box-shadow:0 0 15px #00aaff;
 }
-
 .empty{
   text-align:center;
   margin-top:40px;
@@ -150,20 +134,19 @@ header{
 
 </div>
 
-<!-- FIREBASE -->
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* CONFIG FIREBASE */
+/* 🔥 CONFIG FIREBASE (IDENTIQUE AU PROFIL) */
 const firebaseConfig = {
-  apiKey: "API_KEY",
-  authDomain: "PROJECT.firebaseapp.com",
-  projectId: "PROJECT",
-  storageBucket: "PROJECT.appspot.com",
-  messagingSenderId: "XXXX",
-  appId: "XXXX"
+  apiKey: "AIzaSyCbQGaaTjyTxZTWNwRE5lTVkZsZbJyofgg",
+  authDomain: "brighttupup.firebaseapp.com",
+  projectId: "brighttupup",
+  storageBucket: "brighttupup.appspot.com",
+  messagingSenderId: "812394183947",
+  appId: "1:812394183947:web:d65d60d6aeee39bcc3b60e"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -177,7 +160,7 @@ if(!user.email){ window.location.href="index.html"; }
 
 if(user.credits === undefined) user.credits = 0;
 
-/* ================= PANIER SYSTEM ================= */
+/* ================= PANIER ================= */
 function normalizeId(str){
   return (str||"guest")
     .toLowerCase()
@@ -186,7 +169,6 @@ function normalizeId(str){
 }
 
 function getCartKey(){ return "cart_"+normalizeId(user.email); }
-
 function loadCart(){ return JSON.parse(localStorage.getItem(getCartKey())||"[]"); }
 function saveCart(cart){ localStorage.setItem(getCartKey(),JSON.stringify(cart)); }
 
@@ -246,27 +228,40 @@ window.validateOrder = async function(index){
     return;
   }
 
-  // 🔻 Déduction locale
   user.credits -= item.price;
-  sessionStorage.setItem("dpstore_user", JSON.stringify(user));
 
-  // 🔥 UPDATE FIRESTORE avec recherche par email (comme profil)
   try{
     const usersSnap = await getDocs(collection(db,"users"));
+
+    let found = false;
+
     for(const docSnap of usersSnap.docs){
       const data = docSnap.data();
+
       if(data.email && data.email.toLowerCase() === user.email.toLowerCase()){
-        await updateDoc(doc(db,"users",docSnap.id), { credits: user.credits });
-        break; // trouvé → stop
+
+        await updateDoc(doc(db,"users",docSnap.id), {
+          credits: user.credits
+        });
+
+        found = true;
+        break;
       }
     }
+
+    if(!found){
+      alert("Utilisateur non trouvé");
+      return;
+    }
+
+    sessionStorage.setItem("dpstore_user", JSON.stringify(user));
+
   }catch(e){
     console.error("Erreur Firebase :", e);
     alert("Erreur Firebase");
     return;
   }
 
-  // Mise à jour commande
   item.status="Payé";
   item.validatedDate=new Date().toLocaleString();
   item.email=user.email;
