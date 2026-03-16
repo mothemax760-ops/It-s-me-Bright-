@@ -69,6 +69,7 @@
   <button onclick="logout()">❌ Déconnexion</button>
   <br>
   <button onclick="location.href='produits.html'">🛒 Produits</button>
+  
   <button id="admin-btn" style="display:none;" onclick="location.href='admin.html'">Admin 🔝 🧑‍💻</button>
 </div>
 
@@ -153,17 +154,18 @@ onAuthStateChanged(auth, async (user) => {
 
   updateRoleDisplay(account);
 
-  // 🔥 AJOUT TEMPS RÉEL (NE CASSE RIEN)
+  /* 🔥 AJOUT TEMPS RÉEL (SANS CASSER TON CODE) */
   onSnapshot(collection(db,"users"), (snapshot)=>{
     snapshot.forEach(docSnap=>{
       const data = docSnap.data();
 
       if(data.email && data.email.toLowerCase() === user.email.toLowerCase()){
-        document.getElementById("credits").textContent = data.credits;
+        document.getElementById("credits").textContent = data.credits ?? 0;
 
-        // 🔥 synchro session
-        account.credits = data.credits;
-        sessionStorage.setItem("dpstore_user", JSON.stringify(account));
+        // update session aussi
+        let current = JSON.parse(sessionStorage.getItem("dpstore_user")) || {};
+        current.credits = data.credits ?? 0;
+        sessionStorage.setItem("dpstore_user", JSON.stringify(current));
       }
     });
   });
